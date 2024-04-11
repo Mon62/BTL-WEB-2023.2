@@ -84,6 +84,7 @@ export const registerUser = async (req, res, next) => {
 
 export const resetPassword = async (req, res, next) => {
   const email = req.body.email;
+  console.log(req.body);
   sendPasswordResetEmail(auth, email)
     .then(() => {
       res.status(200).json({
@@ -101,6 +102,7 @@ export const resetPassword = async (req, res, next) => {
 };
 
 export const login = async (req, res, next) => {
+  console.log(req.body);
   const email = req.body.email;
   const password = req.body.password;
   signInWithEmailAndPassword(auth, email, password)

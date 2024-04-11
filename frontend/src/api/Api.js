@@ -10,35 +10,33 @@ const headers = {
 };
 export const API_BASE_URL = local;
 
-class Api {
-  // API user
+// API user
 
-  registerUser(userData) {
-    return axios.post(API_BASE_URL + "/signup", userData, headers);
-  }
-
-  login(email, password) {
-    return axios.post(
-      API_BASE_URL + "/login",
-      {
-        email: email,
-        password: password,
-      },
-      headers
-    );
-  }
-
-  logout() {
-    return axios.get(API_BASE_URL + "/logout", headers);
-  }
-
-  resetPassword(email) {
-    return axios.get(
-      API_BASE_URL + "/password/reset",
-      { email: email },
-      headers
-    );
-  }
+export function registerUser(userData) {
+  return axios.post(API_BASE_URL + "/signup", userData, headers);
 }
 
-export default new Api();
+export function login(email, password) {
+  return axios.post(
+    API_BASE_URL + "/login",
+    {
+      email: email,
+      password: password,
+    },
+    headers
+  );
+}
+
+export function logout() {
+  return axios.get(API_BASE_URL + "/logout", headers);
+}
+
+export function resetPassword(email) {
+  return axios.post(
+    API_BASE_URL + "/password/reset",
+    {
+      email: email,
+    },
+    headers
+  );
+}

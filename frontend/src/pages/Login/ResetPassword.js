@@ -1,24 +1,30 @@
 import React, { useState } from "react";
 import { Container, Form, FormGroup, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../../api/Api.js";
+import { resetPassword } from "../../api/Api.js";
+import { useToast } from "@chakra-ui/react";
 
-export default function Login() {
+export default function ResetPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMessage("");
-    // Call API to login
-    login(email, password)
+    // Call API to reset password
+    resetPassword(email)
       .then((res) => {
-        navigate("/home");
+        toast({
+          title: "Email đã được gửi thành công.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
       })
       .catch((err) => {
-        console.log(err.response.data);
+        console.log(err);
         setErrorMessage(err.response.data.message);
       });
   };
@@ -34,9 +40,24 @@ export default function Login() {
       }}
     >
       <Form className="d-flex flex-column mb-2" onSubmit={handleSubmit}>
-        <h1 className="align-self-center" style={{ marginTop: "50px" }}>
-          Đăng nhập
-        </h1>
+        <p
+          className="align-self-center"
+          style={{ marginTop: "50px", fontWeight: "600", fontSize: "24px" }}
+        >
+          Bạn gặp sự cố khi đăng nhập?
+        </p>
+        <p
+          className="align-self-center mt-2"
+          style={{
+            marginTop: "50px",
+            fontWeight: "300",
+            justifyItems: "center",
+            textAlign: "center",
+          }}
+        >
+          Nhập email của bạn và chúng tôi sẽ gửi cho bạn một <br /> email chứa
+          liên kết để cập nhật lại mật khẩu.
+        </p>
         <FormGroup className="mb-2 mt-3" style={{ width: "400px" }}>
           <Form.Control
             type="email"
@@ -47,25 +68,16 @@ export default function Login() {
             style={{ height: "50px" }}
           />
         </FormGroup>
-        <FormGroup className="mb-3 mt-2">
-          <Form.Control
-            type="password"
-            placeholder="Mật khẩu"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ height: "50px" }}
-          />
-        </FormGroup>
+
         {errorMessage.length > 0 && (
           <p className="text-danger">{errorMessage}</p>
         )}
         <Button
           className="align-self-center mb-2 mt-2"
           type="submit"
-          style={{ width: "150px" }}
+          style={{ width: "400px" }}
         >
-          Đăng nhập
+          Gửi liên kết đăng nhập
         </Button>
         <div
           className="d-flex flex-row"
@@ -77,17 +89,18 @@ export default function Login() {
         </div>
         <Link
           className="align-self-center"
-          to="/password/reset"
+          to="/signup"
           style={{ textDecoration: "none" }}
         >
-          Quên mật khẩu?
+          Tạo tài khoản mới
         </Link>
-        <p className="align-self-center mt-2 mb-2">
-          Bạn chưa có tài khoản?{" "}
-          <Link to="/signup" style={{ textDecoration: "none" }}>
-            Đăng ký
-          </Link>
-        </p>
+        <Link
+          to="/login"
+          className="mt-2 align-self-center"
+          style={{ textDecoration: "none" }}
+        >
+          Quay lại trang đăng nhập
+        </Link>
       </Form>
     </Container>
   );
