@@ -17,10 +17,11 @@ export default function ResetPassword() {
     resetPassword(email)
       .then((res) => {
         toast({
-          title: "Email đã được gửi thành công.",
+          title: res.data.message,
           status: "success",
           duration: 3000,
           isClosable: true,
+          position: "top-right"
         });
       })
       .catch((err) => {
@@ -90,14 +91,14 @@ export default function ResetPassword() {
         <Link
           className="align-self-center"
           to="/signup"
-          style={{ textDecoration: "none" }}
+          style={{ textDecoration: "none", color: "blue" }}
         >
           Tạo tài khoản mới
         </Link>
         <Link
           to="/login"
           className="mt-2 align-self-center"
-          style={{ textDecoration: "none" }}
+          style={{ textDecoration: "none", color: "blue" }}
         >
           Quay lại trang đăng nhập
         </Link>

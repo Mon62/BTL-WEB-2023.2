@@ -78,13 +78,13 @@ export default function Login() {
         <Link
           className="align-self-center"
           to="/password/reset"
-          style={{ textDecoration: "none" }}
+          style={{ textDecoration: "none", color: "blue" }}
         >
           Quên mật khẩu?
         </Link>
         <p className="align-self-center mt-2 mb-2">
           Bạn chưa có tài khoản?{" "}
-          <Link to="/signup" style={{ textDecoration: "none" }}>
+          <Link to="/signup" style={{ textDecoration: "none", color: "blue" }}>
             Đăng ký
           </Link>
         </p>

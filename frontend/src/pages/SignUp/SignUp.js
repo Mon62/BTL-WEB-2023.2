@@ -64,7 +64,7 @@ const SignUp = () => {
           <div className="right-column-login text-center">
             <p>
               Bạn đã có tài khoản
-              <Link to="/login" style={{ textDecoration: "none" }}>
+              <Link to="/login" style={{ textDecoration: "none", color: "blue" }}>
                 {" "}
                 Đăng nhập
               </Link>
