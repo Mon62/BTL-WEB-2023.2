@@ -1,12 +1,11 @@
-import express from 'express';
+import express from "express";
+import { registerUser, resetPassword, login, logout } from "../controllers/UserController.js";
 
 const router = express.Router();
 
-// router.get('/signup/:id', (req, res) => {
-//      res.send("signup sucessfully" + req.params.id);
-// })
-router.get('*', (req, res) => {
-    res.send('Sorry, this is an invalid URL.');
-})
+router.post('/signup', registerUser);
+router.post('/login', login);
+router.get('/logout', logout);
+router.get('/password/reset', resetPassword);
 
 export default router;
