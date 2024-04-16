@@ -50,3 +50,12 @@ export function createPost(postData) {
     headers
   );
 }
+
+// storyData cần có các trường sau:caption, imageURL, musicURL, userId (createdBy)
+export function createStory(storyData) {
+  return axios.post(
+    API_BASE_URL + "/create-story", 
+    storyData, 
+    headers
+  );
+}
