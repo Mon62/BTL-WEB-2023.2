@@ -5,10 +5,13 @@ import Login from "./pages/Login/Login";
 import ResetPassword from "./pages/Login/ResetPassword";
 import SignUp from "./pages/SignUp/SignUp";
 import Home from "./pages/Home/Home";
+import PageLayout from "./layouts/PageLayout/PageLayout.js";
+
 
 function App() {
   return (
     <BrowserRouter>
+    <PageLayout>
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
@@ -20,6 +23,7 @@ function App() {
         </Route>
       </Routes>
       <ToastContainer hideProgressBar />
+      </PageLayout>
     </BrowserRouter>
   );
 }
