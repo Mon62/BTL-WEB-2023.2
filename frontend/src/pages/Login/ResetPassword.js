@@ -21,7 +21,7 @@ export default function ResetPassword() {
           status: "success",
           duration: 3000,
           isClosable: true,
-          position: "top-right"
+          position: "top-right",
         });
       })
       .catch((err) => {
@@ -59,7 +59,7 @@ export default function ResetPassword() {
           Nhập email của bạn và chúng tôi sẽ gửi cho bạn một <br /> email chứa
           liên kết để cập nhật lại mật khẩu.
         </p>
-        <FormGroup className="mb-2 mt-3" style={{ width: "400px" }}>
+        <FormGroup className="mb-2 mt-3 align-self-center" style={{ width: "400px" }}>
           <Form.Control
             type="email"
             placeholder="Địa chỉ email"
@@ -76,7 +76,7 @@ export default function ResetPassword() {
         <Button
           className="align-self-center mb-2 mt-2"
           type="submit"
-          style={{ width: "400px" }}
+          style={{ width: "400px", backgroundColor: "#4285F4" }}
         >
           Gửi liên kết đăng nhập
         </Button>
@@ -91,14 +91,14 @@ export default function ResetPassword() {
         <Link
           className="align-self-center"
           to="/signup"
-          style={{ textDecoration: "none", color: "blue" }}
+          style={{ textDecoration: "none", color: "#4285F4", fontWeight: 700 }}
         >
           Tạo tài khoản mới
         </Link>
         <Link
           to="/login"
           className="mt-2 align-self-center"
-          style={{ textDecoration: "none", color: "blue" }}
+          style={{ textDecoration: "none", color: "#4285F4", fontWeight: 700 }}
         >
           Quay lại trang đăng nhập
         </Link>
