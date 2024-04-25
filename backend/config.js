@@ -25,5 +25,6 @@ export default {
     storageBucket: STORAGE_BUCKET,
     messagingSenderId: MESSAGING_SENDER_ID,
     appId: APP_ID,
+    storageBucket: "btl-web-20232.appspot.com"
   },
 };

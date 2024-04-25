@@ -1,8 +1,8 @@
 class Post {
-  constructor(pid, caption, imgURL, likes, comments, createdAt, createdBy) {
+  constructor(pid, caption, imgURLs, likes, comments, createdAt, createdBy) {
     this.pid = pid;
     this.caption = caption;
-    this.imgURL = imgURL;
+    this.imgURLs = imgURLs;
     this.likes = likes;
     this.comments = comments;
     this.createdAt = createdAt;

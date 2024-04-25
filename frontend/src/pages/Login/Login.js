@@ -2,13 +2,29 @@ import React, { useState } from "react";
 import { Container, Form, FormGroup, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api/Api.js";
+import { GoogleButton } from "react-google-button";
+import { auth } from "../../firebase/firebase.js";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  const googleAuthProvider = new GoogleAuthProvider();
 
+  const signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleAuthProvider)
+        .then(() => {
+          navigate("/home");
+          console.log("first");
+        })
+        .catch((err) => console.log(err));
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -30,14 +46,15 @@ export default function Login() {
         width: "500px",
         marginTop: "200px",
         marginBottom: "200px",
-        maxHeight: "480px",
+        maxHeight: "520px",
+        // backgroundColor: "blue"
       }}
     >
       <Form className="d-flex flex-column mb-2" onSubmit={handleSubmit}>
         <h1 className="align-self-center" style={{ marginTop: "50px" }}>
           Đăng nhập
         </h1>
-        <FormGroup className="mb-2 mt-3" style={{ width: "400px" }}>
+        <FormGroup className="mb-2 mt-3">
           <Form.Control
             type="email"
             placeholder="Địa chỉ email"
@@ -63,7 +80,7 @@ export default function Login() {
         <Button
           className="align-self-center mb-2 mt-2"
           type="submit"
-          style={{ width: "150px" }}
+          style={{ width: "150px", backgroundColor: "#4285F4" }}
         >
           Đăng nhập
         </Button>
@@ -75,16 +92,26 @@ export default function Login() {
           <p style={{ fontSize: "15px" }}>Hoặc</p>
           <hr className="solid" style={{ width: 170 }}></hr>
         </div>
+        <div className="align-self-center mb-3">
+          <GoogleButton onClick={signInWithGoogle}></GoogleButton>
+        </div>
         <Link
           className="align-self-center"
           to="/password/reset"
-          style={{ textDecoration: "none", color: "blue" }}
+          style={{ textDecoration: "none", color: "#4285F4", fontWeight: 700 }}
         >
           Quên mật khẩu?
         </Link>
-        <p className="align-self-center mt-2 mb-2">
+        <p className="align-self-center mt-2 mb-4">
           Bạn chưa có tài khoản?{" "}
-          <Link to="/signup" style={{ textDecoration: "none", color: "blue" }}>
+          <Link
+            to="/signup"
+            style={{
+              textDecoration: "none",
+              color: "#4285F4",
+              fontWeight: 700,
+            }}
+          >
             Đăng ký
           </Link>
         </p>

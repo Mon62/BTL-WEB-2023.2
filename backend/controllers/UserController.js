@@ -4,27 +4,53 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
-  deleteUser,
   onAuthStateChanged,
 } from "firebase/auth";
-import { auth, db } from "../firebase.js";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { auth, db, storage } from "../firebase.js";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  getDocs,
+  where,
+  onSnapshot,
+  collection,
+  updateDoc,
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import multer from "multer";
 import userModel from "../models/UserModel.js";
+import { v4 } from "uuid";
 
+//POST /signup
 export const registerUser = async (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
   const username = req.body.username;
   const fullName = req.body.fullName;
 
-  createUserWithEmailAndPassword(auth, email, password)
+  // check if username already exists
+  const docRef = doc(db, "users", username);
+  await getDoc(docRef)
+    .then((doc) => {
+      if (doc.exists())
+        res.status(409).json({
+          status: "error",
+          message: "Tên người dùng đã tồn tại. Vui lòng chọn tên thay thế!",
+        });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ message: err.message });
+    });
+  if (res.statusCode > 200) return;
+
+  await createUserWithEmailAndPassword(auth, email, password)
     .then(async (userCredential) => {
       const user = userCredential.user;
 
       // set data for new user
-      const createdAt = Timestamp.fromDate(
-        new Date(user.metadata.creationTime)
-      );
       const userData = new userModel(
         user.uid,
         username,
@@ -32,13 +58,13 @@ export const registerUser = async (req, res, next) => {
         email,
         "",
         "",
-        createdAt,
+        Date.now(),
         [],
         [],
         []
       );
       await setDoc(
-        doc(db, "users", user.uid),
+        doc(db, "users", username),
         Object.assign({}, userData)
       ).catch((error) => {
         next(error);
@@ -55,8 +81,7 @@ export const registerUser = async (req, res, next) => {
       });
     })
     .catch(async (error) => {
-      console.log(auth.currentUser);
-
+      // console.log(auth.currentUser);
       const errorCode = error.code;
       if (errorCode === "auth/email-already-in-use")
         return res.status(409).json({
@@ -82,10 +107,11 @@ export const registerUser = async (req, res, next) => {
     });
 };
 
+//POST /login
 export const resetPassword = async (req, res, next) => {
   const email = req.body.email;
-  console.log(req.body);
-  sendPasswordResetEmail(auth, email)
+  // console.log(req.body);
+  await sendPasswordResetEmail(auth, email)
     .then(() => {
       res.status(200).json({
         status: "success",
@@ -94,6 +120,13 @@ export const resetPassword = async (req, res, next) => {
       });
     })
     .catch((error) => {
+      const errorCode = error.code;
+      if (errorCode === "auth/invalid-email") {
+        return res.status(400).json({
+          status: "error",
+          message: "Email không hợp lệ.",
+        });
+      }
       res.status(400).json({
         status: "error",
         message: error.message,
@@ -101,14 +134,17 @@ export const resetPassword = async (req, res, next) => {
     });
 };
 
+//POST /password/reset
 export const login = async (req, res, next) => {
   console.log(req.body);
   const email = req.body.email;
   const password = req.body.password;
-  signInWithEmailAndPassword(auth, email, password)
+  await signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // console.log(userCredential.user);
+      // console.log(auth.currentUser);
       const user = userCredential.user;
+      console.log(user);
       if (!user.emailVerified) {
         throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
         next();
@@ -139,8 +175,9 @@ export const login = async (req, res, next) => {
     });
 };
 
+//GET /logout
 export const logout = async (req, res) => {
-  signOut(auth)
+  await signOut(auth)
     .then(() => {
       res.status(200).json({
         status: "success",
@@ -153,4 +190,58 @@ export const logout = async (req, res) => {
         message: error.message,
       });
     });
+};
+
+//POST /account/edit
+export const updateProfile = async (req, res, next) => {
+  try {
+    const profilePic = req.file;
+    const fullName = req.body.fullName;
+    const biography = req.body.biography;
+    const username = req.body.username;
+    const onlyUpdateProfilePic = req.body.onlyUpdateProfilePic;
+    let profilePicURL;
+
+    //update profilePic in storage
+    if (profilePic != undefined) {
+      const imageRef = ref(
+        storage,
+        `profilePic/${username}/${profilePic.originalname + v4()}`
+      );
+      const metaData = {
+        contentType: profilePic.mimetype,
+      };
+
+      await uploadBytes(imageRef, profilePic.buffer, metaData).catch((err) => {
+        next(err);
+      });
+      await getDownloadURL(imageRef)
+        .then((url) => {
+          profilePicURL = url;
+        })
+        .catch((err) => next(err));
+    }
+
+    //update fullName, biography, profilePicURL in firestore
+    console.log(onlyUpdateProfilePic);
+    if (onlyUpdateProfilePic != "true") {
+      await updateDoc(doc(db, "users", username), {
+        fullName: fullName,
+        biography: biography,
+        profilePicURL: profilePicURL,
+      }).catch((err) => {
+        next(err);
+      });
+    }
+
+    res.status(200).json({
+      message: "Chỉnh sửa trang cá nhân thành công!",
+      name: profilePic.originalname,
+      type: profilePic.mimetype,
+      url: profilePicURL,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
 };
