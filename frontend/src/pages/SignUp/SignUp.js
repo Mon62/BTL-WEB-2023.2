@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Form, FormGroup, Button } from "react-bootstrap";
+import { Container, Form, FormGroup, Button, InputGroup } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import "./SignUp.css";
 //import instagramLogo from "../../assets/instagram_font.png";
@@ -7,6 +7,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../../api/Api.js";
 import {User} from "../../models/User.js"
 import { useToast } from "@chakra-ui/react";
+import { IconButton } from '@chakra-ui/react'
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+
 
 
 const SignUp = () => {
@@ -17,9 +20,18 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const navigate = useNavigate();
   const toast = useToast();
 
+  const VisiblePassword = () => {
+    setShowPassword(!showPassword)
+  }
+
+  const VisibleConfirmPassword = () => {
+    setShowConfirmPassword(!showConfirmPassword)
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
@@ -94,26 +106,29 @@ const SignUp = () => {
             style={{ height: "50px" }}
           />
         </FormGroup>
-        <FormGroup className="mb-1 mt-2">
+        <InputGroup className="mb-1 mt-2">
           <Form.Control
-            type="password"
+            type={showPassword ? 'text': 'password'}
             placeholder="Mật khẩu"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={{ height: "50px" }}
           />
-        </FormGroup>
-        <FormGroup className="mb-2 mt-2">
+          <IconButton icon={showPassword ? <ViewOffIcon />: <ViewIcon />} onClick={VisiblePassword}  color="black" colorScheme="gray" height={50}></IconButton>
+        </InputGroup>
+        <InputGroup className="mb-2 mt-2">
           <Form.Control
-            type="password"
+            type={showConfirmPassword ? "text":"password"}
             placeholder="Xác nhận mật khẩu"
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             style={{ height: "50px" }}
           />
-        </FormGroup>
+          <IconButton icon={showConfirmPassword ? <ViewOffIcon />: <ViewIcon />} onClick={VisibleConfirmPassword}  color="black" colorScheme="gray" height={50}></IconButton>
+
+        </InputGroup>
         {errorMessage.length > 0 && (
           <p className="text-danger">{errorMessage}</p>
         )}
