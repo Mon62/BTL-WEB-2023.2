@@ -42,7 +42,7 @@ export function resetPassword(email) {
 }
 
 
-// postData cần có các trường sau:caption, imageURL, userId (createdBy)
+// postData cần có các trường sau:caption, ảnh và video tải lên , username (createdBy)
 export function createPost(postData) {
   return axios.post(
     API_BASE_URL + "/create-post", 
