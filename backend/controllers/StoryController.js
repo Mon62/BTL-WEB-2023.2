@@ -1,25 +1,62 @@
 import { v4 as uuid } from 'uuid';
-import { db } from "../firebase.js";
-import { doc, setDoc, Timestamp } from "firebase/firestore";
+import { db, storage } from "../firebase.js";
+import {
+    doc,
+    setDoc,
+    getDoc,
+    query,
+    getDocs,
+    where,
+    onSnapshot,
+    collection,
+    updateDoc,
+    Timestamp,
+} from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import multer from "multer";
 import storyModel from "../models/StoryModel.js";
 
 export const createStory = async (req, res, next) => {
-    const userId = req.body.userId; //createdBy
+    const username = req.body.username; //createdBy
     const caption = req.body.caption;
-    const imageURL = req.body.imageURL;
-    const musicURL = req.body.musicURL;
-    
+    // const imageURL = req.body.imageURL;
+    // const musicURL = req.body.musicURL;
+    const media = req.file;
     const createdAt = Timestamp.now();
     const storyId = uuid();
 
+    const mediaRef = ref(
+        storage,
+        `story/${storyId}/${media.originalname + uuid()}`
+    );
+    const metaData = {
+        contentType: media.mimetype,
+    };
+    await uploadBytes(mediaRef, media.buffer, metaData)
+        .then((snapshot) => {
+            console.log("Uploaded a blob or file!");
+        })
+        .catch((error) => {
+            console.error(error);
+            next(error);
+        });
+    const mediaURL = await getDownloadURL(mediaRef)
+        .then((url) => {
+            console.log("File available at", url);
+            return url;
+        })
+        .catch((error) => {
+            console.error(error);
+            next(error);
+        });
     const storyData = {
         storyId: storyId,
         caption: caption,
-        imgURL: imageURL,
-        musicURL: musicURL,
+        mediaURL: mediaURL,
         likes: [],
         createdAt: createdAt,
-        createdBy: userId,
+        createdBy: username,
+        timelive: 24, //hours
     };
     await setDoc(
         doc(db, "stories", storyId),

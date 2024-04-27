@@ -1,7 +1,11 @@
 import express from 'express';
 import { createStory } from '../controllers/StoryController.js';
-const router = express.Router();
+import multer from "multer";
 
-router.post('/create-story', createStory);
+const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
+
+
+router.post('/create-story', upload.single('media'),createStory);
 
 export default router;

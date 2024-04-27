@@ -42,7 +42,7 @@ export function resetPassword(email) {
 }
 
 
-// postData cần có các trường sau:caption, ảnh và video tải lên , username (createdBy)
+// postData cần có các trường sau:caption, ảnh và video tải lên (tối đa 10), username (createdBy)
 export function createPost(postData) {
   return axios.post(
     API_BASE_URL + "/create-post", 
@@ -51,7 +51,7 @@ export function createPost(postData) {
   );
 }
 
-// storyData cần có các trường sau:caption, imageURL, musicURL, userId (createdBy)
+// storyData cần có các trường sau:caption, media (ảnh hoặc video tải lên) chỉ 1, username (createdBy)
 export function createStory(storyData) {
   return axios.post(
     API_BASE_URL + "/create-story", 
