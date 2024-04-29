@@ -250,7 +250,9 @@ export const getProfileByUsername = async (req, res, next) => {
     // console.log(q);
     const querySnapshot = await getDocs(q).catch((err) => next(err));
     if (querySnapshot.empty) {
-      return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+      return res
+        .status(400)
+        .json({ message: "Không tồn tại người dùng " + username });
     }
     querySnapshot.forEach((doc) => {
       return res.status(200).json({ message: "success", data: doc.data() });
@@ -260,3 +262,80 @@ export const getProfileByUsername = async (req, res, next) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+//POST /follow
+export const followUser = (req, res, next) => {
+  try {
+    const username = req.body.username;
+    const followingUsername = req.body.followingUsername;
+    const usernameRef = doc(db, "users", username);
+    const followingUsernameRef = doc(db, "users", followingUsername);
+
+    // update followers of username in firestore
+    getDoc(usernameRef)
+      .then((user) => {
+        let followingUsers = user.data().followingUsers;
+        let newFollowingUsers = [...followingUsers, followingUsername];
+        updateDoc(usernameRef, { followingUsers: newFollowingUsers }).catch(
+          (err) => next(err)
+        );
+      })
+      .catch((error) => next(error));
+
+    // update followingUsers of followingUsername in firestore
+    getDoc(followingUsernameRef)
+      .then((user) => {
+        let followers = user.data().followers;
+        let newFollowers = [...followers, username];
+        updateDoc(followingUsernameRef, { followers: newFollowers }).catch((err) =>
+          next(err)
+        );
+      })
+      .catch((error) => next(error));
+
+    res.status(200).json({
+      message: "Theo dõi người dùng " + followingUsername + " thành công.",
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+//POST /unfollow
+export const unfollowUser = (req, res, next) => {
+  try {
+    const username = req.body.username;
+    const followingUsername = req.body.followingUsername;
+    const usernameRef = doc(db, "users", username);
+    const followingUsernameRef = doc(db, "users", followingUsername);
+
+    // update followers of username in firestore
+    getDoc(usernameRef)
+      .then((user) => {
+        let followingUsers = user.data().followingUsers;
+        let newFollowingUsers = followingUsers.filter(user => user != followingUsername);
+        updateDoc(usernameRef, { followingUsers: newFollowingUsers }).catch(
+          (err) => next(err)
+        );
+      })
+      .catch((error) => next(error));
+
+    // update followingUsers of followingUsername in firestore
+    getDoc(followingUsernameRef)
+      .then((user) => {
+        let followers = user.data().followers;
+        let newFollowers = followers.filter(user => user != username);
+        updateDoc(followingUsernameRef, { followers: newFollowers }).catch((err) =>
+          next(err)
+        );
+      })
+      .catch((error) => next(error));
+
+    res.status(200).json({
+      message: "Hủy theo dõi người dùng " + followingUsername + " thành công.",
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+

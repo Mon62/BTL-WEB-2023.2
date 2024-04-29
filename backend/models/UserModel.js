@@ -8,7 +8,7 @@ class User {
     biography,
     createdAt,
     followers,
-    following,
+    followingUsers,
     posts,
     stories
   ) {
@@ -20,7 +20,7 @@ class User {
     this.biography = biography;
     this.createdAt = createdAt;
     this.followers = followers;
-    this.following = following;
+    this.followingUsers = followingUsers;
     this.posts = posts;
     this.stories = stories;
   }

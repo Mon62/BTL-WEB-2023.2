@@ -5,7 +5,9 @@ import {
   login,
   logout,
   updateProfile,
-  getProfileByUsername
+  getProfileByUsername,
+  followUser,
+  unfollowUser
 } from "../controllers/UserController.js";
 import multer from "multer";
 
@@ -18,5 +20,7 @@ router.get("/logout", upload.none(), logout);
 router.post("/password/reset", upload.none(), resetPassword);
 router.post("/account/edit", upload.single("profilePic"), updateProfile);
 router.get("/profile/:username", upload.none(), getProfileByUsername);
+router.post("/follow", upload.none(), followUser);
+router.post("/unfollow", upload.none(), unfollowUser);
 
 export default router;
