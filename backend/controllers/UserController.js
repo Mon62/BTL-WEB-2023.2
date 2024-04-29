@@ -19,7 +19,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import multer from "multer";
 import userModel from "../models/UserModel.js";
 import { v4 } from "uuid";
 
@@ -59,6 +58,7 @@ export const registerUser = async (req, res, next) => {
         "",
         "",
         Date.now(),
+        [],
         [],
         [],
         []
@@ -199,7 +199,6 @@ export const updateProfile = async (req, res, next) => {
     const fullName = req.body.fullName;
     const biography = req.body.biography;
     const username = req.body.username;
-    const onlyUpdateProfilePic = req.body.onlyUpdateProfilePic;
     let profilePicURL;
 
     //update profilePic in storage
@@ -223,16 +222,13 @@ export const updateProfile = async (req, res, next) => {
     }
 
     //update fullName, biography, profilePicURL in firestore
-    console.log(onlyUpdateProfilePic);
-    if (onlyUpdateProfilePic != "true") {
-      await updateDoc(doc(db, "users", username), {
-        fullName: fullName,
-        biography: biography,
-        profilePicURL: profilePicURL,
-      }).catch((err) => {
-        next(err);
-      });
-    }
+    await updateDoc(doc(db, "users", username), {
+      fullName: fullName,
+      biography: biography,
+      profilePicURL: profilePicURL,
+    }).catch((err) => {
+      next(err);
+    });
 
     res.status(200).json({
       message: "Chỉnh sửa trang cá nhân thành công!",
@@ -242,6 +238,25 @@ export const updateProfile = async (req, res, next) => {
     });
   } catch (error) {
     console.log(error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+//GET /profile/:username
+export const getProfileByUsername = async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const q = query(collection(db, "users"), where("username", "==", username));
+    // console.log(q);
+    const querySnapshot = await getDocs(q).catch((err) => next(err));
+    if (querySnapshot.empty) {
+      return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+    }
+    querySnapshot.forEach((doc) => {
+      return res.status(200).json({ message: "success", data: doc.data() });
+      // console.log(doc.data());
+    });
+  } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };

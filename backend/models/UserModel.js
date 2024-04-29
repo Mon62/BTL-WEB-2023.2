@@ -9,7 +9,8 @@ class User {
     createdAt,
     followers,
     following,
-    posts
+    posts,
+    stories
   ) {
     this.uid = uid;
     this.username = username;
@@ -21,6 +22,7 @@ class User {
     this.followers = followers;
     this.following = following;
     this.posts = posts;
+    this.stories = stories;
   }
 }
 
