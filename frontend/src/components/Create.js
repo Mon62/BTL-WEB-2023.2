@@ -35,7 +35,7 @@ const Create = () => {
                 <Modal isOpen={isOpen} onClose={onClose} isCentered={true}>
                     <ModalOverlay />
                     <ModalContent>
-                        <ModalHeader>Create new post</ModalHeader>
+                        <ModalHeader style={{textAlign: "center", width: "100%"}}>Create new post</ModalHeader>
                         <ModalCloseButton />
                         <ModalBody>
                         <Input type={"file"}></Input>
