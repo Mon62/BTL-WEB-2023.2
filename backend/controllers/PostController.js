@@ -114,3 +114,47 @@ try {
 //         data: posts,
 //     });
 // }  
+
+// export const getPostByUsername = async (req, res, next) => {
+//     try {
+//         const username = req.params.username;
+//         const q = query(collection(db, "posts"), where("createdBy", "==", username));
+//         const querySnapshot = await getDocs(q).catch((err) => next(err));
+//         if (querySnapshot.empty) {
+//             return res
+//                 .status(400)
+//                 .json({ message: "Không tồn tại người dùng " + username });
+//         }
+//         const posts = [];
+//         querySnapshot.forEach((doc) => {
+//             posts.push(doc.data());
+//         });
+//         return res.status(200).json({ message: "success", data: posts });
+//     }
+//     catch (error) {
+//         res.status(400).json({ message: error.message });
+//     }
+// }
+
+export const getPostByUsername = async (req, res, next) => {
+    try {
+        const username = req.params.username;
+        const userSnapshot = await getDoc(doc(db, "users", username));
+        if (!userSnapshot.exists()) {
+            return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+        }
+        const q = query(collection(db, "posts"), where("createdBy", "==", username));
+        const querySnapshot = await getDocs(q).catch((err) => next(err));
+        if (querySnapshot.empty) {
+            return res.status(400).json({ message: "Người dùng " + username + " không có bài viết nào" });
+        }
+        const posts = [];
+        querySnapshot.forEach((doc) => {
+            posts.push(doc.data());
+        });
+        return res.status(200).json({ message: "success", data: posts });
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}

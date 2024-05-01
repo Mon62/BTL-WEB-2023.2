@@ -59,3 +59,11 @@ export function createStory(storyData) {
     headers
   );
 }
+// API get posts and stories
+export function getPostsByUsername(username) {
+  return axios.get(API_BASE_URL + "/posts/" + username, headers);
+}
+
+export function getStoriesByUsername(username) {
+  return axios.get(API_BASE_URL + "/stories/" + username, headers);
+}

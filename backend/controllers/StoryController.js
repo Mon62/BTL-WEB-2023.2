@@ -72,7 +72,7 @@ export const createStory = async (req, res, next) => {
     //         next(error);
     //     });
     // console.log(storyData);
-    
+
     try {
         await setDoc(doc(db, "stories", storyId), storyData);
         await updateDoc(doc(db, "users", username), {
@@ -86,6 +86,28 @@ export const createStory = async (req, res, next) => {
         console.error(error);
         return next(error);
     }
-        console.log(storyData);
+    console.log(storyData);
+}
+
+export const getStoryByUsername = async (req, res, next) => {
+    try {
+        const username = req.params.username;
+        const userSnapshot = await getDoc(doc(db, "users", username));
+        if (!userSnapshot.exists()) {
+            return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+        }
+        const q = query(collection(db, "stories"), where("createdBy", "==", username));
+        const querySnapshot = await getDocs(q).catch((err) => next(err));
+        if (querySnapshot.empty) {
+            return res.status(400).json({ message: "Người dùng " + username + " không có story nào" });
+        }
+        const stories = [];
+        querySnapshot.forEach((doc) => {
+            stories.push(doc.data());
+        });
+        return res.status(200).json({ message: "success", data: stories });
     }
-// }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}

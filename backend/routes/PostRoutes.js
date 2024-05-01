@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost} from '../controllers/PostController.js';
+import { createPost, getPostByUsername} from '../controllers/PostController.js';
 import multer from 'multer';
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -9,7 +9,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // })
 
 router.post('/create-post', upload.array('file', 10) ,createPost);
-// router.get('posts/:username', getPostsOfUser);
+router.get('/posts/:username', getPostByUsername);
 
 
 export default router;
