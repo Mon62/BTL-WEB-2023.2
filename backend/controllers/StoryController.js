@@ -11,6 +11,7 @@ import {
     collection,
     updateDoc,
     Timestamp,
+    arrayUnion,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import multer from "multer";
@@ -58,17 +59,33 @@ export const createStory = async (req, res, next) => {
         createdBy: username,
         timelive: 24, //hours
     };
-    await setDoc(
-        doc(db, "stories", storyId),
-        Object.assign({}, storyData))
-        .then(() => {
-            res.status(200).json({
-                status: "success",
-                message: "Đăng story thành công!",
-            });
-        })
-        .catch((error) => {
-            next(error);
+    // await setDoc(
+    //     doc(db, "stories", storyId),
+    //     Object.assign({}, storyData))
+    //     .then(() => {
+    //         res.status(200).json({
+    //             status: "success",
+    //             message: "Đăng story thành công!",
+    //         });
+    //     })
+    //     .catch((error) => {
+    //         next(error);
+    //     });
+    // console.log(storyData);
+    
+    try {
+        await setDoc(doc(db, "stories", storyId), storyData);
+        await updateDoc(doc(db, "users", username), {
+            stories: arrayUnion(storyId),
         });
-    console.log(storyData);
-}
+        res.status(200).json({
+            status: "success",
+            message: "Đăng bài viết thành công!",
+        });
+    } catch (error) {
+        console.error(error);
+        return next(error);
+    }
+        console.log(storyData);
+    }
+// }
