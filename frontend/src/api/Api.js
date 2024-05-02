@@ -67,3 +67,24 @@ export function getPostsByUsername(username) {
 export function getStoriesByUsername(username) {
   return axios.get(API_BASE_URL + "/stories/" + username, headers);
 }
+
+// API highlight
+export function addToHighlight(highlightData) {
+  return axios.post(
+    API_BASE_URL + "/highlights/add-to-highlights", 
+    highlightData, 
+    headers
+  );
+}
+
+export function deleteStoriesFromHighlight(highlightData) {
+  return axios.post(
+    API_BASE_URL + "/highlights/delete", 
+    highlightData, 
+    headers
+  );
+}
+function getHighlightsByUsername(username) {
+  return axios.get(API_BASE_URL + "/highlights/" + username, headers);
+}
+

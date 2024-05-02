@@ -91,50 +91,6 @@ try {
 }
 
 
-// export const getPostsOfUser = async (req, res, next) => {
-//     const username = req.params.username;
-//     const userSnapshot = await getDoc(doc(db, "users", username));
-//     if (!userSnapshot.exists()) {
-//         return res.status(404).json({
-//             status: "error",
-//             message: "Người dùng không tồn tại!",
-//         });
-//     }
-//     const user = userSnapshot.data();
-//     const posts = [];
-//     for (let i = 0; i < user.posts.length; i++) {
-//         const postSnapshot = await getDoc(doc(db, "posts", user.posts[i]));
-//         if (postSnapshot.exists()) {
-//             posts.push(postSnapshot.data());
-//         }
-//     }
-//     res.status(200).json({
-//         status: "success",
-//         message: "Lấy bài viết thành công!",
-//         data: posts,
-//     });
-// }  
-
-// export const getPostByUsername = async (req, res, next) => {
-//     try {
-//         const username = req.params.username;
-//         const q = query(collection(db, "posts"), where("createdBy", "==", username));
-//         const querySnapshot = await getDocs(q).catch((err) => next(err));
-//         if (querySnapshot.empty) {
-//             return res
-//                 .status(400)
-//                 .json({ message: "Không tồn tại người dùng " + username });
-//         }
-//         const posts = [];
-//         querySnapshot.forEach((doc) => {
-//             posts.push(doc.data());
-//         });
-//         return res.status(200).json({ message: "success", data: posts });
-//     }
-//     catch (error) {
-//         res.status(400).json({ message: error.message });
-//     }
-// }
 
 export const getPostByUsername = async (req, res, next) => {
     try {

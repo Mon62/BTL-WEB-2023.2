@@ -12,6 +12,7 @@ import {
     updateDoc,
     Timestamp,
     arrayUnion,
+    arrayRemove,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import multer from "multer";
@@ -20,12 +21,10 @@ import storyModel from "../models/StoryModel.js";
 export const createStory = async (req, res, next) => {
     const username = req.body.username; //createdBy
     const caption = req.body.caption;
-    // const imageURL = req.body.imageURL;
-    // const musicURL = req.body.musicURL;
     const media = req.file;
     const createdAt = Timestamp.now();
     const storyId = uuid();
-
+    const endAt = Timestamp.fromMillis(createdAt.toMillis() + 24 * 60 * 60 * 1000); // 24 hours
     const mediaRef = ref(
         storage,
         `story/${storyId}/${media.originalname + uuid()}`
@@ -57,22 +56,8 @@ export const createStory = async (req, res, next) => {
         likes: [],
         createdAt: createdAt,
         createdBy: username,
-        timelive: 24, //hours
+        endAt: endAt, 
     };
-    // await setDoc(
-    //     doc(db, "stories", storyId),
-    //     Object.assign({}, storyData))
-    //     .then(() => {
-    //         res.status(200).json({
-    //             status: "success",
-    //             message: "Đăng story thành công!",
-    //         });
-    //     })
-    //     .catch((error) => {
-    //         next(error);
-    //     });
-    // console.log(storyData);
-
     try {
         await setDoc(doc(db, "stories", storyId), storyData);
         await updateDoc(doc(db, "users", username), {
@@ -80,7 +65,7 @@ export const createStory = async (req, res, next) => {
         });
         res.status(200).json({
             status: "success",
-            message: "Đăng bài viết thành công!",
+            message: "Đăng Story thành công!",
         });
     } catch (error) {
         console.error(error);
@@ -111,3 +96,68 @@ export const getStoryByUsername = async (req, res, next) => {
         res.status(400).json({ message: error.message });
     }
 }
+
+export const addToHighlight = async (req, res, next) => {
+    try {
+        const { storyIds, username } = req.body;
+        const userRef = doc(db, "users", username);
+        const userSnapshot = await getDoc(userRef);
+        if (!userSnapshot.exists()) {
+            return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+        }
+        await updateDoc(userRef, {
+            highlights: arrayUnion(...storyIds),
+        });
+        return res.status(200).json({
+            status: "success",
+            message: "Thêm vào highlight thành công!",
+        });
+    } catch (error) {
+        console.error(error);
+        return next(error);
+    }
+}
+
+export const getHighlightByUsername = async (req, res, next) => {
+    try {
+        const username = req.params.username;
+        const userSnapshot = await getDoc(doc(db, "users", username));
+        if (!userSnapshot.exists()) {
+            return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+        }
+        const userData = userSnapshot.data();
+        const highlights = userData.highlights || [];
+        const highlightStories = [];
+        for (let i = 0; i < highlights.length; i++) {
+            const storySnapshot = await getDoc(doc(db, "stories", highlights[i]));
+            if (storySnapshot.exists()) {
+                highlightStories.push(storySnapshot.data());
+            }
+        }
+        return res.status(200).json({ message: "success", data: highlightStories });
+    } catch (error) {
+        console.error(error);
+        return next(error);
+    }
+}
+
+export const deleteStoriesFromHighlight = async (req, res, next) => {
+    try {
+      const { storyIds, username } = req.body;
+      const userRef = doc(db, "users", username);
+      const userSnapshot = await getDoc(userRef);
+      if (!userSnapshot.exists()) {
+        return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+      }
+      await updateDoc(userRef, {
+        highlights: arrayRemove(...storyIds),
+      });
+      return res.status(200).json({
+        status: "success",
+        message: "Xóa khỏi highlight thành công!",
+      });
+    } catch (error) {
+      console.error(error);
+      return next(error);
+    }
+  }
