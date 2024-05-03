@@ -135,6 +135,7 @@ export const getPostByUsername = async (req, res, next) => {
 }
 
 
+
 // export const getNewPostsByUsername = async (req, res, next) => {
 //     try {
 //         const username = req.params.username;
@@ -150,11 +151,8 @@ export const getPostByUsername = async (req, res, next) => {
 //             const postSnapshot = await getDoc(doc(db, "posts", postId));
 //             if (postSnapshot.exists()) {
 //                 const post = postSnapshot.data();
-//                 // Assuming post.createdAt is a timestamp in milliseconds
-//                 console.log(post.createdAt);
-//                 console.log(currentTime);
 //                 if (currentTime - post.createdAt.toMillis() <= 3*24 * 60 * 60 * 1000) { // 3 days
-//                     validPosts.push(postId);
+//                     validPosts.push(post); // push the post object instead of postId
 //                 }
 //             }
 //         });
@@ -164,6 +162,8 @@ export const getPostByUsername = async (req, res, next) => {
 //         res.status(400).json({ message: error.message });
 //     }
 // }
+
+
 
 export const getNewPostsByUsername = async (req, res, next) => {
     try {
@@ -175,17 +175,20 @@ export const getNewPostsByUsername = async (req, res, next) => {
         const user = userSnapshot.data();
         const newPosts = user.newPosts;
         const validPosts = [];
-        const currentTime = Date.now();
         const postPromises = newPosts.map(async (postId) => {
             const postSnapshot = await getDoc(doc(db, "posts", postId));
             if (postSnapshot.exists()) {
                 const post = postSnapshot.data();
-                if (currentTime - post.createdAt.toMillis() <= 3*24 * 60 * 60 * 1000) { // 3 days
-                    validPosts.push(post); // push the post object instead of postId
-                }
+                validPosts.push(post); // push the post object instead of postId
             }
         });
         await Promise.all(postPromises);
+
+        // Clear newPosts
+        await updateDoc(doc(db, "users", username), {
+            newPosts: [],
+        });
+        console.log(newPosts)
         return res.status(200).json({ message: "success", data: validPosts });
     } catch (error) {
         res.status(400).json({ message: error.message });
