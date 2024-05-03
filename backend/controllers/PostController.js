@@ -28,7 +28,7 @@ export const createPost = async (req, res, next) => {
     const pid = uuid();
     let imgURLs = [];
 
-// Kiểm tra sự tồn tại của người dùng
+    // Kiểm tra sự tồn tại của người dùng
     const userSnapshot = await getDoc(doc(db, "users", username));
     if (!userSnapshot.exists()) {
         return res.status(404).json({
@@ -74,19 +74,38 @@ export const createPost = async (req, res, next) => {
         createdBy: username,
     };
 
-try {
-    await setDoc(doc(db, "posts", pid), postData);
-    await updateDoc(doc(db, "users", username), {
-        posts: arrayUnion(pid),
-    });
-    res.status(200).json({
-        status: "success",
-        message: "Đăng bài viết thành công!",
-    });
-} catch (error) {
-    console.error(error);
-    return next(error);
-}
+
+
+    try {
+        await setDoc(doc(db, "posts", pid), postData);
+        await updateDoc(doc(db, "users", username), {
+            posts: arrayUnion(pid),
+        });
+
+        //Update Post to newPosts of followers
+        //Update Post to newPosts of followers
+        const userRef = doc(db, 'users', username);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+            const user = userSnap.data();
+            const followers = user.followers;
+            const updatePromises = followers.map(follower => {
+                const followerRef = doc(db, 'users', follower);
+                return updateDoc(followerRef, {
+                    newPosts: arrayUnion(pid)
+                });
+            });
+            await Promise.all(updatePromises);
+        }
+
+        res.status(200).json({
+            status: "success",
+            message: "Đăng bài viết thành công!",
+        });
+    } catch (error) {
+        console.error(error);
+        return next(error);
+    }
     console.log(postData);
 }
 
@@ -111,6 +130,64 @@ export const getPostByUsername = async (req, res, next) => {
         return res.status(200).json({ message: "success", data: posts });
     }
     catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+
+
+// export const getNewPostsByUsername = async (req, res, next) => {
+//     try {
+//         const username = req.params.username;
+//         const userSnapshot = await getDoc(doc(db, "users", username));
+//         if (!userSnapshot.exists()) {
+//             return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+//         }
+//         const user = userSnapshot.data();
+//         const newPosts = user.newPosts;
+//         const validPosts = [];
+//         const currentTime = Date.now();
+//         const postPromises = newPosts.map(async (postId) => {
+//             const postSnapshot = await getDoc(doc(db, "posts", postId));
+//             if (postSnapshot.exists()) {
+//                 const post = postSnapshot.data();
+//                 // Assuming post.createdAt is a timestamp in milliseconds
+//                 console.log(post.createdAt);
+//                 console.log(currentTime);
+//                 if (currentTime - post.createdAt.toMillis() <= 3*24 * 60 * 60 * 1000) { // 3 days
+//                     validPosts.push(postId);
+//                 }
+//             }
+//         });
+//         await Promise.all(postPromises);
+//         return res.status(200).json({ message: "success", data: validPosts });
+//     } catch (error) {
+//         res.status(400).json({ message: error.message });
+//     }
+// }
+
+export const getNewPostsByUsername = async (req, res, next) => {
+    try {
+        const username = req.params.username;
+        const userSnapshot = await getDoc(doc(db, "users", username));
+        if (!userSnapshot.exists()) {
+            return res.status(400).json({ message: "Không tồn tại người dùng " + username });
+        }
+        const user = userSnapshot.data();
+        const newPosts = user.newPosts;
+        const validPosts = [];
+        const currentTime = Date.now();
+        const postPromises = newPosts.map(async (postId) => {
+            const postSnapshot = await getDoc(doc(db, "posts", postId));
+            if (postSnapshot.exists()) {
+                const post = postSnapshot.data();
+                if (currentTime - post.createdAt.toMillis() <= 3*24 * 60 * 60 * 1000) { // 3 days
+                    validPosts.push(post); // push the post object instead of postId
+                }
+            }
+        });
+        await Promise.all(postPromises);
+        return res.status(200).json({ message: "success", data: validPosts });
+    } catch (error) {
         res.status(400).json({ message: error.message });
     }
 }

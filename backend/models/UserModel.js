@@ -10,6 +10,7 @@ class User {
     followers,
     followingUsers,
     posts,
+    newPosts,
     stories,
     highlights
   ) {
@@ -23,6 +24,7 @@ class User {
     this.followers = followers;
     this.followingUsers = followingUsers;
     this.posts = posts;
+    this.newPosts = newPosts;
     this.stories = stories;
     this.highlights = highlights;
   }
