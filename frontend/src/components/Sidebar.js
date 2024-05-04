@@ -1,10 +1,14 @@
-import { Box, Flex, Link, Tooltip, useToast } from "@chakra-ui/react";
+import { Box, Flex, Link, MenuDivider, Tooltip, useToast } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { InstagramLogo, InstagramMobileLogo } from "../assets/constants";
 import SidebarItems from "./SidebarItems";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { logout } from "./../api/Api.js";
-import { IoIosSettings, IoIosLogOut } from "react-icons/io";
+import { IoIosLogOut } from "react-icons/io";
+import { HiMiniPencilSquare } from "react-icons/hi2";
+import { FaRegBookmark } from "react-icons/fa6";
+import { PiUserSwitch } from "react-icons/pi";
+import { MdLockReset } from "react-icons/md";
 import {
 	Menu,
 	MenuButton,
@@ -105,10 +109,13 @@ const Sidebar = () => {
 							</Flex>
 						</Flex>
 
-						<MenuList>
+						<MenuList style={{boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2)"}}>
 							{/* MenuItems are not rendered unless Menu is open */}
-
-							<MenuItem icon={<IoIosSettings size={20} />}>Settings</MenuItem>
+							<MenuItem icon={<FaRegBookmark size={20}/>}>Saved</MenuItem>
+							<MenuItem icon={<HiMiniPencilSquare size={20} />}>Edit profile</MenuItem>
+							<MenuItem icon={<MdLockReset size={20}/>}>Reset Password</MenuItem>
+							<MenuDivider />
+							<MenuItem icon={<PiUserSwitch size={20}/>}>Switch account</MenuItem>
 							<MenuItem icon={<IoIosLogOut size={20} />} onClick={handleLogout}>Log out</MenuItem>
 						</MenuList>
 					</Menu>
