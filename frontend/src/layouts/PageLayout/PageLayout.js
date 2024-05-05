@@ -7,14 +7,14 @@ const PageLayout = ({children}) =>{
 <Flex>
     {/*sidebar in the left*/}
     {(pathname !== "/login" && pathname !== "/signup"  && pathname !== "/password/reset" && pathname !== "/" && pathname !== "/profile") ? (
-        <Box w={{base: "70px", md: "240px"}}  style={{ position: "fixed", left: "0", top: "0" }}>
-            <Sidebar/>
-        </Box>
+        <Box w={{ base: "70px", md: "240px" }} display={'sticky'}>
+					<Sidebar />
+				</Box>
     ) : null}
     {/*contents in the right*/}
-    <Box flex = {1}> 
-        {children}
-    </Box>
+    <Box flex={1} w={{ base: "calc(100% - 70px)", md: "calc(100% - 240px)" }} mx={"auto"}>
+				{children}
+			</Box>
 </Flex>
     )
 }

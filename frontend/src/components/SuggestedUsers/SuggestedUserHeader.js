@@ -4,6 +4,7 @@ import { Modal } from 'react-bootstrap';
 import { Avatar, Flex, Link, Text, VStack, useToast } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 import { logout } from "../../api/Api.js";
+import  SwitchAccountForm  from '../SwitchAccountForm.js';
 
 const SuggestedUserHeader = () => {
     const [show, setShow] = useState(false);
@@ -53,23 +54,7 @@ const SuggestedUserHeader = () => {
                     _hover={{ color: "black" }}
                     onClick={handleShow}
                 >Switch</Link>
-                <Modal show={show} onHide={handleClose} centered>
-                    <Modal.Header closeButton >
-                        <Modal.Title style={{ textAlign: "center", width: "100%" }}>Switch accounts</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body></Modal.Body>
-                    <Modal.Footer style={{justifyContent: "center",alignItems:"center", width: "100%"}}>
-                        <Link
-                            fontWeight={'medium'}
-                            fontSize={14}
-                            color='blue.400'
-                            cursor={'pointer'}
-                            style={{ textDecoration: "none" }}
-                            _hover={{ color: "black" }}
-                            onClick={handleLogout}
-                        >Log into an Existing Account</Link>
-                    </Modal.Footer>
-                </Modal>
+                <SwitchAccountForm showAtt={show} handleCloseAtt={handleClose}/>
 
             </Flex>
         </VStack>

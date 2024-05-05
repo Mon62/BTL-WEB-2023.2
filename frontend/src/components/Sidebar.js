@@ -9,6 +9,8 @@ import { HiMiniPencilSquare } from "react-icons/hi2";
 import { FaRegBookmark } from "react-icons/fa6";
 import { PiUserSwitch } from "react-icons/pi";
 import { MdLockReset } from "react-icons/md";
+import { useState } from "react";
+import SwitchAccountForm from "./SwitchAccountForm.js";
 import {
 	Menu,
 	MenuButton,
@@ -24,6 +26,13 @@ const Sidebar = () => {
 	//const { handleLogout, isLoggingOut } = useLogout();
 	const navigate = useNavigate()
 	const toast = useToast()
+
+	const [show, setShow] = useState(false)
+
+	const handleClose= () => setShow(false)
+	const handleShow = () => setShow(true)
+	
+
 	const handleLogout = (e) => {
 		e.preventDefault();
 		// Call API to login
@@ -115,7 +124,12 @@ const Sidebar = () => {
 							<MenuItem icon={<HiMiniPencilSquare size={20} />}>Edit profile</MenuItem>
 							<MenuItem icon={<MdLockReset size={20}/>}>Reset Password</MenuItem>
 							<MenuDivider />
-							<MenuItem icon={<PiUserSwitch size={20}/>}>Switch account</MenuItem>
+
+							<MenuItem icon={<PiUserSwitch size={20}/>} onClick={handleShow}>
+								Switch account
+							</MenuItem>
+							<SwitchAccountForm showAtt={show} handleCloseAtt={handleClose} />
+
 							<MenuItem icon={<IoIosLogOut size={20} />} onClick={handleLogout}>Log out</MenuItem>
 						</MenuList>
 					</Menu>
