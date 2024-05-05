@@ -3,6 +3,7 @@ import { Container, Form, FormGroup, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { resetPassword } from "../../api/Api.js";
 import { useToast } from "@chakra-ui/react";
+import { Success, Error } from "../../models/Toast.js";
 
 export default function ResetPassword() {
   const [email, setEmail] = useState("");
@@ -16,13 +17,7 @@ export default function ResetPassword() {
     // Call API to reset password
     resetPassword(email)
       .then((res) => {
-        toast({
-          title: res.data.message,
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-          position: "top-right",
-        });
+        toast(new Success(res));
       })
       .catch((err) => {
         console.log(err);

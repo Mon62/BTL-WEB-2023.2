@@ -18,7 +18,7 @@ export default function Login() {
       await signInWithPopup(auth, googleAuthProvider)
         .then(() => {
           navigate("/home");
-          console.log("first");
+          // console.log("first");
         })
         .catch((err) => console.log(err));
     } catch (err) {
@@ -47,7 +47,6 @@ export default function Login() {
         marginTop: "200px",
         marginBottom: "200px",
         maxHeight: "520px",
-        // backgroundColor: "blue"
       }}
     >
       <Form className="d-flex flex-column mb-2" onSubmit={handleSubmit}>

@@ -150,7 +150,7 @@ const SignUp = () => {
         
         <p className="align-self-center mt-2 mb-2">
           Bạn đã có tài khoản?{" "}
-          <Link to="/login" style={{ textDecoration: "none", color: "blue" }}>
+          <Link to="/login" style={{ textDecoration: "none", color: "#3897f0", fontWeight: "bold" }}>
             Đăng nhập
           </Link>
         </p>
