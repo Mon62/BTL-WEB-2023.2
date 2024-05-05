@@ -4,7 +4,7 @@ import {
   resetPassword,
   login,
   logout,
-  updateProfile,
+  editProfile,
   getProfileByUsername,
   followUser,
   unfollowUser
@@ -18,7 +18,7 @@ router.post("/signup", upload.none(), registerUser);
 router.post("/login", upload.none(), login);
 router.get("/logout", upload.none(), logout);
 router.post("/password/reset", upload.none(), resetPassword);
-router.post("/account/edit", upload.single("profilePic"), updateProfile);
+router.post("/account/edit", upload.fields([{name: 'profilePic', maxCount: 1}]), editProfile);
 router.get("/profile/:username", upload.none(), getProfileByUsername);
 router.post("/follow", upload.none(), followUser);
 router.post("/unfollow", upload.none(), unfollowUser);

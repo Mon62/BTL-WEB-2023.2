@@ -1,17 +1,17 @@
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from "uuid";
 import { db, storage } from "../firebase.js";
 import {
-    doc,
-    setDoc,
-    getDoc,
-    query,
-    getDocs,
-    where,
-    onSnapshot,
-    collection,
-    updateDoc,
-    Timestamp,
-    arrayUnion,
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  getDocs,
+  where,
+  onSnapshot,
+  collection,
+  updateDoc,
+  Timestamp,
+  arrayUnion,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import multer from "multer";
@@ -20,6 +20,7 @@ import PostModel from "../models/PostModel.js";
 import UserModel from "../models/UserModel.js";
 
 export const createPost = async (req, res, next) => {
+  try {
     const username = req.body.username; //createdBy
     const caption = req.body.caption;
     const files = req.files;
@@ -31,111 +32,110 @@ export const createPost = async (req, res, next) => {
     // Kiểm tra sự tồn tại của người dùng
     const userSnapshot = await getDoc(doc(db, "users", username));
     if (!userSnapshot.exists()) {
-        return res.status(404).json({
-            status: "error",
-            message: "Người dùng không tồn tại!",
-        });
+      return res.status(404).json({
+        status: "error",
+        message: "Người dùng không tồn tại!",
+      });
     }
 
     // upload image to storage
     for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const imgRef = ref(storage, `post/${pid}/${file.originalname + uuid()}`);
-        const metaData = {
-            contentType: file.mimetype,
-        };
-        await uploadBytes(imgRef, file.buffer, metaData)
-            .then((snapshot) => {
-                console.log("Uploaded a blob or file!");
-            })
-            .catch((error) => {
-                console.error(error);
-                next(error);
-            });
-        await getDownloadURL(imgRef)
-            .then((url) => {
-                console.log("File available at", url);
-                imgURLs.push(url);
-            })
-            .catch((error) => {
-                console.error(error);
-                next(error);
-            });
+      const file = files[i];
+      const imgRef = ref(storage, `post/${pid}/${file.originalname + uuid()}`);
+      const metaData = {
+        contentType: file.mimetype,
+      };
+      await uploadBytes(imgRef, file.buffer, metaData)
+        .then((snapshot) => {
+          console.log("Uploaded a blob or file!");
+        })
+        .catch((error) => {
+          console.error(error);
+          next(error);
+        });
+      await getDownloadURL(imgRef)
+        .then((url) => {
+          console.log("File available at", url);
+          imgURLs.push(url);
+        })
+        .catch((error) => {
+          console.error(error);
+          next(error);
+        });
     }
 
     //const postData = new postModel(username, caption, imgURL, createdAt);
     const postData = {
-        pid: pid,
-        caption: req.body.caption, // change this line
-        imgURLs: imgURLs,
-        likes: [],
-        comments: [],
-        createdAt: createdAt,
-        createdBy: username,
+      pid: pid,
+      caption: req.body.caption, // change this line
+      imgURLs: imgURLs,
+      likes: [],
+      comments: [],
+      createdAt: createdAt,
+      createdBy: username,
     };
 
+    await setDoc(doc(db, "posts", pid), postData);
+    await updateDoc(doc(db, "users", username), {
+      posts: arrayUnion(pid),
+    });
 
-
-    try {
-        await setDoc(doc(db, "posts", pid), postData);
-        await updateDoc(doc(db, "users", username), {
-            posts: arrayUnion(pid),
+    //Update Post to newPosts of followers
+    //Update Post to newPosts of followers
+    const userRef = doc(db, "users", username);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const user = userSnap.data();
+      const followers = user.followers;
+      const updatePromises = followers.map((follower) => {
+        const followerRef = doc(db, "users", follower);
+        return updateDoc(followerRef, {
+          newPosts: arrayUnion(pid),
         });
-
-        //Update Post to newPosts of followers
-        //Update Post to newPosts of followers
-        const userRef = doc(db, 'users', username);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-            const user = userSnap.data();
-            const followers = user.followers;
-            const updatePromises = followers.map(follower => {
-                const followerRef = doc(db, 'users', follower);
-                return updateDoc(followerRef, {
-                    newPosts: arrayUnion(pid)
-                });
-            });
-            await Promise.all(updatePromises);
-        }
-
-        res.status(200).json({
-            status: "success",
-            message: "Đăng bài viết thành công!",
-            data: postData,
-        });
-    } catch (error) {
-        console.error(error);
-        return next(error);
+      });
+      await Promise.all(updatePromises);
     }
-    console.log(postData);
-}
 
-
+    res.status(200).json({
+      status: "success",
+      message: "Đăng bài viết thành công!",
+      data: postData,
+    });
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+  console.log(postData);
+};
 
 export const getPostByUsername = async (req, res, next) => {
-    try {
-        const username = req.params.username;
-        const userSnapshot = await getDoc(doc(db, "users", username));
-        if (!userSnapshot.exists()) {
-            return res.status(400).json({ message: "Không tồn tại người dùng " + username });
-        }
-        const q = query(collection(db, "posts"), where("createdBy", "==", username));
-        const querySnapshot = await getDocs(q).catch((err) => next(err));
-        if (querySnapshot.empty) {
-            return res.status(400).json({ message: "Người dùng " + username + " không có bài viết nào" });
-        }
-        const posts = [];
-        querySnapshot.forEach((doc) => {
-            posts.push(doc.data());
-        });
-        return res.status(200).json({ message: "success", data: posts });
+  try {
+    const username = req.params.username;
+    const userSnapshot = await getDoc(doc(db, "users", username));
+    if (!userSnapshot.exists()) {
+      return res
+        .status(400)
+        .json({ message: "Không tồn tại người dùng " + username });
     }
-    catch (error) {
-        res.status(400).json({ message: error.message });
+    const q = query(
+      collection(db, "posts"),
+      where("createdBy", "==", username)
+    );
+    const querySnapshot = await getDocs(q).catch((err) => next(err));
+    if (querySnapshot.empty) {
+      return res
+        .status(400)
+        .json({ message: "Người dùng " + username + " không có bài viết nào" });
     }
-}
-
-
+    const posts = [];
+    querySnapshot.forEach((doc) => {
+      posts.push(doc.data());
+    });
+    return res.status(200).json({ message: "success", data: posts });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 // export const getNewPostsByUsername = async (req, res, next) => {
 //     try {
@@ -164,34 +164,34 @@ export const getPostByUsername = async (req, res, next) => {
 //     }
 // }
 
-
-
 export const getNewPostsByUsername = async (req, res, next) => {
-    try {
-        const username = req.params.username;
-        const userSnapshot = await getDoc(doc(db, "users", username));
-        if (!userSnapshot.exists()) {
-            return res.status(400).json({ message: "Không tồn tại người dùng " + username });
-        }
-        const user = userSnapshot.data();
-        const newPosts = user.newPosts;
-        const validPosts = [];
-        const postPromises = newPosts.map(async (postId) => {
-            const postSnapshot = await getDoc(doc(db, "posts", postId));
-            if (postSnapshot.exists()) {
-                const post = postSnapshot.data();
-                validPosts.push(post); // push the post object instead of postId
-            }
-        });
-        await Promise.all(postPromises);
-
-        // Clear newPosts
-        await updateDoc(doc(db, "users", username), {
-            newPosts: [],
-        });
-        console.log(newPosts)
-        return res.status(200).json({ message: "success", data: validPosts });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
+  try {
+    const username = req.params.username;
+    const userSnapshot = await getDoc(doc(db, "users", username));
+    if (!userSnapshot.exists()) {
+      return res
+        .status(400)
+        .json({ message: "Không tồn tại người dùng " + username });
     }
-}
+    const user = userSnapshot.data();
+    const newPosts = user.newPosts;
+    const validPosts = [];
+    const postPromises = newPosts.map(async (postId) => {
+      const postSnapshot = await getDoc(doc(db, "posts", postId));
+      if (postSnapshot.exists()) {
+        const post = postSnapshot.data();
+        validPosts.push(post); // push the post object instead of postId
+      }
+    });
+    await Promise.all(postPromises);
+
+    // Clear newPosts
+    await updateDoc(doc(db, "users", username), {
+      newPosts: [],
+    });
+    console.log(newPosts);
+    return res.status(200).json({ message: "success", data: validPosts });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
