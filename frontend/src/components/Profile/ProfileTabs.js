@@ -46,13 +46,13 @@ export const ProfileTabs = () => {
         />
         <TabPanels>
           <TabPanel>
-            <p>one!</p>
+
           </TabPanel>
           <TabPanel>
-            <p>two!</p>
+            <p>SAVED</p>
           </TabPanel>
           <TabPanel>
-            <p>three!</p>
+            <p>TAGGED</p>
           </TabPanel>
         </TabPanels>
       </Tabs>
