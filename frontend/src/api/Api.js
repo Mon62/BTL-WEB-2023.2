@@ -72,6 +72,9 @@ export function createStory(storyData) {
 export function getStoriesByUsername(username) {
   return axios.get(API_BASE_URL + "/stories/" + username, headers);
 }
+export function getNewStoriesByUsername(username) {
+  return axios.get(API_BASE_URL + "/new-stories/" + username, headers);
+}
 
 // API highlight
 export function addToHighlight(highlightData) {
