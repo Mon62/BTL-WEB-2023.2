@@ -12,7 +12,8 @@ class User {
     posts,
     newPosts,
     stories,
-    newStories,
+    newStories, //newStories from following users
+    myNewStories, // newStories from me
     highlights
   ) {
     this.uid = uid;
@@ -28,6 +29,7 @@ class User {
     this.newPosts = newPosts;
     this.stories = stories;
     this.newStories = newStories;
+    this.myNewStories = myNewStories;
     this.highlights = highlights;
   }
 }

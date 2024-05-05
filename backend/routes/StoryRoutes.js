@@ -1,7 +1,7 @@
 import express from 'express';
 import { createStory, getStoryByUsername, 
     addToHighlight,getHighlightByUsername, deleteStoriesFromHighlight,
-    getNewStoriesByUsername
+    getNewStoriesByUsername, getMyNewStories
  } from '../controllers/StoryController.js';
 import multer from "multer";
 
@@ -19,4 +19,6 @@ router.post('/highlights/delete', deleteStoriesFromHighlight);
 
 //new stories
 router.get('/new-stories/:username', getNewStoriesByUsername);
+router.get('/my-new-stories/:username', getMyNewStories);
+
 export default router;

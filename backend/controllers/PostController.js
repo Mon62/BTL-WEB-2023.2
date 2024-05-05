@@ -101,6 +101,7 @@ export const createPost = async (req, res, next) => {
         res.status(200).json({
             status: "success",
             message: "Đăng bài viết thành công!",
+            data: postData,
         });
     } catch (error) {
         console.error(error);

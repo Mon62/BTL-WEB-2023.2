@@ -151,9 +151,13 @@ export const createStory = async (req, res, next) => {
             });
         }
 
+        await updateDoc(doc(db, "users", username), {
+            myNewStories : arrayUnion(storyId),
+        });
         res.status(200).json({
             status: "success",
             message: "Đăng Story thành công!",
+            data: storyData,
         });
     } catch (error) {
         console.error(error);
@@ -162,6 +166,7 @@ export const createStory = async (req, res, next) => {
     console.log(storyData);
 }
 
+//Get All Stories by Username
 export const getStoryByUsername = async (req, res, next) => {
     try {
         const username = req.params.username;
@@ -185,6 +190,113 @@ export const getStoryByUsername = async (req, res, next) => {
     }
 }
 
+export const getNewStoriesByUsername = async (req, res, next) => {
+    const username = req.params.username;
+    try {
+        // Fetch the user
+        const userRef = doc(db, "users", username);
+        const userSnapshot = await getDoc(userRef);
+        if (!userSnapshot.exists()) {
+            throw new Error("User does not exist");
+        }
+
+        // Get the user's newStories
+        const userData = userSnapshot.data();
+        const newStoriesIds = userData.newStories || {};
+
+        // Fetch each story and replace the storyId with the story object
+        const newStories = {};
+        for (const [username, storyIds] of Object.entries(newStoriesIds)) {
+            newStories[username] = [];
+            for (const storyId of storyIds) {
+                const storySnapshot = await getDoc(doc(db, "stories", storyId));
+                if (storySnapshot.exists()) {
+                    // newStories[username].push(storySnapshot.data());
+                    const storyData = storySnapshot.data();
+                    // Check if the story's endAt is greater than the current time
+                    if (storyData.endAt.toMillis() > Date.now()) {
+                        newStories[username].push(storyData);
+                    }
+                }
+            }
+            // Sort the stories by createdAt in ascending order
+            newStories[username].sort((a, b) => a.createdAt - b.createdAt);
+        }
+        for (const username in newStories) {
+            if (newStories[username].length === 0) {
+                delete newStories[username];
+            }
+        }
+
+        // Sort the usernames by the createdAt of their latest story in descending order
+        const sortedUsernames = Object.keys(newStories).sort((a, b) => newStories[b][newStories[b].length-1].createdAt - newStories[a][newStories[a].length-1].createdAt);
+        const sortedNewStories = {};
+        for (const username of sortedUsernames) {
+            sortedNewStories[username] = newStories[username];
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Lấy newStories thành công!",
+            data: sortedNewStories,
+        });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+export const getMyNewStories = async (req, res, next) => {
+    const username = req.params.username;
+    try {
+        // Fetch the user
+        const userRef = doc(db, "users", username);
+        const userSnapshot = await getDoc(userRef);
+        if (!userSnapshot.exists()) {
+            throw new Error("User does not exist");
+        }
+
+        // Get the user's myNewStories
+        const userData = userSnapshot.data();
+        const myNewStoriesIds = userData.myNewStories || [];
+
+        // Fetch each story and replace the storyId with the story object
+        const myNewStories = [];
+        const expiredStories = [];
+        for (const storyId of myNewStoriesIds) {
+            const storySnapshot = await getDoc(doc(db, "stories", storyId));
+            if (storySnapshot.exists()) {
+                const storyData = storySnapshot.data();
+                // Check if the story's endAt is greater than the current time
+                if (storyData.endAt.toMillis() > Date.now()) {
+                    myNewStories.push(storyData);
+                } else {
+                    expiredStories.push(storyId);
+                }
+            }
+        }
+        // Sort the stories by createdAt in descending order
+        myNewStories.sort((a, b) => b.createdAt - a.createdAt);
+
+        // Remove expired stories from user's myNewStories
+        if (expiredStories.length > 0) {
+            await updateDoc(userRef, {
+                myNewStories: arrayRemove(...expiredStories),
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Lấy myNewStories thành công!",
+            data: myNewStories,
+        });
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+//Highlight
 export const addToHighlight = async (req, res, next) => {
     try {
         const { storyIds, username } = req.body;
@@ -251,58 +363,3 @@ export const deleteStoriesFromHighlight = async (req, res, next) => {
 }
 
 
-export const getNewStoriesByUsername = async (req, res, next) => {
-    const username = req.params.username;
-    try {
-        // Fetch the user
-        const userRef = doc(db, "users", username);
-        const userSnapshot = await getDoc(userRef);
-        if (!userSnapshot.exists()) {
-            throw new Error("User does not exist");
-        }
-
-        // Get the user's newStories
-        const userData = userSnapshot.data();
-        const newStoriesIds = userData.newStories || {};
-
-        // Fetch each story and replace the storyId with the story object
-        const newStories = {};
-        for (const [username, storyIds] of Object.entries(newStoriesIds)) {
-            newStories[username] = [];
-            for (const storyId of storyIds) {
-                const storySnapshot = await getDoc(doc(db, "stories", storyId));
-                if (storySnapshot.exists()) {
-                    // newStories[username].push(storySnapshot.data());
-                    const storyData = storySnapshot.data();
-                    // Check if the story's endAt is greater than the current time
-                    if (storyData.endAt.toMillis() > Date.now()) {
-                        newStories[username].push(storyData);
-                    }
-                }
-            }
-            // Sort the stories by createdAt in ascending order
-            newStories[username].sort((a, b) => a.createdAt - b.createdAt);
-        }
-        for (const username in newStories) {
-            if (newStories[username].length === 0) {
-                delete newStories[username];
-            }
-        }
-
-        // Sort the usernames by the createdAt of their latest story in descending order
-        const sortedUsernames = Object.keys(newStories).sort((a, b) => newStories[b][newStories[b].length-1].createdAt - newStories[a][newStories[a].length-1].createdAt);
-        const sortedNewStories = {};
-        for (const username of sortedUsernames) {
-            sortedNewStories[username] = newStories[username];
-        }
-
-        return res.status(200).json({
-            status: "success",
-            message: "Lấy newStories thành công!",
-            data: sortedNewStories,
-        });
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
-};
