@@ -71,7 +71,7 @@ export function getProfileByUsername(username) {
 // API for posts and stories
 // postData cần có các trường sau:caption, ảnh và video tải lên (tối đa 10), username (createdBy)
 export function createPost(postData) {
-  return axios.post(API_URL + "/create-post", postData, baseHeader);
+  return axios.post(API_URL + "/create-post", postData, formDataHeader);
 }
 
 // API get posts and stories
@@ -85,7 +85,7 @@ export function getNewPostsByUsername(username) {
 
 // storyData cần có các trường sau:caption, media (ảnh hoặc video tải lên) chỉ 1, username (createdBy)
 export function createStory(storyData) {
-  return axios.post(API_URL + "/create-story", storyData, baseHeader);
+  return axios.post(API_URL + "/create-story", storyData, formDataHeader);
 }
 export function getStoriesByUsername(username) {
   return axios.get(API_URL + "/stories/" + username, baseHeader);
