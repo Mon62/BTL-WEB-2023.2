@@ -6,15 +6,15 @@ class User {
     email,
     profilePicURL,
     biography,
-    createdAt,
-    followers,
-    followingUsers,
-    posts,
-    newPosts,
-    stories,
-    newStories, //newStories from following users
+    createdAt, // TimeStamp
+    followers, //username string
+    followingUsers, // username string
+    posts, // array of postID
+    newPosts, // array of postID
+    stories, // array of storyID
+    newStories, // map key (username) - value (array of storyID) xem mẫu newStories trong username nam03nd trên firebase 
     myNewStories, // newStories from me
-    highlights
+    highlights // array of some storyIDs
   ) {
     this.uid = uid;
     this.username = username;
