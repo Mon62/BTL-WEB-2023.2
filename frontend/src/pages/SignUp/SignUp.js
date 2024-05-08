@@ -69,15 +69,17 @@ const SignUp = () => {
         width: "500px",
         marginTop: "200px",
         marginBottom: "200px",
-        maxHeight: "700px",
+        height: "800px",
       }}
     >
       <Form className="d-flex flex-column mb-2" onSubmit={handleSubmit}>
         <h1 className="align-self-center" style={{ marginTop: "50px" }}>
           Đăng ký
         </h1>
-        <FormGroup className="mb-1 mt-3" style={{ width: "400px" }}>
+        <Form.Label className="mt-4" htmlFor="email">Email</Form.Label>
+        <FormGroup className="mb-1" style={{ width: "400px", border: "1px solid #000", borderRadius: 6 }}>
           <Form.Control
+            id="email"
             type="email"
             placeholder="Địa chỉ email"
             required
@@ -86,8 +88,10 @@ const SignUp = () => {
             style={{ height: "50px" }}
           />
         </FormGroup>
-        <FormGroup className="mb-1 mt-2">
+        <Form.Label className="mt-2" htmlFor="fullname">Tên đầy đủ</Form.Label>
+        <FormGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
           <Form.Control
+            id="fullname"
             type="text"
             placeholder="Tên hiển thị"
             required
@@ -96,8 +100,11 @@ const SignUp = () => {
             style={{ height: "50px", borderColor: "red", borderWidth: "1px"}}
           />
         </FormGroup>
-        <FormGroup className="mb-1 mt-2">
+
+        <Form.Label className="mt-2" htmlFor="username">Tên người dùng</Form.Label>
+        <FormGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
           <Form.Control
+            id="username"
             type="text"
             placeholder="Tên người dùng"
             required
@@ -106,8 +113,10 @@ const SignUp = () => {
             style={{ height: "50px" }}
           />
         </FormGroup>
-        <InputGroup className="mb-1 mt-2">
+        <Form.Label className="mt-2" htmlFor="password">Mật khẩu</Form.Label>
+        <InputGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
           <Form.Control
+            id="password"
             type={showPassword ? 'text': 'password'}
             placeholder="Mật khẩu"
             required
@@ -117,8 +126,10 @@ const SignUp = () => {
           />
           <IconButton icon={showPassword ? <ViewOffIcon />: <ViewIcon />} onClick={VisiblePassword}  color="black" colorScheme="gray" height={50}></IconButton>
         </InputGroup>
-        <InputGroup className="mb-2 mt-2">
+        <Form.Label className="mt-2" htmlFor="confirmPassword">Tên người dùng</Form.Label>
+        <InputGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
           <Form.Control
+            id="confirmPassword"
             type={showConfirmPassword ? "text":"password"}
             placeholder="Xác nhận mật khẩu"
             required
@@ -148,7 +159,7 @@ const SignUp = () => {
           <hr className="solid" style={{ width: 170 }}></hr>
         </div>
         
-        <p className="align-self-center mt-2 mb-2">
+        <p className="align-self-center mb-2">
           Bạn đã có tài khoản?{" "}
           <Link to="/login" style={{ textDecoration: "none", color: "#3897f0", fontWeight: "bold" }}>
             Đăng nhập
