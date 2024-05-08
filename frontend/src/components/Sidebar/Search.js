@@ -44,7 +44,7 @@ const Search = () => {
                         <DrawerHeader>Search</DrawerHeader>
 
                         <DrawerBody>
-                            <Input placeholder='Type here...' ref={firstField}/>
+                            <Input placeholder='Type here...' style={{ border: "1px solid #000", borderRadius: 6 }} ref={firstField}/>
                         </DrawerBody>
 
                     </DrawerContent>
