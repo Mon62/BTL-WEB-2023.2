@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box,  Flex, Tooltip, useDisclosure } from "@chakra-ui/react";
-import { NotificationsLogo } from "../assets/constants";
+import { NotificationsLogo } from "../../assets/constants";
 import {
     Drawer,
     DrawerHeader,

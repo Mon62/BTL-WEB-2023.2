@@ -9,6 +9,7 @@ import {
   TabIndicator,
 } from "@chakra-ui/react";
 import { BsGrid3X3, BsBookmark, BsPersonSquare } from "react-icons/bs";
+import { ProfilePosts } from "./ProfilePosts";
 
 export const ProfileTabs = () => {
   return (
@@ -18,35 +19,26 @@ export const ProfileTabs = () => {
       gap={{ base: 4, sm: 10 }}
       textTransform={"uppercase"}
       fontWeight={"bold"}
+      direction="column"
     >
-      {/* <Flex gap={{base: 12}}>
-        <hr className="solid" style={{ width: 500 }}></hr>
-      </Flex> */}
-      <Tabs position="relative" variant="unstyled">
-        <TabList>
-          <Tab>
-            {" "}
+      <Tabs position="relative" className="mb-4" isFitted>
+        <TabList className="mb-3" >
+          <Tab gap={2}>
             <BsGrid3X3 />
-            POSTS
+            Posts
           </Tab>
-          <Tab>
+          <Tab gap={2}>
             <BsBookmark />
-            SAVED
+            Saved
           </Tab>
-          <Tab>
+          <Tab gap={2}>
             <BsPersonSquare />
-            TAGGED
+            Tagged
           </Tab>
         </TabList>
-        <TabIndicator
-          mt="-1.5px"
-          height="2px"
-          bg="blue.500"
-          borderRadius="1px"
-        />
         <TabPanels>
           <TabPanel>
-
+            <ProfilePosts />
           </TabPanel>
           <TabPanel>
             <p>SAVED</p>

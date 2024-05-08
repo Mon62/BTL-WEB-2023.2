@@ -1,9 +1,9 @@
 import { Box, Flex, Link, MenuDivider, Tooltip, useToast } from "@chakra-ui/react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { InstagramLogo, InstagramMobileLogo } from "../assets/constants";
+import { InstagramLogo, InstagramMobileLogo } from "../../assets/constants.js";
 import SidebarItems from "./SidebarItems";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { logout } from "./../api/Api.js";
+import { logout } from "../../api/Api.js";
 import { IoIosLogOut } from "react-icons/io";
 import { HiMiniPencilSquare } from "react-icons/hi2";
 import { FaRegBookmark } from "react-icons/fa6";

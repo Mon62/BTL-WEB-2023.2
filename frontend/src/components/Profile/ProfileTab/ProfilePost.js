@@ -18,7 +18,7 @@ import {
 import { AiFillHeart } from "react-icons/ai";
 import { FaComment } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { Comment } from "../Comment/Comment.js";
+import { Comment } from "../../Comment/Comment.js";
 
 export const ProfilePost = ({ img }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();

@@ -6,7 +6,7 @@ import { GoogleButton } from "react-google-button";
 import { auth } from "../../firebase/firebase.js";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-export default function Login() {
+export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -17,8 +17,7 @@ export default function Login() {
     try {
       await signInWithPopup(auth, googleAuthProvider)
         .then(() => {
-          navigate("/home");
-          // console.log("first");
+          // navigate("/home");
         })
         .catch((err) => console.log(err));
     } catch (err) {
@@ -31,6 +30,10 @@ export default function Login() {
     // Call API to login
     login(email, password)
       .then((res) => {
+        sessionStorage.setItem("currentUser", res.data.username);
+        sessionStorage.setItem("accessToken", res.data.accessToken);
+
+        setTimeout(function () {}, 500);
         navigate("/home");
       })
       .catch((err) => {
@@ -38,7 +41,6 @@ export default function Login() {
         setErrorMessage(err.response.data.message);
       });
   };
-
   return (
     <Container
       className="shadow border p-4 pb-0 rounded-2"
@@ -117,4 +119,4 @@ export default function Login() {
       </Form>
     </Container>
   );
-}
+};

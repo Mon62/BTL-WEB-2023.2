@@ -89,7 +89,7 @@ const SignUp = () => {
         <FormGroup className="mb-1 mt-2">
           <Form.Control
             type="text"
-            placeholder="Tên đầy đủ"
+            placeholder="Tên hiển thị"
             required
             value={fullName}
             onChange={(e) => setFullname(e.target.value)}

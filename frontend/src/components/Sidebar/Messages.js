@@ -1,6 +1,6 @@
 import React from 'react'
 import { Tooltip, Flex, Box } from '@chakra-ui/react'
-import { MessagesLogo } from '../assets/constants'
+import { MessagesLogo } from '../../assets/constants'
 const Messages = () => {
   return (
     <Tooltip

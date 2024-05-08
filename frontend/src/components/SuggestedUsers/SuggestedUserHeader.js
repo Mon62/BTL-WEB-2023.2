@@ -4,7 +4,7 @@ import { Modal } from 'react-bootstrap';
 import { Avatar, Flex, Link, Text, VStack, useToast } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 import { logout } from "../../api/Api.js";
-import  SwitchAccountForm  from '../SwitchAccountForm.js';
+import  SwitchAccountForm  from '../Sidebar/SwitchAccountForm.js';
 
 const SuggestedUserHeader = () => {
     const [show, setShow] = useState(false);

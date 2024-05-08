@@ -13,8 +13,8 @@ import {
   CircularProgress,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { editProfile } from "../../api/Api";
-import { Success, Error } from "../../models/Toast.js";
+import { editProfile } from "../../../api/Api";
+import { Success, Error } from "../../../models/Toast.js";
 
 export const EditProfileModal = ({
   profilePicURL,

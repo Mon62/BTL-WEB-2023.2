@@ -1,8 +1,8 @@
-
 import axios from "axios";
 
 const dev_API_URL = "http://localhost:3000";
 const production_API_URL = "";
+const accessToken = sessionStorage.getItem("accessToken");
 const baseHeader = {
   headers: {
     "access-control-allow-origin": "*",
@@ -34,7 +34,13 @@ export function login(email, password) {
 }
 
 export function logout() {
-  return axios.get(API_URL + "/logout", baseHeader);
+  return axios.get(API_URL + "/logout", {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
 }
 
 export function resetPassword(email) {
@@ -56,7 +62,13 @@ export function editProfile(username, profilePic, fullName, biography) {
       fullName: fullName,
       biography: biography,
     },
-    formDataHeader
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "multipart/form-data",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
   );
 }
 
@@ -64,8 +76,58 @@ export function getProfileByUsername(username) {
   return axios.get(API_URL + "/profile/" + username, {
     headers: {
       "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
     },
   });
+}
+
+export function checkFollowStatus(currentUser, targetUser) {
+  return axios.post(
+    API_URL + "/check/followStatus",
+    { currentUser: currentUser, targetUser: targetUser },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
+export function follow(currentUser, targetUser) {
+  return axios.post(
+    API_URL + "/follow",
+    {
+      currentUser: currentUser,
+      targetUser: targetUser,
+    },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
+export function unfollow(currentUser, targetUser) {
+  return axios.post(
+    API_URL + "/unfollow",
+    {
+      currentUser: currentUser,
+      targetUser: targetUser,
+    },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
 }
 
 // API for posts and stories

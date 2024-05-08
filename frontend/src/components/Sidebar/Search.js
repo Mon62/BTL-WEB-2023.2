@@ -1,6 +1,6 @@
 import React, { useRef} from 'react'
 import { Box, Flex,  Tooltip, useDisclosure, Input } from "@chakra-ui/react";
-import { SearchLogo } from "../assets/constants";
+import { SearchLogo } from "../../assets/constants";
 import {
     Drawer,
     DrawerBody,

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Box, Flex, Tooltip, useDisclosure, Input } from "@chakra-ui/react";
-import { CreatePostLogo } from "../assets/constants";
+import { CreatePostLogo } from "../../assets/constants";
 import {
     Modal,
     ModalOverlay,
