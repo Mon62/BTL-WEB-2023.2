@@ -5,8 +5,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updateProfile,
 } from "firebase/auth";
-import { auth, db, storage } from "../firebase.js";
+import { auth, db, storage, admin } from "../firebase.js";
 import {
   doc,
   setDoc,
@@ -23,6 +24,7 @@ import {
   uploadBytes,
   getDownloadURL,
   deleteObject,
+  listAll,
 } from "firebase/storage";
 import userModel from "../models/UserModel.js";
 import { v4 } from "uuid";
@@ -58,7 +60,7 @@ export const registerUser = async (req, res, next) => {
           username,
           fullName,
           email,
-          "https://bit.ly/broken-link",
+          "",
           "",
           Date.now(),
           [],
@@ -66,8 +68,13 @@ export const registerUser = async (req, res, next) => {
           [],
           [],
           [],
+          [],
+          [],
           []
         );
+        updateProfile(auth.currentUser, {
+          displayName: username,
+        });
         await setDoc(doc(db, "users", username), Object.assign({}, userData));
         await sendEmailVerification(auth.currentUser);
 
@@ -101,6 +108,78 @@ export const registerUser = async (req, res, next) => {
   }
 };
 
+//POST /login
+export const login = async (req, res, next) => {
+  try {
+    const email = req.body.email;
+    const password = req.body.password;
+
+    await signInWithEmailAndPassword(auth, email, password).then(
+      (userCredential) => {
+        const user = userCredential.user;
+        // console.log(user);
+        if (!user.emailVerified) {
+          throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
+          next();
+        }
+        res.status(200).json({
+          username: user.displayName,
+          accessToken: user.accessToken,
+          message: "Bạn đã đăng nhập thành công",
+        });
+      }
+    );
+  } catch (error) {
+    const errorCode = error.code;
+    console.log(error.code);
+    if (errorCode === "auth/invalid-credential") {
+      return res.status(403).json({
+        status: "failed",
+        message: "Email hoặc mật khẩu không chính xác!",
+      });
+    }
+    if (errorCode === "auth/invalid-email") {
+      return res.status(403).json({
+        status: "failed",
+        message: "Email không hợp lệ!",
+      });
+    }
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+//GET /logout
+export const logout = async (req, res) => {
+  try {
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(() => {
+        signOut(auth)
+          .then(() => {
+            res.status(200).json({
+              status: "success",
+              message: "Bạn đã đăng xuất tài khoản!",
+            });
+          })
+          .catch((error) => {
+            next(error);
+          });
+      })
+      .catch((err) => {
+        next(err);
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
 //POST /password/reset
 export const resetPassword = async (req, res, next) => {
   try {
@@ -127,66 +206,7 @@ export const resetPassword = async (req, res, next) => {
   }
 };
 
-//POST /login
-export const login = async (req, res, next) => {
-  try {
-    const email = req.body.email;
-    const password = req.body.password;
-    await signInWithEmailAndPassword(auth, email, password).then(
-      (userCredential) => {
-        // console.log(userCredential.user);
-        // console.log(auth.currentUser);
-        const user = userCredential.user;
-        console.log(user);
-        if (!user.emailVerified) {
-          throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
-          next();
-        }
-        res.status(200).json({
-          status: "success",
-          message: "Bạn đã đăng nhập thành công",
-        });
-      }
-    );
-  } catch (error) {
-    const errorCode = error.code;
-    if (errorCode === "auth/invalid-credential") {
-      return res.status(403).json({
-        status: "failed",
-        message: "Email hoặc mật khẩu không chính xác!",
-      });
-    }
-    if (errorCode === "auth/invalid-email") {
-      return res.status(403).json({
-        status: "failed",
-        message: "Email không hợp lệ!",
-      });
-    }
-    res.status(400).json({
-      status: "error",
-      message: error.message,
-    });
-  }
-};
-
-//GET /logout
-export const logout = async (req, res) => {
-  await signOut(auth)
-    .then(() => {
-      res.status(200).json({
-        status: "success",
-        message: "Bạn đã đăng xuất tài khoản!",
-      });
-    })
-    .catch((error) => {
-      res.status(400).json({
-        status: "error",
-        message: error.message,
-      });
-    });
-};
-
-//POST /account/edit
+//PUT /account/edit
 export const editProfile = async (req, res, next) => {
   try {
     const profilePic = req.files["profilePic"]
@@ -195,53 +215,60 @@ export const editProfile = async (req, res, next) => {
     const fullName = req.body.fullName;
     const biography = req.body.biography;
     const username = req.body.username;
+    const accessToken = req.headers.authorization;
     let profilePicURL;
 
-    //update profilePic in storage
-    if (profilePic != null) {
-      // Delete old profilePic
-      // const deleteRef = ref(storage, `profilePic/${username}`);
-      // deleteObject(deleteRef).catch((err) => next(err));
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        //update profilePic in storage
+        if (profilePic != null) {
+          // Update new profilePic
+          const newProfilePicPath = `profilePic/${username}/${
+            profilePic.originalname + v4()
+          }`;
+          const imageRef = ref(storage, newProfilePicPath);
+          const metaData = {
+            contentType: profilePic.mimetype,
+          };
+          await uploadBytes(imageRef, profilePic.buffer, metaData);
 
-      // Update new profilePic
-      const imageRef = ref(
-        storage,
-        `profilePic/${username}/${profilePic.originalname + v4()}`
-      );
-      const metaData = {
-        contentType: profilePic.mimetype,
-      };
-      await uploadBytes(imageRef, profilePic.buffer, metaData).catch((err) => {
-        next(err);
-      });
+          // Get URL of new profilePic
+          await getDownloadURL(imageRef).then((url) => {
+            profilePicURL = url;
+          });
 
-      // Get URL of new profilePic
-      await getDownloadURL(imageRef)
-        .then((url) => {
-          profilePicURL = url;
-        })
-        .catch((err) => next(err));
-    } else {
-      const userRef = doc(db, "users", username);
-      await getDoc(userRef)
-        .then((doc) => {
-          profilePicURL = doc.data().profilePicURL;
-        })
-        .catch((err) => next(err));
-    }
+          // Delete old profilePic
+          const profilePicRef = ref(storage, `profilePic/${username}`);
+          listAll(profilePicRef).then((res) => {
+            res.items.forEach((item) => {
+              let path = item._location.path_;
+              if (path != newProfilePicPath) {
+                let deleteRef = ref(storage, path);
+                deleteObject(deleteRef);
+              }
+            });
+          });
+        } else {
+          const userRef = doc(db, "users", username);
+          await getDoc(userRef).then((doc) => {
+            profilePicURL = doc.data().profilePicURL;
+          });
+        }
 
-    //update fullName, biography, profilePicURL in firestore
-    await updateDoc(doc(db, "users", username), {
-      fullName: fullName,
-      biography: biography,
-      profilePicURL: profilePicURL,
-    }).catch((err) => {
-      next(err);
-    });
+        //update fullName, biography, profilePicURL in firestore
+        await updateDoc(doc(db, "users", username), {
+          fullName: fullName,
+          biography: biography,
+          profilePicURL: profilePicURL,
+        });
 
-    res.status(200).json({
-      message: "Chỉnh sửa trang cá nhân thành công!",
-    });
+        res.status(200).json({
+          message: "Chỉnh sửa trang cá nhân thành công!",
+        });
+      })
+      .catch((err) => next(err));
   } catch (error) {
     console.log(error);
     res.status(400).json({ message: error.message });
@@ -252,112 +279,168 @@ export const editProfile = async (req, res, next) => {
 export const getProfileByUsername = async (req, res, next) => {
   try {
     const username = req.params.username;
-    const q = query(collection(db, "users"), where("username", "==", username));
-    // console.log(q);
-    const querySnapshot = await getDocs(q).catch((err) => next(err));
-    if (querySnapshot.empty) {
-      return res
-        .status(400)
-        .json({ message: "Không tồn tại người dùng " + username });
-    }
-    querySnapshot.forEach((doc) => {
-      return res.status(200).json({ message: "success", data: doc.data() });
-      // console.log(doc.data());
-    });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+    const accessToken = req.headers.authorization;
+
+    // console.log(accessToken);
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        // console.log(decodedToken);
+
+        const docRef = doc(db, "users", username);
+
+        setTimeout(async () => {
+          await getDoc(docRef)
+            .then((doc) => {
+              if (!doc.exists()) {
+                return res
+                  .status(400)
+                  .json({ message: "Không tồn tại người dùng " + username });
+              }
+              const userData = doc.data();
+              return res.status(200).json({
+                biography: userData.biography,
+                followers: userData.followers,
+                followingUsers: userData.followingUsers,
+                fullName: userData.fullName,
+                highlights: userData.highlights,
+                posts: userData.posts,
+                profilePicURL: userData.profilePicURL,
+                stories: userData.stories,
+                myNewStories: userData.myNewStories,
+              });
+            })
+            .catch((err) => next(err));
+        }, 500);
+      })
+      .catch((err) => next(err));
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 };
 
 //POST /follow
 export const followUser = (req, res, next) => {
   try {
-    const username = req.body.username;
-    const followingUsername = req.body.followingUsername;
-    const usernameRef = doc(db, "users", username);
-    const followingUsernameRef = doc(db, "users", followingUsername);
+    const currentUser = req.body.currentUser;
+    const targetUser = req.body.targetUser;
+    const currentUserRef = doc(db, "users", currentUser);
+    const targetUserRef = doc(db, "users", targetUser);
+    const accessToken = req.headers.accessToken;
 
-    // update followers of username in firestore
-    getDoc(usernameRef)
-      .then((user) => {
-        let followingUsers = user.data().followingUsers;
-        let newFollowingUsers = [...followingUsers, followingUsername];
-        updateDoc(usernameRef, { followingUsers: newFollowingUsers }).catch(
-          (err) => next(err)
-        );
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(() => {
+        // update followers of username in firestore
+        getDoc(currentUserRef)
+          .then((user) => {
+            let followingUsers = user.data().followingUsers;
+            let newFollowingUsers = [...followingUsers, targetUser];
+            updateDoc(currentUserRef, {
+              followingUsers: newFollowingUsers,
+            }).catch((err) => next(err));
+          })
+          .catch((err) => next(err));
+
+        // update followingUsers of targetUser in firestore
+        getDoc(targetUserRef)
+          .then((user) => {
+            let followers = user.data().followers;
+            let newFollowers = [...followers, currentUser];
+            updateDoc(targetUserRef, { followers: newFollowers }).catch((err) =>
+              next(err)
+            );
+          })
+          .catch((err) => next(err));
+
+        res.status(200).json({
+          message: "Theo dõi người dùng " + targetUser + " thành công.",
+        });
       })
-      .catch((error) => next(error));
-
-    // update followingUsers of followingUsername in firestore
-    getDoc(followingUsernameRef)
-      .then((user) => {
-        let followers = user.data().followers;
-        let newFollowers = [...followers, username];
-        updateDoc(followingUsernameRef, { followers: newFollowers }).catch(
-          (err) => next(err)
-        );
-      })
-      .catch((error) => next(error));
-
-    res.status(200).json({
-      message: "Theo dõi người dùng " + followingUsername + " thành công.",
-    });
+      .catch((err) => next(err));
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
-//POST /unfollow
+//POST /unFollow
 export const unfollowUser = (req, res, next) => {
   try {
-    const username = req.body.username;
-    const followingUsername = req.body.followingUsername;
-    const usernameRef = doc(db, "users", username);
-    const followingUsernameRef = doc(db, "users", followingUsername);
+    const currentUser = req.body.currentUser;
+    const targetUser = req.body.targetUser;
+    const currentUserRef = doc(db, "users", currentUser);
+    const targetUserRef = doc(db, "users", targetUser);
+    const accessToken = req.headers.accessToken;
 
-    // update followers of username in firestore
-    getDoc(usernameRef)
-      .then((user) => {
-        let followingUsers = user.data().followingUsers;
-        let newFollowingUsers = followingUsers.filter(
-          (user) => user != followingUsername
-        );
-        updateDoc(usernameRef, { followingUsers: newFollowingUsers }).catch(
-          (err) => next(err)
-        );
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(() => {
+        // update followers of username in firestore
+        getDoc(currentUserRef)
+          .then((user) => {
+            let followingUsers = user.data().followingUsers;
+            let newFollowingUsers = followingUsers.filter(
+              (user) => user != targetUser
+            );
+            updateDoc(currentUserRef, {
+              followingUsers: newFollowingUsers,
+            }).catch((err) => next(err));
+          })
+          .catch((err) => next(err));
+
+        // update followingUsers of targetUser in firestore
+        getDoc(targetUserRef)
+          .then((user) => {
+            let followers = user.data().followers;
+            let newFollowers = followers.filter((user) => user != currentUser);
+            updateDoc(targetUserRef, { followers: newFollowers }).catch((err) =>
+              next(err)
+            );
+          })
+          .catch((err) => next(err));
+
+        res.status(200).json({
+          message: "Hủy theo dõi người dùng " + targetUser + " thành công.",
+        });
       })
-      .catch((error) => next(error));
-
-    // update followingUsers of followingUsername in firestore
-    getDoc(followingUsernameRef)
-      .then((user) => {
-        let followers = user.data().followers;
-        let newFollowers = followers.filter((user) => user != username);
-        updateDoc(followingUsernameRef, { followers: newFollowers }).catch(
-          (err) => next(err)
-        );
-      })
-      .catch((error) => next(error));
-
-    res.status(200).json({
-      message: "Hủy theo dõi người dùng " + followingUsername + " thành công.",
-    });
+      .catch((err) => next(err));
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
+//POST /checkIfFollowing
+export const checkFollowStatus = (req, res, next) => {
+  try {
+    const currentUser = req.body.currentUser;
+    const targetUser = req.body.targetUser;
+    const userRef = doc(db, "users", currentUser);
+    const accessToken = req.headers.accessToken;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(() => {
+        setTimeout(function () {
+          getDoc(userRef)
+            .then((doc) => {
+              const followingUsers = doc.data().followingUsers;
+              followingUsers.forEach((username) => {
+                if (username === targetUser)
+                  res.status(201).json({ followStatus: "Following" });
+              });
+              if (res.statusCode == 200)
+                res.status(200).json({ followStatus: "Follow" });
+            })
+            .catch((err) => next(err));
+        }, 500);
+      })
+      .catch((err) => next(err));
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).json({ message: error.message });
+  }
+};

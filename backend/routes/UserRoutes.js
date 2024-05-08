@@ -7,7 +7,8 @@ import {
   editProfile,
   getProfileByUsername,
   followUser,
-  unfollowUser
+  unfollowUser,
+  checkFollowStatus
 } from "../controllers/UserController.js";
 import multer from "multer";
 
@@ -22,5 +23,6 @@ router.post("/account/edit", upload.fields([{name: 'profilePic', maxCount: 1}]),
 router.get("/profile/:username", upload.none(), getProfileByUsername);
 router.post("/follow", upload.none(), followUser);
 router.post("/unfollow", upload.none(), unfollowUser);
+router.post("/check/followStatus", upload.none(), checkFollowStatus);
 
 export default router;
