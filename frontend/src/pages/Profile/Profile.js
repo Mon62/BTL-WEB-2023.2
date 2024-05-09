@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Flex } from "@chakra-ui/react";
 import { ProfileHeader } from "../../components/Profile/ProfileHeader/ProfileHeader.js";
 import { ProfileTabs } from "../../components/Profile/ProfileTab/ProfileTabs.js";
+import { useState } from "react";
 
 export const Profile = () => {
+  const pathnameParts = window.location.pathname.split("/");
+  const [defaultIndexTab, setDefaultIndexTab] = useState(
+    pathnameParts[pathnameParts.length - 1] === "saved" ? 1 : 0
+  );
+  const profileUser = pathnameParts[pathnameParts.length - defaultIndexTab];
+
   return (
     <Container className="mw-100" h={"800px"} overflowY={"auto"}>
       <Flex
@@ -21,7 +28,7 @@ export const Profile = () => {
         borderColor={"whiteAlpha.300"}
         flexDirection={"column"}
       >
-        <ProfileTabs />
+        <ProfileTabs defaultIndexTab={defaultIndexTab} profileUser={profileUser} />
       </Flex>
     </Container>
   );

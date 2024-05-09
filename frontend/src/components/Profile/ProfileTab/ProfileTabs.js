@@ -9,9 +9,11 @@ import {
   TabIndicator,
 } from "@chakra-ui/react";
 import { BsGrid3X3, BsBookmark, BsPersonSquare } from "react-icons/bs";
-import { ProfilePosts } from "./ProfilePosts";
+import { ProfilePostList } from "./ProfilePostList";
 
-export const ProfileTabs = () => {
+export const ProfileTabs = ({ defaultIndexTab, profileUser }) => {
+  const currentUser = sessionStorage.getItem("currentUser");
+  // console.log(currentUser, profileUser);
   return (
     <Flex
       w={"full"}
@@ -21,8 +23,13 @@ export const ProfileTabs = () => {
       fontWeight={"bold"}
       direction="column"
     >
-      <Tabs position="relative" className="mb-4" isFitted>
-        <TabList className="mb-3" >
+      <Tabs
+        position="relative"
+        className="mb-4"
+        isFitted
+        defaultIndex={defaultIndexTab}
+      >
+        <TabList className="mb-3">
           <Tab gap={2}>
             <BsGrid3X3 />
             Posts
@@ -38,7 +45,7 @@ export const ProfileTabs = () => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <ProfilePosts />
+            <ProfilePostList />
           </TabPanel>
           <TabPanel>
             <p>SAVED</p>
