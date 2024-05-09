@@ -39,13 +39,15 @@ export const registerUser = async (req, res, next) => {
 
     // check if username already exists
     const docRef = doc(db, "users", username);
-    await getDoc(docRef).then((doc) => {
-      if (doc.exists())
-        res.status(409).json({
-          status: "error",
-          message: "Tên người dùng đã tồn tại. Vui lòng chọn tên thay thế!",
-        });
-    });
+    await getDoc(docRef)
+      .then((doc) => {
+        if (doc.exists())
+          res.status(409).json({
+            status: "error",
+            message: "Tên người dùng đã tồn tại. Vui lòng chọn tên thay thế!",
+          });
+      })
+      .catch((err) => next(err));
     if (res.statusCode > 200) {
       return;
     }
@@ -74,9 +76,12 @@ export const registerUser = async (req, res, next) => {
         );
         updateProfile(auth.currentUser, {
           displayName: username,
-        });
-        await setDoc(doc(db, "users", username), Object.assign({}, userData));
-        await sendEmailVerification(auth.currentUser);
+        }).catch((err) => next(err));
+        await setDoc(
+          doc(db, "users", username),
+          Object.assign({}, userData)
+        ).catch((err) => next(err));
+        await sendEmailVerification(auth.currentUser).catch((err) => next(err));
 
         res.status(200).json({
           status: "success",
@@ -129,6 +134,7 @@ export const login = async (req, res, next) => {
         });
       }
     );
+    // .catch((err) => next(err));
   } catch (error) {
     const errorCode = error.code;
     console.log(error.code);
@@ -191,6 +197,7 @@ export const resetPassword = async (req, res, next) => {
           "Thư hướng dẫn cách reset lại mật khẩu đã được gửi đến email của bạn!",
       });
     });
+    // .catch((err) => next(err));
   } catch (error) {
     const errorCode = error.code;
     if (errorCode === "auth/invalid-email") {
@@ -232,29 +239,37 @@ export const editProfile = async (req, res, next) => {
           const metaData = {
             contentType: profilePic.mimetype,
           };
-          await uploadBytes(imageRef, profilePic.buffer, metaData);
+          await uploadBytes(imageRef, profilePic.buffer, metaData).catch(
+            (err) => next(err)
+          );
 
           // Get URL of new profilePic
-          await getDownloadURL(imageRef).then((url) => {
-            profilePicURL = url;
-          });
+          await getDownloadURL(imageRef)
+            .then((url) => {
+              profilePicURL = url;
+            })
+            .catch((err) => next(err));
 
           // Delete old profilePic
           const profilePicRef = ref(storage, `profilePic/${username}`);
-          listAll(profilePicRef).then((res) => {
-            res.items.forEach((item) => {
-              let path = item._location.path_;
-              if (path != newProfilePicPath) {
-                let deleteRef = ref(storage, path);
-                deleteObject(deleteRef);
-              }
-            });
-          });
+          listAll(profilePicRef)
+            .then((res) => {
+              res.items.forEach((item) => {
+                let path = item._location.path_;
+                if (path != newProfilePicPath) {
+                  let deleteRef = ref(storage, path);
+                  deleteObject(deleteRef);
+                }
+              });
+            })
+            .catch((err) => next(err));
         } else {
           const userRef = doc(db, "users", username);
-          await getDoc(userRef).then((doc) => {
-            profilePicURL = doc.data().profilePicURL;
-          });
+          await getDoc(userRef)
+            .then((doc) => {
+              profilePicURL = doc.data().profilePicURL;
+            })
+            .catch((err) => next(err));
         }
 
         //update fullName, biography, profilePicURL in firestore
@@ -262,7 +277,7 @@ export const editProfile = async (req, res, next) => {
           fullName: fullName,
           biography: biography,
           profilePicURL: profilePicURL,
-        });
+        }).catch((err) => next(err));
 
         res.status(200).json({
           message: "Chỉnh sửa trang cá nhân thành công!",
@@ -287,7 +302,6 @@ export const getProfileByUsername = async (req, res, next) => {
       .verifyIdToken(accessToken)
       .then((decodedToken) => {
         // console.log(decodedToken);
-
         const docRef = doc(db, "users", username);
 
         setTimeout(async () => {
@@ -316,6 +330,7 @@ export const getProfileByUsername = async (req, res, next) => {
       })
       .catch((err) => next(err));
   } catch (err) {
+    console.log(err);
     res.status(400).json({ message: err.message });
   }
 };
@@ -327,7 +342,7 @@ export const followUser = (req, res, next) => {
     const targetUser = req.body.targetUser;
     const currentUserRef = doc(db, "users", currentUser);
     const targetUserRef = doc(db, "users", targetUser);
-    const accessToken = req.headers.accessToken;
+    const accessToken = req.headers.authorization;
 
     admin
       .auth()
@@ -372,7 +387,7 @@ export const unfollowUser = (req, res, next) => {
     const targetUser = req.body.targetUser;
     const currentUserRef = doc(db, "users", currentUser);
     const targetUserRef = doc(db, "users", targetUser);
-    const accessToken = req.headers.accessToken;
+    const accessToken = req.headers.authorization;
 
     admin
       .auth()
@@ -408,6 +423,7 @@ export const unfollowUser = (req, res, next) => {
       })
       .catch((err) => next(err));
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: error.message });
   }
 };
@@ -418,7 +434,7 @@ export const checkFollowStatus = (req, res, next) => {
     const currentUser = req.body.currentUser;
     const targetUser = req.body.targetUser;
     const userRef = doc(db, "users", currentUser);
-    const accessToken = req.headers.accessToken;
+    const accessToken = req.headers.authorization;
 
     admin
       .auth()

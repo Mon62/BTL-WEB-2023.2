@@ -11,11 +11,11 @@ const SidebarItems = () => {
   return (
     <>
         <Home />
+        <Search />
+        <Explore />
+        <Messages />
         <Notifications/>
         <Create />
-        <Search />
-        <Messages />
-        <Explore />
         <Profile />
     </>
   )
