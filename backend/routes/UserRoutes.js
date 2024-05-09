@@ -8,7 +8,8 @@ import {
   getProfileByUsername,
   followUser,
   unfollowUser,
-  checkFollowStatus
+  checkFollowStatus,
+  changePassword
 } from "../controllers/UserController.js";
 import multer from "multer";
 
@@ -19,6 +20,7 @@ router.post("/signup", upload.none(), registerUser);
 router.post("/login", upload.none(), login);
 router.get("/logout", upload.none(), logout);
 router.post("/password/reset", upload.none(), resetPassword);
+router.post("/password/change", upload.none(), changePassword);
 router.post("/account/edit", upload.fields([{name: 'profilePic', maxCount: 1}]), editProfile);
 router.get("/profile/:username", upload.none(), getProfileByUsername);
 router.post("/follow", upload.none(), followUser);

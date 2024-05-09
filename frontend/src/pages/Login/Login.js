@@ -41,6 +41,7 @@ export const Login = () => {
       .then((res) => {
         sessionStorage.setItem("currentUser", res.data.username);
         sessionStorage.setItem("accessToken", res.data.accessToken);
+        sessionStorage.setItem("email", email);
 
         setTimeout(function () {}, 500);
         navigate("/home");

@@ -53,6 +53,22 @@ export function resetPassword(email) {
   );
 }
 
+export function changePassword(email) {
+  return axios.post(
+    API_URL + "/password/change",
+    {
+      email: email,
+    },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
 export function editProfile(username, profilePic, fullName, biography) {
   return axios.post(
     API_URL + "/account/edit",

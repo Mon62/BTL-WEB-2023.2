@@ -53,7 +53,7 @@ const SuggestedUserHeader = () => {
                     style={{ textDecoration: "none" }}
                     _hover={{ color: "black" }}
                     onClick={handleShow}
-                >Switch</Link>
+                >Switch Accounts</Link>
                 <SwitchAccountForm showAtt={show} handleCloseAtt={handleClose}/>
 
             </Flex>
