@@ -1,5 +1,5 @@
 import express from 'express';
-import { createPost, getPostByUsername, getNewPostsByUsername} from '../controllers/PostController.js';
+import { createPost, getPostById, getNewPostsByUsername} from '../controllers/PostController.js';
 import multer from 'multer';
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -9,7 +9,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 // })
 
 router.post('/create-post', upload.array('file', 10) ,createPost);
-router.get('/posts/:username', getPostByUsername);
+router.get('/posts/:pid', getPostById);
 router.get('/new-posts/:username', getNewPostsByUsername);
 
 export default router;

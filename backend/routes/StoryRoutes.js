@@ -1,5 +1,5 @@
 import express from 'express';
-import { createStory, getStoryByUsername, 
+import { createStory, getStoryByStoryId, 
     addToHighlight,getHighlightByUsername, deleteStoriesFromHighlight,
     getNewStoriesByUsername, getMyNewStories
  } from '../controllers/StoryController.js';
@@ -10,7 +10,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 
 router.post('/create-story', upload.single('media'),createStory);
-router.get('/stories/:username', getStoryByUsername);
+router.get('/stories/:storyId', getStoryByStoryId);
 
 //highlight
 router.post('/highlights/add-to-highlights', addToHighlight);
