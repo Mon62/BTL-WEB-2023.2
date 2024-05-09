@@ -4,7 +4,6 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
   updateProfile,
 } from "firebase/auth";
 import { auth, db, storage, admin } from "../firebase.js";
@@ -123,10 +122,11 @@ export const login = async (req, res, next) => {
       (userCredential) => {
         const user = userCredential.user;
         // console.log(user);
-        if (!user.emailVerified) {
-          throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
-          next();
-        }
+        // if (!user.emailVerified) {
+        //   throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
+        //   next();
+        // }
+        // 
         res.status(200).json({
           username: user.displayName,
           accessToken: user.accessToken,
@@ -195,6 +195,32 @@ export const resetPassword = async (req, res, next) => {
         status: "success",
         message:
           "Thư hướng dẫn cách reset lại mật khẩu đã được gửi đến email của bạn!",
+      });
+    });
+    // .catch((err) => next(err));
+  } catch (error) {
+    const errorCode = error.code;
+    if (errorCode === "auth/invalid-email") {
+      return res.status(400).json({
+        status: "error",
+        message: "Email không hợp lệ.",
+      });
+    }
+    res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+export const changePassword = async (req, res, next) => {
+  try {
+    const email = req.body.email;
+    await sendPasswordResetEmail(auth, email).then(() => {
+      res.status(200).json({
+        status: "success",
+        message:
+          "Thư chứa liên kết thay đổi mật khẩu đã được gửi đến email của bạn!",
       });
     });
     // .catch((err) => next(err));
@@ -296,7 +322,6 @@ export const getProfileByUsername = async (req, res, next) => {
     const username = req.params.username;
     const accessToken = req.headers.authorization;
 
-    // console.log(accessToken);
     admin
       .auth()
       .verifyIdToken(accessToken)
@@ -326,7 +351,7 @@ export const getProfileByUsername = async (req, res, next) => {
               });
             })
             .catch((err) => next(err));
-        }, 500);
+        }, 700);
       })
       .catch((err) => next(err));
   } catch (err) {
@@ -452,7 +477,7 @@ export const checkFollowStatus = (req, res, next) => {
                 res.status(200).json({ followStatus: "Follow" });
             })
             .catch((err) => next(err));
-        }, 500);
+        }, 700);
       })
       .catch((err) => next(err));
   } catch (error) {
