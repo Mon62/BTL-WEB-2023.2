@@ -133,38 +133,92 @@ export function unfollow(currentUser, targetUser) {
 // API for posts and stories
 // postData cần có các trường sau:caption, ảnh và video tải lên (tối đa 10), username (createdBy)
 export function createPost(postData) {
-  return axios.post(API_URL + "/create-post", postData, formDataHeader);
+  return axios.post(API_URL + "/create-post", 
+  postData, 
+  {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "multipart/form-data",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  }
+);
 }
 
-// API get posts and stories
-export function getPostsByUsername(username) {
-  return axios.get(API_URL + "/posts/" + username, baseHeader);
+ // API get posts and stories
+
+
+// export function getPostsByUsername(username) {
+//   return axios.get(API_URL + "/posts/" + username, baseHeader);
+// }
+export function getPostById(pid) {
+  return axios.get(API_URL + "/posts/" + pid, baseHeader);
 }
 
 export function getNewPostsByUsername(username) {
-  return axios.get(API_URL + "/new-posts/" + username, baseHeader);
+  return axios.get(API_URL + "/new-posts/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
 }
 
 // storyData cần có các trường sau:caption, media (ảnh hoặc video tải lên) chỉ 1, username (createdBy)
 export function createStory(storyData) {
-  return axios.post(API_URL + "/create-story", storyData, formDataHeader);
+  return axios.post(API_URL + "/create-story", storyData, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "multipart/form-data",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
 }
-export function getStoriesByUsername(username) {
-  return axios.get(API_URL + "/stories/" + username, baseHeader);
+// export function getStoriesByUsername(username) {
+//   return axios.get(API_URL + "/stories/" + username, baseHeader);
+// }
+export function getStoryByStoryId(storyId) {
+  return axios.get(API_URL + "/stories/" + storyId, baseHeader);
 }
+
+export function getNewStoriesByUsername(username) {
+  return axios.get(API_URL + "/new-stories/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
+
 
 // API highlight
 export function addToHighlight(highlightData) {
   return axios.post(
     API_URL + "/highlights/add-to-highlights",
     highlightData,
-    baseHeader
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
   );
 }
 
 export function deleteStoriesFromHighlight(highlightData) {
-  return axios.post(API_URL + "/highlights/delete", highlightData, baseHeader);
+  return axios.post(API_URL + "/highlights/delete", highlightData, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
 }
-function getHighlightsByUsername(username) {
+
+export function getHighlightsByUsername(username) {
   return axios.get(API_URL + "/highlights/" + username, baseHeader);
 }
