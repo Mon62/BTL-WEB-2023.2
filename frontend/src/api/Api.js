@@ -192,6 +192,16 @@ export function getNewStoriesByUsername(username) {
   });
 }
 
+export function getMyNewStories(username) {
+  return axios.get(API_URL + "/my-new-stories/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
 
 
 // API highlight
@@ -221,4 +231,10 @@ export function deleteStoriesFromHighlight(highlightData) {
 
 export function getHighlightsByUsername(username) {
   return axios.get(API_URL + "/highlights/" + username, baseHeader);
+}
+
+
+//MUSIC
+export function getMusicFiles() {
+  return axios.get(API_URL + "/music", baseHeader);
 }

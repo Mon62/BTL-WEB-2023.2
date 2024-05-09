@@ -14,7 +14,7 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import multer from "multer";
 import storyModel from "../models/StoryModel.js";
 
@@ -94,6 +94,7 @@ export const createStory = async (req, res, next) => {
     const username = req.body.username; //createdBy
     const caption = req.body.caption;
     const media = req.file;
+    const musicURL = req.body.musicURL;
     const createdAt = Timestamp.now();
     const storyId = uuid();
     const endAt = Timestamp.fromMillis(
@@ -132,6 +133,7 @@ export const createStory = async (req, res, next) => {
           storyId: storyId,
           caption: caption,
           mediaURL: mediaURL,
+          musicURL: musicURL,
           likes: [],
           createdAt: createdAt,
           createdBy: username,
@@ -454,3 +456,40 @@ export const deleteStoriesFromHighlight = async (req, res, next) => {
     return next(error);
   }
 };
+
+
+
+// MUSIC IN STORY
+// export const getMusicFiles = async (req, res, next) => {
+//   try {
+//     const musicFolder = storage.ref('/music');
+//     const files = await getFiles(musicFolder);
+//     const fileData = await Promise.all(files.map(async (file) => {
+//       const url = await getDownloadURL(file);
+//       const name = file.name;
+//       return { name, url };
+//     }));
+//     res.status(200).json({ message: "success", data: fileData });
+//   }
+//   catch (error) {
+//     console.error(error);
+//     return next(error);
+//   }
+// }
+
+export const getMusicFiles = async (req, res, next) => {
+  try {
+    const musicFolder = ref(storage, '/music');
+    const result = await listAll(musicFolder);
+    const fileData = await Promise.all(result.items.map(async (item) => {
+      const url = await getDownloadURL(item);
+      const name = item.name;
+      return { name, url };
+    }));
+    res.status(200).json({ message: "success", data: fileData });
+  }
+  catch (error) {
+    console.error(error);
+    return next(error);
+  }
+}

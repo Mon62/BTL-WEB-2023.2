@@ -1,7 +1,8 @@
 import express from 'express';
 import { createStory, getStoryByStoryId, 
     addToHighlight,getHighlightByUsername, deleteStoriesFromHighlight,
-    getNewStoriesByUsername, getMyNewStories
+    getNewStoriesByUsername, getMyNewStories,
+    getMusicFiles
  } from '../controllers/StoryController.js';
 import multer from "multer";
 
@@ -21,4 +22,6 @@ router.post('/highlights/delete', deleteStoriesFromHighlight);
 router.get('/new-stories/:username', getNewStoriesByUsername);
 router.get('/my-new-stories/:username', getMyNewStories);
 
+//MUSIC
+router.get('/music', getMusicFiles);
 export default router;
