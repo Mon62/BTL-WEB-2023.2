@@ -19,12 +19,14 @@ const Create = () => {
     const [view, setView] = useState([])
     const [caption, setCaption] = useState("")
     const [showAlert, setShowAlert] = useState(false)
+    const [disablePost, setDisablePost] = useState(false) 
     //const [selectedFileURL, setSelectedFileURL] = useState([])
     const username = sessionStorage.getItem("currentUser")
     const toast= useToast()
 
     const handleSubmit =(event) => {
         event.preventDefault();
+        setDisablePost(true)
         const files = view.map((file)=>{
             return file.originalFile
         })
@@ -34,6 +36,7 @@ const Create = () => {
         createPost(postData)
         .then((res) => {
             toast(new Success(res));
+            discard()
           })
           .catch((err) => {
             // console.log(err);
@@ -171,7 +174,7 @@ const Create = () => {
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={handleSubmit}>Post</Button>
+                        <Button onClick={handleSubmit} disabled={disablePost}>Post</Button>
                     </Modal.Footer>
                 </Modal>
                 <AlertModal 
