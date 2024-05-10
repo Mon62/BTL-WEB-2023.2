@@ -148,17 +148,36 @@ export function unfollow(currentUser, targetUser) {
 
 // API for posts and stories
 // postData cần có các trường sau:caption, ảnh và video tải lên (tối đa 10), username (createdBy)
+// export function createPost(postData) {
+//   return axios.post(API_URL + "/create-post", 
+//   postData, 
+//   {
+//     headers: {
+//       "access-control-allow-origin": "*",
+//       "content-type": "multipart/form-data",
+//       Authorization: sessionStorage.getItem("accessToken"),
+//     },
+//   }
+// );
+// }
 export function createPost(postData) {
+  const formData = new FormData();
+  formData.append('username', postData.username);
+  formData.append('caption', postData.caption);
+  postData.files.forEach((file, index) => {
+    formData.append('file', file);
+  });
+
   return axios.post(API_URL + "/create-post", 
-  postData, 
-  {
-    headers: {
-      "access-control-allow-origin": "*",
-      "content-type": "multipart/form-data",
-      Authorization: sessionStorage.getItem("accessToken"),
-    },
-  }
-);
+    formData, 
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "multipart/form-data",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
 }
 
  // API get posts and stories
