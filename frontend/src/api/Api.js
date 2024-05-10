@@ -180,6 +180,32 @@ export function createPost(postData) {
   );
 }
 
+//update post
+//chỉ cần truyền pid, caption
+export function updatePost(postData) {
+  return axios.put(API_URL + "/update-post", postData, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
+//delete post
+//chỉ cần truyền pid
+export function deletePost(postData) {
+  return axios.delete(API_URL + "/delete-post", {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+    data: postData,
+  });
+}
+
+
  // API get posts and stories
 
 

@@ -6,6 +6,7 @@ import {
   getDoc,
   query,
   getDocs,
+  deleteDoc,
   where,
   onSnapshot,
   collection,
@@ -118,6 +119,82 @@ export const createPost = async (req, res, next) => {
     return next(error);
   }
 
+};
+
+
+export const updatePost = async (req, res, next) => {
+  try {
+    const pid = req.body.pid;
+    const caption = req.body.caption;
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        const postRef = doc(db, "posts", pid);
+        const postSnapshot = await getDoc(postRef);
+        if (!postSnapshot.exists()) {
+          return res.status(404).json({
+            status: "error",
+            message: "Bài viết không tồn tại!",
+          });
+        }
+
+        // update the post document
+        await updateDoc(postRef, {
+          caption: caption,
+        });
+
+        res.status(200).json({
+          status: "success",
+          message: "Cập nhật bài viết thành công!",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        next(error);
+      });
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+};
+
+export const deletePost = async (req, res, next) => {
+  try {
+    const pid = req.body.pid;
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        const postRef = doc(db, "posts", pid);
+        const postSnapshot = await getDoc(postRef);
+        if (!postSnapshot.exists()) {
+          return res.status(404).json({
+            status: "error",
+            message: "Bài viết không tồn tại!",
+          });
+        }
+
+        // delete the post document
+        await deleteDoc(postRef);
+
+        res.status(200).json({
+          status: "success",
+          message: "Xóa bài viết thành công!",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        next(error);
+      });
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
 };
 
 // export const getPostByUsername = async (req, res, next) => {
