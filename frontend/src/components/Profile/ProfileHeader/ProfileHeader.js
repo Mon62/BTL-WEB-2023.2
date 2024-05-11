@@ -34,7 +34,7 @@ export const ProfileHeader = () => {
     onOpen: onOpenSearchModal,
     onClose: onCloseSearchModal,
   } = useDisclosure();
-  const { profileUser } = useParams();
+  const { profileUser, tabName } = useParams();
   const [fullName, setFullName] = useState("");
   const [biography, setBiography] = useState("");
   const [profilePicURL, setProfilePicURL] = useState("");
@@ -168,8 +168,9 @@ export const ProfileHeader = () => {
                   size={{ base: "xs", md: "sm" }}
                   onClick={() =>
                     profileUser === currentUser
-                      ? navigate("archive/stories")
-                      : navigate("message")
+                      ? navigate(`/profile/${profileUser}/archive/stories`)
+                      : navigate(`/profile/${profileUser}/messages`)
+                      
                   }
                 >
                   {profileUser === currentUser ? "View archive" : "Message"}

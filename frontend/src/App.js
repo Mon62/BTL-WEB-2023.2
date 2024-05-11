@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import { Login } from "./pages/Login/Login.js";
 import ResetPassword from "./pages/Login/ResetPassword";
 import SignUp from "./pages/SignUp/SignUp";
-import Home from "./pages/Home/Home";
+import {Home} from "./pages/Home/Home";
 import PageLayout from "./layouts/PageLayout/PageLayout.js";
 import { Profile } from "./pages/Profile/Profile.js";
 import { Archive } from "./pages/Archive/Archive.js";
