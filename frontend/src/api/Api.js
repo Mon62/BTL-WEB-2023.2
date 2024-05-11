@@ -236,6 +236,18 @@ export function createStory(storyData) {
     },
   });
 }
+
+//delete story, chỉ cần truyền storyId vào body
+export function deleteStory(storyData) {
+  return axios.delete(API_URL + "/delete-story", {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+    data: storyData,
+  });
+}
 // export function getStoriesByUsername(username) {
 //   return axios.get(API_URL + "/stories/" + username, baseHeader);
 // }

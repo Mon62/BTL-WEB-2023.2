@@ -6,6 +6,7 @@ import {
   getDoc,
   query,
   getDocs,
+  deleteDoc,
   where,
   onSnapshot,
   collection,
@@ -182,6 +183,52 @@ export const createStory = async (req, res, next) => {
 
 };
 
+
+//delete story
+export const deleteStory = async (req, res, next) => {
+  try {
+    const accessToken = req.headers.authorization;
+    const storyId = req.body.storyId;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        const storyRef = doc(db, "stories", storyId);
+        const storySnapshot = await getDoc(storyRef);
+
+        if (!storySnapshot.exists()) {
+          return res
+            .status(400)
+            .json({ message: "Story does not exist" });
+        }
+
+        const storyData = storySnapshot.data();
+        const username = storyData.createdBy;
+
+        // Remove storyId from user's stories
+        const userRef = doc(db, "users", username);
+        await updateDoc(userRef, {
+          stories: arrayRemove(storyId),
+        });
+
+        // Remove story from database
+        await deleteDoc(storyRef);
+
+        return res.status(200).json({
+          status: "success",
+          message: "Story deleted successfully",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        return next(error);
+      });
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+};
 //Get All Stories by Username
 // export const getStoryByUsername = async (req, res, next) => {
 //   try {
