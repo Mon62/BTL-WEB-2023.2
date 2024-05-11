@@ -1,20 +1,39 @@
 import React from 'react'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { Avatar, Flex, Link, Text, VStack, useToast } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 import { logout } from "../../api/Api.js";
 import  SwitchAccountForm  from '../Sidebar/SwitchAccountForm.js';
+import { getProfileByUsername } from "../../api/Api.js";
+
 
 const SuggestedUserHeader = () => {
     const [show, setShow] = useState(false);
-
+    const currentUser = sessionStorage.getItem("currentUser");
+    const [profilePicURL, setProfilePicURL] = useState("");
+    const [fullName, setFullName] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
     //Logout
     const navigate = useNavigate()
 	const toast = useToast()
+    useEffect(() => {
+        getProfileByUsername(currentUser)
+          .then((res) => {
+            const profileData = res.data;
+            setProfilePicURL(profileData.profilePicURL);
+            setFullName(profileData.fullName);
+            
+            //setFollowers(profileData.followers);
+            //setFollowing(profileData.followingUsers);
+            //setPosts(profileData.posts);
+          })
+          .catch((err) => {
+            console.log(err.response.data.message);
+            toast(new Error(err));
+          });},[currentUser])
     
 	const handleLogout = (e) => {
 		e.preventDefault();
@@ -41,8 +60,8 @@ const SuggestedUserHeader = () => {
         <VStack py={8} px={6} gap={4}>
             <Flex justifyContent={"space-between"} alignItems={"center"} w={"full"} gap={10}>
                 <Flex alignItems={"center"} gap={2}>
-                    <Avatar name='test name' size={'lg'} />
-                    <Text fontSize={14} fontWeight={'bold'} alignItems={"center"} marginBottom={0} > test name</Text>
+                    <Avatar name='test name' src={profilePicURL} size={'lg'} />
+                    <Text fontSize={14} fontWeight={'bold'} alignItems={"center"} marginBottom={0} >{currentUser}</Text>
 
                 </Flex>
                 <Link
