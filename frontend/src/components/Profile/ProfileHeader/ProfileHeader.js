@@ -44,12 +44,13 @@ export const ProfileHeader = () => {
   const [followStatus, setFollowStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const currentUser = sessionStorage.getItem("currentUser");
-
+  const isGetShortListData = "false";
   const toast = useToast();
   const navigate = useNavigate();
+
   useEffect(() => {
-    setIsLoading(true);
-    getProfileByUsername(profileUser)
+    if (!isOpen) setIsLoading(true);
+    getProfileByUsername(profileUser, isGetShortListData)
       .then((res) => {
         const profileData = res.data;
         setProfilePicURL(profileData.profilePicURL);
@@ -197,7 +198,8 @@ export const ProfileHeader = () => {
               <SearchUserModal
                 isOpen={isOpenSearchModal}
                 onClose={onCloseSearchModal}
-                modalTitle={"Search"}
+                modalTitle={"Followers"}
+                followers = {followers}
               />
               <Button
                 fontSize={{ base: "xs", md: "lg" }}

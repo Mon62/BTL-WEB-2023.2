@@ -20,9 +20,8 @@ import { FaComment } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { Comment } from "../../Comment/Comment.js";
 
-export const ProfilePost = ({ img }) => {
+export const ProfilePost = ({ img, nam }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   return (
     <>
       <GridItem
@@ -66,7 +65,6 @@ export const ProfilePost = ({ img }) => {
 
         <Image
           src={img}
-          alt="profile post"
           w={"100%"}
           h={"100%"}
           objectFit={"cover"}
