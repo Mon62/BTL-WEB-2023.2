@@ -192,6 +192,7 @@ const Create = () => {
                     handleCloseAtt={()=>setShowAlert(false)}
                     Cancel={()=>setShowAlert(false)}
                     Discard={discard} 
+                    title="Discard post?"
                 /> 
             </>
         </Tooltip>
