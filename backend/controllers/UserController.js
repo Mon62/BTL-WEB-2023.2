@@ -51,7 +51,7 @@ export const registerUser = async (req, res, next) => {
       return;
     }
 
-    await createUserWithEmailAndPassword(auth, email, password).then(
+    createUserWithEmailAndPassword(auth, email, password).then(
       async (userCredential) => {
         const user = userCredential.user;
 
@@ -76,11 +76,10 @@ export const registerUser = async (req, res, next) => {
         updateProfile(auth.currentUser, {
           displayName: username,
         }).catch((err) => next(err));
-        await setDoc(
-          doc(db, "users", username),
-          Object.assign({}, userData)
-        ).catch((err) => next(err));
-        await sendEmailVerification(auth.currentUser).catch((err) => next(err));
+        setDoc(doc(db, "users", username), Object.assign({}, userData)).catch(
+          (err) => next(err)
+        );
+        sendEmailVerification(auth.currentUser).catch((err) => next(err));
 
         res.status(200).json({
           status: "success",
@@ -118,22 +117,21 @@ export const login = async (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    await signInWithEmailAndPassword(auth, email, password).then(
-      (userCredential) => {
-        const user = userCredential.user;
-        // console.log(user);
-        // if (!user.emailVerified) {
-        //   throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
-        //   next();
-        // }
-        // 
-        res.status(200).json({
-          username: user.displayName,
-          accessToken: user.accessToken,
-          message: "Bạn đã đăng nhập thành công",
-        });
-      }
-    );
+    signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
+      const user = userCredential.user;
+      // console.log(user);
+      // if (!user.emailVerified) {
+      //   throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
+      //   next();
+      // }
+      //
+      res.status(200).json({
+        username: user.displayName,
+        accessToken: user.accessToken,
+        message: "Bạn đã đăng nhập thành công",
+      });
+      console.log(user.username);
+    });
     // .catch((err) => next(err));
   } catch (error) {
     const errorCode = error.code;
@@ -162,23 +160,15 @@ export const logout = async (req, res) => {
   try {
     const accessToken = req.headers.authorization;
 
-    admin
-      .auth()
-      .verifyIdToken(accessToken)
+    signOut(auth)
       .then(() => {
-        signOut(auth)
-          .then(() => {
-            res.status(200).json({
-              status: "success",
-              message: "Bạn đã đăng xuất tài khoản!",
-            });
-          })
-          .catch((error) => {
-            next(error);
-          });
+        res.status(200).json({
+          status: "success",
+          message: "Bạn đã đăng xuất tài khoản!",
+        });
       })
-      .catch((err) => {
-        next(err);
+      .catch((error) => {
+        next(error);
       });
   } catch (error) {
     console.log(error);
@@ -186,10 +176,10 @@ export const logout = async (req, res) => {
   }
 };
 
-//POST /password/reset
+//GET /password/reset/:email
 export const resetPassword = async (req, res, next) => {
   try {
-    const email = req.body.email;
+    const email = req.params.email;
     await sendPasswordResetEmail(auth, email).then(() => {
       res.status(200).json({
         status: "success",
@@ -213,9 +203,10 @@ export const resetPassword = async (req, res, next) => {
   }
 };
 
+//GET /password/change/:email
 export const changePassword = async (req, res, next) => {
   try {
-    const email = req.body.email;
+    const email = req.params.email;
     await sendPasswordResetEmail(auth, email).then(() => {
       res.status(200).json({
         status: "success",
@@ -239,7 +230,7 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
-//PUT /account/edit
+//POST /account/edit
 export const editProfile = async (req, res, next) => {
   try {
     const profilePic = req.files["profilePic"]
@@ -255,7 +246,13 @@ export const editProfile = async (req, res, next) => {
       .auth()
       .verifyIdToken(accessToken)
       .then(async () => {
+        //update fullName and biography in firestore
+        updateDoc(doc(db, "users", username), {
+          fullName: fullName,
+          biography: biography,
+        }).catch((err) => next(err));
         //update profilePic in storage
+
         if (profilePic != null) {
           // Update new profilePic
           const newProfilePicPath = `profilePic/${username}/${
@@ -265,45 +262,34 @@ export const editProfile = async (req, res, next) => {
           const metaData = {
             contentType: profilePic.mimetype,
           };
-          await uploadBytes(imageRef, profilePic.buffer, metaData).catch(
-            (err) => next(err)
-          );
+          uploadBytes(imageRef, profilePic.buffer, metaData)
+            .then(async () => {
+              // Delete old profilePic
+              const profilePicRef = ref(storage, `profilePic/${username}`);
+              listAll(profilePicRef)
+                .then((res) => {
+                  res.items.forEach((item) => {
+                    let path = item._location.path_;
+                    if (path != newProfilePicPath) {
+                      let deleteRef = ref(storage, path);
+                      deleteObject(deleteRef);
+                    }
+                  });
+                })
+                .catch((err) => next(err));
 
-          // Get URL of new profilePic
-          await getDownloadURL(imageRef)
-            .then((url) => {
-              profilePicURL = url;
-            })
-            .catch((err) => next(err));
-
-          // Delete old profilePic
-          const profilePicRef = ref(storage, `profilePic/${username}`);
-          listAll(profilePicRef)
-            .then((res) => {
-              res.items.forEach((item) => {
-                let path = item._location.path_;
-                if (path != newProfilePicPath) {
-                  let deleteRef = ref(storage, path);
-                  deleteObject(deleteRef);
-                }
-              });
-            })
-            .catch((err) => next(err));
-        } else {
-          const userRef = doc(db, "users", username);
-          await getDoc(userRef)
-            .then((doc) => {
-              profilePicURL = doc.data().profilePicURL;
+              // Get URL of new profilePic
+              getDownloadURL(imageRef)
+                .then((url) => {
+                  profilePicURL = url;
+                  updateDoc(doc(db, "users", username), {
+                    profilePicURL: profilePicURL,
+                  }).catch((err) => next(err));
+                })
+                .catch((err) => next(err));
             })
             .catch((err) => next(err));
         }
-
-        //update fullName, biography, profilePicURL in firestore
-        await updateDoc(doc(db, "users", username), {
-          fullName: fullName,
-          biography: biography,
-          profilePicURL: profilePicURL,
-        }).catch((err) => next(err));
 
         res.status(200).json({
           message: "Chỉnh sửa trang cá nhân thành công!",
@@ -320,17 +306,16 @@ export const editProfile = async (req, res, next) => {
 export const getProfileByUsername = async (req, res, next) => {
   try {
     const username = req.params.username;
+    const isGetShortListData = req.params.isGetShortListData;
     const accessToken = req.headers.authorization;
-
     admin
       .auth()
       .verifyIdToken(accessToken)
       .then((decodedToken) => {
-        // console.log(decodedToken);
         const docRef = doc(db, "users", username);
 
         setTimeout(async () => {
-          await getDoc(docRef)
+          getDoc(docRef)
             .then((doc) => {
               if (!doc.exists()) {
                 return res
@@ -338,17 +323,25 @@ export const getProfileByUsername = async (req, res, next) => {
                   .json({ message: "Không tồn tại người dùng " + username });
               }
               const userData = doc.data();
-              return res.status(200).json({
-                biography: userData.biography,
-                followers: userData.followers,
-                followingUsers: userData.followingUsers,
-                fullName: userData.fullName,
-                highlights: userData.highlights,
-                posts: userData.posts,
-                profilePicURL: userData.profilePicURL,
-                stories: userData.stories,
-                myNewStories: userData.myNewStories,
-              });
+              if (isGetShortListData === "true") {
+                return res.status(200).json({
+                  username: userData.username,
+                  fullName: userData.fullName,
+                  profilePicURL: userData.profilePicURL,
+                });
+              } else {
+                return res.status(200).json({
+                  biography: userData.biography,
+                  followers: userData.followers,
+                  followingUsers: userData.followingUsers,
+                  fullName: userData.fullName,
+                  highlights: userData.highlights,
+                  posts: userData.posts,
+                  profilePicURL: userData.profilePicURL,
+                  stories: userData.stories,
+                  myNewStories: userData.myNewStories,
+                });
+              }
             })
             .catch((err) => next(err));
         }, 700);
