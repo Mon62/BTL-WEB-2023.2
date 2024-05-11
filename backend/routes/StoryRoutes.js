@@ -1,5 +1,5 @@
 import express from 'express';
-import { createStory, getStoryByStoryId, 
+import { createStory, deleteStory, getStoryByStoryId, 
     addToHighlight,getHighlightByUsername, deleteStoriesFromHighlight,
     getNewStoriesByUsername, getMyNewStories,
     getMusicFiles
@@ -11,6 +11,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 
 router.post('/create-story', upload.single('media'),createStory);
+router.delete('/delete-story', deleteStory);
 router.get('/stories/:storyId', getStoryByStoryId);
 
 //highlight
