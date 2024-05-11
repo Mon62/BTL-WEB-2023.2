@@ -52,6 +52,7 @@ export const EditProfileModal = ({
     editProfile(username, newProfilePic, newFullName, newBiography)
       .then((res) => {
         toast(new Success(res));
+        // onclose();
       })
       .catch((err) => {
         // console.log(err);

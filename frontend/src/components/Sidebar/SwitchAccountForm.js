@@ -9,7 +9,7 @@ import FormGroup from "react-bootstrap/InputGroup";
 import { IconButton, useToast } from "@chakra-ui/react";
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { login, logout } from "../../api/Api.js";
-import { Success, Error } from "../../models/Toast.js";
+import { Success } from "../../models/Toast.js";
 
 const SwitchAccountForm = (props) => {
   const [showPassword, setShowPassword] = useState(false);

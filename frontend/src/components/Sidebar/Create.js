@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Box, Flex, Tooltip, IconButton, useToast } from "@chakra-ui/react";
 import { CreatePostLogo } from "../../assets/constants";
 import { CloseButton, Modal } from "react-bootstrap"
@@ -19,7 +19,8 @@ const Create = () => {
     const [view, setView] = useState([])
     const [caption, setCaption] = useState("")
     const [showAlert, setShowAlert] = useState(false)
-    const [disablePost, setDisablePost] = useState(false) 
+    const [disablePost, setDisablePost] = useState(true) 
+    const [variant, setVariant] = useState("secondary")
     //const [selectedFileURL, setSelectedFileURL] = useState([])
     const username = sessionStorage.getItem("currentUser")
     const toast= useToast()
@@ -87,7 +88,16 @@ const Create = () => {
         console.log(selectedFile)
     };
 
-
+    useEffect(() => {
+        if ((view.length === 0) && (caption.length === 0)) {
+            setDisablePost(true);
+            setVariant("secondary")
+        }
+        else {
+            setDisablePost(false);
+            setVariant("primary")}
+    },[view, caption])
+    
     const inputRef = useRef()
 
     const handleClick = () => {
@@ -174,7 +184,7 @@ const Create = () => {
                         </Form>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button onClick={handleSubmit} disabled={disablePost}>Post</Button>
+                        <Button onClick={handleSubmit} disabled={disablePost} variant={variant}>Post</Button>
                     </Modal.Footer>
                 </Modal>
                 <AlertModal 
@@ -182,6 +192,7 @@ const Create = () => {
                     handleCloseAtt={()=>setShowAlert(false)}
                     Cancel={()=>setShowAlert(false)}
                     Discard={discard} 
+                    title="Discard post?"
                 /> 
             </>
         </Tooltip>

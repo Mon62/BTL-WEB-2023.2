@@ -11,7 +11,6 @@ import { Archive } from "./pages/Archive/Archive.js";
 import { NotFound } from "./pages/NotFound/NotFound.js";
 
 function App() {
-  const currentUser = sessionStorage.getItem("currentUser");
   return (
     <BrowserRouter>
       <PageLayout>
@@ -22,11 +21,11 @@ function App() {
           <Route path="/password/reset" element={<ResetPassword />} />
           <Route path="/home" element={<Home />} />
           <Route path="/profile/:profileUser" element={<Profile />} />
+          <Route path="/profile/:profileUser/:tabName" element={<Profile />} />
           <Route
             path="/profile/:profileUser/archive/stories"
             element={<Archive />}
           />
-          <Route path="/profile/:profileUser/saved" element={<Profile />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ToastContainer hideProgressBar />

@@ -1,8 +1,28 @@
-import React from "react";
-import { Tooltip, Flex, Box, Avatar, Link } from "@chakra-ui/react";
+import React, {useEffect, useState} from "react";
+import { Tooltip, Flex, Box, Avatar, Link, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { getProfileByUsername } from "../../api/Api.js";
+
 const Profile = () => {
+  const currentUser = sessionStorage.getItem("currentUser");
+  const [profilePicURL, setProfilePicURL] = useState("");
+  const toast = useToast();
   const navigate = useNavigate();
+  useEffect(() => {
+    getProfileByUsername(currentUser)
+      .then((res) => {
+        const profileData = res.data;
+        setProfilePicURL(profileData.profilePicURL);
+        
+        
+        //setFollowers(profileData.followers);
+        //setFollowing(profileData.followingUsers);
+        //setPosts(profileData.posts);
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+        toast(new Error(err));
+      });},[currentUser])
   const handleClick = (e) => {
     navigate(`/profile/${sessionStorage.getItem("currentUser")}`);
   };
@@ -25,7 +45,7 @@ const Profile = () => {
         justifyContent={{ base: "center", md: "flex-start" }}
         onClick={handleClick}
       >
-        <Avatar size={"xs"} src={""} />
+        <Avatar size={"xs"} src={profilePicURL} />
         <Box display={{ base: "none", md: "block" }}>Profile</Box>
       </Flex>
     </Tooltip>

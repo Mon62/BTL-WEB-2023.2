@@ -58,7 +58,7 @@ export const Login = () => {
         width: "500px",
         marginTop: "200px",
         marginBottom: "200px",
-        maxHeight: "550px",
+        maxHeight: "600px",
       }}
     >
       <Form className="d-flex flex-column mb-2" onSubmit={handleSubmit}>

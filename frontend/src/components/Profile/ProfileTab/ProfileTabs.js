@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Flex,
   Tabs,
@@ -10,10 +10,17 @@ import {
 } from "@chakra-ui/react";
 import { BsGrid3X3, BsBookmark, BsPersonSquare } from "react-icons/bs";
 import { ProfilePostList } from "./ProfilePostList";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 
-export const ProfileTabs = ({ defaultIndexTab, profileUser }) => {
-  const currentUser = sessionStorage.getItem("currentUser");
-  // console.log(currentUser, profileUser);
+export const ProfileTabs = () => {
+  const { profileUser, tabName } = useParams();
+  const [tabIndex, setTabIndex] = useState(0)
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setTabIndex((tabName === undefined ? 0 : (tabName === "saved" ? 1 : 2)));
+  }, [tabName])
   return (
     <Flex
       w={"full"}
@@ -27,24 +34,31 @@ export const ProfileTabs = ({ defaultIndexTab, profileUser }) => {
         position="relative"
         className="mb-4"
         isFitted
-        defaultIndex={defaultIndexTab}
+        index={tabIndex}
+        
       >
-        <TabList className="mb-3">
-          <Tab gap={2}>
+        <TabList className="mb-4">
+          <Tab gap={2} onClick={() => navigate("/profile/" + profileUser)}>
             <BsGrid3X3 />
             Posts
           </Tab>
-          <Tab gap={2}>
+          <Tab
+            gap={2}
+            onClick={() => navigate("/profile/" + profileUser + "/saved")}
+          >
             <BsBookmark />
             Saved
           </Tab>
-          <Tab gap={2}>
+          <Tab
+            gap={2}
+            onClick={() => navigate("/profile/" + profileUser + "/tagged")}
+          >
             <BsPersonSquare />
             Tagged
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel>
+          <TabPanel padding={0}>
             <ProfilePostList />
           </TabPanel>
           <TabPanel>

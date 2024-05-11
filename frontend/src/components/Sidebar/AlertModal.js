@@ -9,7 +9,7 @@ const AlertModal = (props) => {
     <Modal show={props.showAtt} onHide={props.handleCloseAtt} centered style={{backdropFilter: "blur(10px)"}} animation={false} >
       <Modal.Header closeButton>
         <Modal.Title style={{ textAlign: "center", width: "100%" }}>
-          Discard post?
+          {props.title}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body style={{
