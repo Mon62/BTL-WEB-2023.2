@@ -1,15 +1,16 @@
 import React from "react";
 import { useState } from "react";
-import { FormLabel, Modal } from "react-bootstrap";
+import {  Modal } from "react-bootstrap";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Link } from "@chakra-ui/react";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import FormGroup from "react-bootstrap/InputGroup";
-import { IconButton, useToast } from "@chakra-ui/react";
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import {  useToast } from "@chakra-ui/react";
 import { login, logout } from "../../api/Api.js";
 import { Success } from "../../models/Toast.js";
+import { InputRightElement, Input, InputGroup } from "@chakra-ui/react";
+
 
 const SwitchAccountForm = (props) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -69,7 +70,6 @@ const SwitchAccountForm = (props) => {
       });
   };
 
-  const VisiblePassword = () => setShowPassword(!showPassword);
   return (
     <Modal show={props.showAtt} onHide={props.handleCloseAtt} centered style={{backdropFilter: "blur(10px)"}}>
       <Modal.Header closeButton>
@@ -79,44 +79,50 @@ const SwitchAccountForm = (props) => {
       </Modal.Header>
       <Modal.Body>
         <Form className="d-flex flex-column mb-2" onSubmit={handleSubmit}>
-          <FormLabel htmlFor="email">Email</FormLabel>
-          <FormGroup
-            className="mb-3"
-            style={{ border: "1px solid #000", borderRadius: 6 }}
-          >
-            <Form.Control
-              id="email"
-              type="email"
-              placeholder="Địa chỉ email"
-              required
-              style={{ height: "50px" }}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </FormGroup>
+        <Form.Label className="mt-3" htmlFor="email">
+          Email
+        </Form.Label>
+        <FormGroup className="mb-2">
+          <Input
+            type="email"
+            id="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{ height: "50px" }}
+          />
+        </FormGroup>
 
-          <FormLabel htmlFor="password">Password</FormLabel>
-          <FormGroup
-            className="mb-3"
-            style={{ border: "1px solid #000", borderRadius: 6 }}
-          >
-            <Form.Control
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Mật khẩu"
-              required
-              style={{ height: "50px" }}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <IconButton
-              icon={showPassword ? <ViewOffIcon /> : <ViewIcon />}
-              onClick={VisiblePassword}
-              color="black"
-              colorScheme="gray"
-              height={50}
-            ></IconButton>
-          </FormGroup>
+        <Form.Label className="mt-2" htmlFor="password">
+          Password
+        </Form.Label>
+        <InputGroup className="mb-1">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{ height: "50px" }}
+          />
+          <InputRightElement width="4.5rem">
+            <Button
+              className="m-0 mt-2"
+              h="1.75rem"
+              size="sm"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                backgroundColor: "#EFECEC",
+                color: "black",
+                border: "none",
+                borderRadius: "5px",
+                borderColor: "white",
+              }}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
           {errorMessage.length > 0 && (
             <p className="text-danger">{errorMessage}</p>
           )}
@@ -125,7 +131,7 @@ const SwitchAccountForm = (props) => {
             type="submit"
             style={{ width: "150px", backgroundColor: "#4285F4" }}
           >
-            Đăng nhập
+            Sign in
           </Button>
         </Form>
       </Modal.Body>

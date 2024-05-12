@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Container, Form, FormGroup, Button, InputGroup } from "react-bootstrap";
+import { Container, Form, FormGroup, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import "./SignUp.css";
 //import instagramLogo from "../../assets/instagram_font.png";
@@ -7,8 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../../api/Api.js";
 import {User} from "../../models/User.js"
 import { useToast } from "@chakra-ui/react";
-import { IconButton } from '@chakra-ui/react'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { InputRightElement, Input, InputGroup } from "@chakra-ui/react";
 
 
 
@@ -25,14 +24,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const VisiblePassword = () => {
-    setShowPassword(!showPassword)
-  }
-
-  const VisibleConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword)
-  }
-  const handleSubmit = (e) => {
+    const handleSubmit = (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       // Xử lý trường hợp mật khẩu không khớp
@@ -73,15 +65,14 @@ const SignUp = () => {
       }}
     >
       <Form className="d-flex flex-column mb-2" onSubmit={handleSubmit}>
-        <h1 className="align-self-center" style={{ marginTop: "50px" }}>
+        <h1 className="align-self-center" style={{ marginTop: "20px" }}>
           Đăng ký
         </h1>
         <Form.Label className="mt-4" htmlFor="email">Email</Form.Label>
-        <FormGroup className="mb-1" style={{ width: "400px", border: "1px solid #000", borderRadius: 6 }}>
-          <Form.Control
+        <FormGroup className="mb-1">
+          <Input
             id="email"
             type="email"
-            placeholder="Địa chỉ email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -89,24 +80,22 @@ const SignUp = () => {
           />
         </FormGroup>
         <Form.Label className="mt-2" htmlFor="fullname">Tên đầy đủ</Form.Label>
-        <FormGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
-          <Form.Control
+        <FormGroup className="mb-1">
+          <Input
             id="fullname"
             type="text"
-            placeholder="Tên hiển thị"
             required
             value={fullName}
             onChange={(e) => setFullname(e.target.value)}
-            style={{ height: "50px", borderColor: "red", borderWidth: "1px"}}
+            style={{ height: "50px" }}
           />
         </FormGroup>
 
         <Form.Label className="mt-2" htmlFor="username">Tên người dùng</Form.Label>
-        <FormGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
-          <Form.Control
+        <FormGroup className="mb-1">
+          <Input
             id="username"
             type="text"
-            placeholder="Tên người dùng"
             required
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -114,31 +103,62 @@ const SignUp = () => {
           />
         </FormGroup>
         <Form.Label className="mt-2" htmlFor="password">Mật khẩu</Form.Label>
-        <InputGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
-          <Form.Control
+
+        <InputGroup className="mb-1">
+          <Input
             id="password"
-            type={showPassword ? 'text': 'password'}
-            placeholder="Mật khẩu"
+            type={showPassword ? "text" : "password"}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={{ height: "50px" }}
           />
-          <IconButton icon={showPassword ? <ViewOffIcon />: <ViewIcon />} onClick={VisiblePassword}  color="black" colorScheme="gray" height={50}></IconButton>
+          <InputRightElement width="4.5rem">
+            <Button
+              className="m-0 mt-2"
+              h="1.75rem"
+              size="sm"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                backgroundColor: "#EFECEC",
+                color: "black",
+                border: "none",
+                borderRadius: "5px",
+                borderColor: "white",
+              }}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
         </InputGroup>
-        <Form.Label className="mt-2" htmlFor="confirmPassword">Tên người dùng</Form.Label>
-        <InputGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
-          <Form.Control
+        
+        <Form.Label className="mt-2" htmlFor="confirmPassword">Xác nhận mật khẩu</Form.Label>
+        <InputGroup className="mb-1">
+          <Input
             id="confirmPassword"
-            type={showConfirmPassword ? "text":"password"}
-            placeholder="Xác nhận mật khẩu"
+            type={showConfirmPassword ? "text" : "password"}
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             style={{ height: "50px" }}
           />
-          <IconButton icon={showConfirmPassword ? <ViewOffIcon />: <ViewIcon />} onClick={VisibleConfirmPassword}  color="black" colorScheme="gray" height={50}></IconButton>
-
+          <InputRightElement width="4.5rem">
+            <Button
+              className="m-0 mt-2"
+              h="1.75rem"
+              size="sm"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              style={{
+                backgroundColor: "#EFECEC",
+                color: "black",
+                border: "none",
+                borderRadius: "5px",
+                borderColor: "white",
+              }}
+            >
+              {showConfirmPassword ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
         </InputGroup>
         {errorMessage.length > 0 && (
           <p className="text-danger">{errorMessage}</p>

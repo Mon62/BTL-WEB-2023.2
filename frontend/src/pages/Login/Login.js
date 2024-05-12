@@ -64,6 +64,7 @@ export const Login = () => {
         <FormGroup className="mb-2">
           <Input
             type="email"
+            id="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -74,9 +75,9 @@ export const Login = () => {
         <Form.Label className="mt-2" htmlFor="password">
           Password
         </Form.Label>
-
         <InputGroup className="mb-1">
           <Input
+            id="password"
             type={showPassword ? "text" : "password"}
             required
             value={password}
