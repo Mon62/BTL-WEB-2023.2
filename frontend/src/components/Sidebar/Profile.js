@@ -2,10 +2,12 @@ import React, {useEffect, useState} from "react";
 import { Tooltip, Flex, Box, Avatar, Link, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { getProfileByUsername } from "../../api/Api.js";
+import { SkeletonCircle } from "@chakra-ui/react";
 
 const Profile = () => {
   const currentUser = sessionStorage.getItem("currentUser");
   const [profilePicURL, setProfilePicURL] = useState("");
+  const [loading, setLoading] = useState(true)
   const toast = useToast();
   const navigate = useNavigate();
   useEffect(() => {
@@ -22,7 +24,11 @@ const Profile = () => {
       .catch((err) => {
         console.log(err.response.data.message);
         toast(new Error(err));
-      });},[currentUser])
+      });
+      setTimeout(() => {
+        setLoading(false);
+      }, 4500)
+    },[currentUser])
   const handleClick = (e) => {
     navigate(`/profile/${sessionStorage.getItem("currentUser")}`);
   };
@@ -45,7 +51,8 @@ const Profile = () => {
         justifyContent={{ base: "center", md: "flex-start" }}
         onClick={handleClick}
       >
-        <Avatar size={"xs"} src={profilePicURL} />
+        {loading && <SkeletonCircle size='6'/>}
+        {!loading && <Avatar size={"xs"} src={profilePicURL} />}
         <Box display={{ base: "none", md: "block" }}>Profile</Box>
       </Flex>
     </Tooltip>
