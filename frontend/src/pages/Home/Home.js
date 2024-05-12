@@ -17,7 +17,6 @@ export const Home = () => {
   const handleShow = () => setShow(true)
   const handleClose = () => setShow(false)
   const[loading, setLoading] = useState(true)
-  console.log(1)
 
   useEffect(() => {
     getProfileByUsername(currentUser)

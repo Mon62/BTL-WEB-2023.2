@@ -145,9 +145,7 @@ const Sidebar = () => {
               >
                 Saved
               </MenuItem>
-              {/* <MenuItem icon={<HiMiniPencilSquare size={20} />}>
-                Edit profile
-              </MenuItem> */}
+
               <MenuItem icon={<MdLockReset size={20} />} onClick={onOpenDialog}>
                 Change Password
                 <ChangePasswordDialog
