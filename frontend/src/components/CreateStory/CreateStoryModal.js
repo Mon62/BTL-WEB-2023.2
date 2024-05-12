@@ -6,11 +6,9 @@ import { LuImagePlus } from "react-icons/lu";
 import { Button } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
-import Carousel from 'react-bootstrap/Carousel';
 import AlertModal from "../Sidebar/AlertModal.js"
 import { Success, Error } from "../../models/Toast.js";
 import {createStory, getMusicFiles} from "../../api/Api.js"
-import {Post} from "../../models/Post.js"
 import { Select } from '@chakra-ui/react'
 import { Story } from '../../models/Story.js';
 

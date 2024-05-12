@@ -1,7 +1,13 @@
 import React from 'react'
 import { Tooltip, Flex, Box } from '@chakra-ui/react'
 import { MessagesLogo } from '../../assets/constants'
-const Messages = () => {
+const Messages = (props) => {
+    const handleClick = () =>{
+        
+        if(typeof props.handleBg === 'function'){
+            (props.handleBg)();
+          }
+    }
   return (
     <Tooltip
             hasArrow
@@ -14,12 +20,13 @@ const Messages = () => {
             <Flex
                 alignItems={"center"}
                 gap={4}
-                _hover={{ bg: "blackAlpha.200" }}
+                _hover={{ bg: "blackAlpha.300" }}
                 borderRadius={6}
                 p={2}
                 w={{ base: 10, md: "full" }}
                 justifyContent={{ base: "center", md: "flex-start" }}
-                //onClick={""}
+                onClick={handleClick}
+                bg ={props.bg}
             >
                 
                 <MessagesLogo />
