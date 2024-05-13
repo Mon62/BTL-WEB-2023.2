@@ -27,7 +27,7 @@ import { useNavigate } from "react-router-dom";
 import {
   follow,
   unfollow,
-  getProfileByUsername,
+  getShortenedProfileDataByUsername,
   checkFollowStatus,
 } from "../../api/Api";
 import { Error, Success } from "../../models/Toast";
@@ -38,14 +38,14 @@ export const SearchUserModal = ({
   isOpenModal,
   onCloseModal,
   modalTitle,
-  followers,
+  users,
 }) => {
   const [input, setInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [followersData, setFollowersData] = useState([]);
+  const [usersData, setUsersData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDisabled, setIsDisabled] = useState(true);
   const [index, setIndex] = useState(-1);
-  const isGetShortListData = "true";
   const toast = useToast();
   const currentUser = sessionStorage.getItem("currentUser");
   const navigate = useNavigate();
@@ -53,16 +53,19 @@ export const SearchUserModal = ({
   useEffect(() => {
     setIsLoading(true);
     setInput("");
+    setSearchResults([]);
+    setIsDisabled(true);
 
+    console.log(users)
     let usersData = [];
-    followers.forEach((username) => {
-      getProfileByUsername(username, isGetShortListData)
+    const userPromises = users.map(async (username) => {
+      let data = {};
+      await getShortenedProfileDataByUsername(username)
         .then((res) => {
-          const data = res.data;
+          data = res.data;
           checkFollowStatus(currentUser, username)
             .then((RES) => {
               data.followStatus = RES.data.followStatus;
-              usersData.push(data);
             })
             .catch((err) => {
               console.log(err.response.data.message);
@@ -73,24 +76,31 @@ export const SearchUserModal = ({
           console.log(err.response.data.message);
           toast(new Error(err));
         });
-
-      return;
+      return data;
     });
 
-    setFollowersData(usersData);
-    setSearchResults(usersData);
+    Promise.all(userPromises).then((_usersData) => {
+      usersData.push(..._usersData);
+      setUsersData(usersData);
+
+    });
     setTimeout(function () {
       setIsLoading(false);
-    }, 8000);
-  }, [followers, isOpenModal]);
+      setIsDisabled(false);
+    }, 1000);
+  }, [users, isOpenModal]);
 
   const search = (value) => {
-    const results = followersData.filter((user) => {
+    setIsLoading(true);
+    const results = usersData.filter((user) => {
       return value === ""
         ? user
         : user.username.toLowerCase().includes(value.toLowerCase());
     });
     setSearchResults(results);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1500)
   };
 
   const handleChangeInput = (value) => {
@@ -113,7 +123,7 @@ export const SearchUserModal = ({
         setSearchResults(newSearchResults);
         setTimeout(function () {
           setIndex(-1);
-        }, 300);
+        }, 500);
         toast(new Success(res));
       })
       .catch((err) => {
@@ -139,6 +149,7 @@ export const SearchUserModal = ({
                 </InputLeftAddon>
               )}
               <Input
+                disabled={isDisabled}
                 variant={"filled"}
                 placeholder="Type to search user"
                 value={input}
@@ -146,11 +157,21 @@ export const SearchUserModal = ({
               />
               <InputRightAddon>
                 {" "}
-                <CloseIcon
-                  boxSize={2}
-                  cursor={"pointer"}
-                  onClick={() => handleChangeInput("")}
-                />
+                {index !== -1 ? (
+                  <Spinner
+                    thickness="4px"
+                    speed="0.7s"
+                    emptyColor="gray.200"
+                    color="blue.500"
+                    size="lg"
+                  />
+                ) : (
+                  <CloseIcon
+                    boxSize={2}
+                    cursor={"pointer"}
+                    onClick={() => handleChangeInput("")}
+                  />
+                )}
               </InputRightAddon>
             </InputGroup>
             <Container className="p-0" gap={10} h={"300px"} overflow={"auto"}>
@@ -227,17 +248,7 @@ export const SearchUserModal = ({
                           )
                         }
                       >
-                        {index === id ? (
-                          <Spinner
-                            thickness="4px"
-                            speed="0.7s"
-                            emptyColor="gray.200"
-                            color="blue.500"
-                            size="lg"
-                          />
-                        ) : (
-                          result.followStatus
-                        )}
+                        {result.followStatus}
                       </Button>
                     )}
                   </Flex>

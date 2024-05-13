@@ -16,11 +16,13 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { AiFillHeart } from "react-icons/ai";
+import { SlHeart } from "react-icons/sl";
+
 import { FaComment } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { Comment } from "../../Comment/Comment.js";
 
-export const ProfilePost = ({ img, nam }) => {
+export const ProfilePost = ({ img, likes, comments }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -42,36 +44,39 @@ export const ProfilePost = ({ img, nam }) => {
           left={0}
           right={0}
           bottom={0}
-          bg={"blackAlpha.700"}
+          bg={"blackAlpha.400"}
           transition={"all 0.3s ease"}
           zIndex={1}
           justifyContent={"center"}
         >
-          <Flex alignItems={"center"} justifyContent={"center"} gap={50}>
-            <Flex>
-              <AiFillHeart size={20} />
-              <Text fontWeight={"bold"} ml={2}>
-                7
+          <Flex alignItems={"center"} gap={50}>
+            <Flex gap={2}>
+              <AiFillHeart
+                style={{ alignSelf: "center" }}
+                size={25}
+                color="white"
+              />
+              <Text className="fw-bold fs-4 ml-2 mt-3" color={"white"}>
+                {likes}
               </Text>
             </Flex>
-            <Flex>
-              <FaComment size={20} />
-              <Text fontWeight={"bold"} ml={2}>
-                7
+            <Flex gap={2}>
+              <FaComment
+                style={{ alignSelf: "center" }}
+                size={25}
+                color="white"
+              />
+              <Text className="fw-bold fs-4 ml-2 mt-3" color={"white"}>
+                {comments}
               </Text>
             </Flex>
           </Flex>
         </Flex>
 
-        <Image
-          src={img}
-          w={"100%"}
-          h={"100%"}
-          objectFit={"cover"}
-        ></Image>
+        <Image src={img} w={"100%"} h={"100%"} objectFit={"cover"}></Image>
       </GridItem>
 
-      <Modal
+      {/* <Modal
         isOpen={isOpen}
         onClose={onClose}
         isCentered={true}
@@ -135,7 +140,7 @@ export const ProfilePost = ({ img, nam }) => {
             </Flex>
           </ModalBody>
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

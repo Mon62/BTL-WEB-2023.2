@@ -54,15 +54,15 @@ export const ProfileHeader = () => {
   const [followStatus, setFollowStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const currentUser = sessionStorage.getItem("currentUser");
-  const isGetShortListData = "false";
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isOpen && !isOpenSearchFollowersModal && !isOpenSearchFollowingModal)
-      setIsLoading(true);
-    getProfileByUsername(profileUser, isGetShortListData)
+    // if (!isOpen && !isOpenSearchFollowersModal && !isOpenSearchFollowingModal)
+    //   setIsLoading(true);
+    getProfileByUsername(profileUser)
       .then((res) => {
+        // console.log(res.data)
         const profileData = res.data;
         setProfilePicURL(profileData.profilePicURL);
         setFullName(profileData.fullName);
@@ -226,7 +226,7 @@ export const ProfileHeader = () => {
                 isOpenModal={isOpenSearchFollowersModal}
                 onCloseModal={onCloseSearchFollowersModal}
                 modalTitle={"Followers"}
-                followers={followers}
+                users={followers}
               />
               <Button
                 fontSize={{ base: "xs", md: "lg" }}
@@ -244,7 +244,7 @@ export const ProfileHeader = () => {
                 isOpenModal={isOpenSearchFollowingModal}
                 onCloseModal={onCloseSearchFollowingModal}
                 modalTitle={"Following"}
-                followers={following}
+                users={following}
               />
             </Flex>
             <Flex alignItems={"flex-start"} gap={0} direction={"column"}>
