@@ -409,100 +409,100 @@ export const getMyNewStories = async (req, res, next) => {
   }
 };
 
-//Highlight
-export const addToHighlight = async (req, res, next) => {
-  try {
-    const accessToken = req.headers.authorization;
-    const { storyIds, username } = req.body;
+// //Highlight
+// export const addToHighlight = async (req, res, next) => {
+//   try {
+//     const accessToken = req.headers.authorization;
+//     const { storyIds, username } = req.body;
 
-    admin
-      .auth()
-      .verifyIdToken(accessToken)
-      .then(async () => {
-        const userRef = doc(db, "users", username);
-        const userSnapshot = await getDoc(userRef);
-        if (!userSnapshot.exists()) {
-          return res
-            .status(400)
-            .json({ message: "Không tồn tại người dùng " + username });
-        }
-        await updateDoc(userRef, {
-          highlights: arrayUnion(...storyIds),
-        });
-        return res.status(200).json({
-          status: "success",
-          message: "Thêm vào highlight thành công!",
-        });
-      }
-      )
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
-  } catch (error) {
-    console.error(error);
-    return next(error);
-  }
-};
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then(async () => {
+//         const userRef = doc(db, "users", username);
+//         const userSnapshot = await getDoc(userRef);
+//         if (!userSnapshot.exists()) {
+//           return res
+//             .status(400)
+//             .json({ message: "Không tồn tại người dùng " + username });
+//         }
+//         await updateDoc(userRef, {
+//           highlights: arrayUnion(...storyIds),
+//         });
+//         return res.status(200).json({
+//           status: "success",
+//           message: "Thêm vào highlight thành công!",
+//         });
+//       }
+//       )
+//       .catch((error) => {
+//         console.error(error);
+//         return next(error);
+//       });
+//   } catch (error) {
+//     console.error(error);
+//     return next(error);
+//   }
+// };
 
-export const getHighlightByUsername = async (req, res, next) => {
-  try {
-    const username = req.params.username;
-    const userSnapshot = await getDoc(doc(db, "users", username));
-    if (!userSnapshot.exists()) {
-      return res
-        .status(400)
-        .json({ message: "Không tồn tại người dùng " + username });
-    }
-    const userData = userSnapshot.data();
-    const highlights = userData.highlights || [];
-    const highlightStories = [];
-    for (let i = 0; i < highlights.length; i++) {
-      const storySnapshot = await getDoc(doc(db, "stories", highlights[i]));
-      if (storySnapshot.exists()) {
-        highlightStories.push(storySnapshot.data());
-      }
-    }
-    return res.status(200).json({ message: "success", data: highlightStories });
-  } catch (error) {
-    console.error(error);
-    return next(error);
-  }
-};
+// export const getHighlightByUsername = async (req, res, next) => {
+//   try {
+//     const username = req.params.username;
+//     const userSnapshot = await getDoc(doc(db, "users", username));
+//     if (!userSnapshot.exists()) {
+//       return res
+//         .status(400)
+//         .json({ message: "Không tồn tại người dùng " + username });
+//     }
+//     const userData = userSnapshot.data();
+//     const highlights = userData.highlights || [];
+//     const highlightStories = [];
+//     for (let i = 0; i < highlights.length; i++) {
+//       const storySnapshot = await getDoc(doc(db, "stories", highlights[i]));
+//       if (storySnapshot.exists()) {
+//         highlightStories.push(storySnapshot.data());
+//       }
+//     }
+//     return res.status(200).json({ message: "success", data: highlightStories });
+//   } catch (error) {
+//     console.error(error);
+//     return next(error);
+//   }
+// };
 
-export const deleteStoriesFromHighlight = async (req, res, next) => {
-  try {
-    const accessToken = req.headers.authorization;
-    const { storyIds, username } = req.body;
+// export const deleteStoriesFromHighlight = async (req, res, next) => {
+//   try {
+//     const accessToken = req.headers.authorization;
+//     const { storyIds, username } = req.body;
 
-    admin
-      .auth()
-      .verifyIdToken(accessToken)
-      .then(async () => {
-        const userRef = doc(db, "users", username);
-        const userSnapshot = await getDoc(userRef);
-        if (!userSnapshot.exists()) {
-          return res
-            .status(400)
-            .json({ message: "Không tồn tại người dùng " + username });
-        }
-        await updateDoc(userRef, {
-          highlights: arrayRemove(...storyIds),
-        });
-        return res.status(200).json({
-          status: "success",
-          message: "Xóa khỏi highlight thành công!",
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
-  } catch (error) {
-    console.error(error);
-    return next(error);
-  }
-};
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then(async () => {
+//         const userRef = doc(db, "users", username);
+//         const userSnapshot = await getDoc(userRef);
+//         if (!userSnapshot.exists()) {
+//           return res
+//             .status(400)
+//             .json({ message: "Không tồn tại người dùng " + username });
+//         }
+//         await updateDoc(userRef, {
+//           highlights: arrayRemove(...storyIds),
+//         });
+//         return res.status(200).json({
+//           status: "success",
+//           message: "Xóa khỏi highlight thành công!",
+//         });
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//         return next(error);
+//       });
+//   } catch (error) {
+//     console.error(error);
+//     return next(error);
+//   }
+// };
 
 
 

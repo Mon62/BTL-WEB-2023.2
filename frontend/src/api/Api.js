@@ -261,9 +261,11 @@ export function getMyNewStories(username) {
   });
 }
 
-// API highlight
-export function addToHighlight(highlightData) {
-  return axios.post(API_URL + "/highlights/add-to-highlights", highlightData, {
+
+//API for highlights
+//highlightData cần có các trường sau:hlname, hlimgURL, stories (array), username (createdBy)
+export function createHighlight(highlightData) {
+  return axios.post(API_URL + "/highlight/create-highlight", highlightData, {
     headers: {
       "access-control-allow-origin": "*",
       "content-type": "application/json; charset=utf-8 ",
@@ -272,19 +274,57 @@ export function addToHighlight(highlightData) {
   });
 }
 
-export function deleteStoriesFromHighlight(highlightData) {
-  return axios.post(API_URL + "/highlights/delete", highlightData, {
+//highlightData cần có các trường sau:hlid, hlname, hlimgURL, stories (array), username (createdBy)
+export function updateHighlight(highlightData) {
+  return axios.put(API_URL + "/highlight/update-highlight", highlightData, {
     headers: {
       "access-control-allow-origin": "*",
       "content-type": "application/json; charset=utf-8 ",
       Authorization: sessionStorage.getItem("accessToken"),
     },
+  });
+}
+
+//highlightData cần có các trường sau:hlid
+export function deleteHighlight(highlightData) {
+  return axios.delete(API_URL + "/highlight/delete-highlight", {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+    data: highlightData,
   });
 }
 
 export function getHighlightsByUsername(username) {
-  return axios.get(API_URL + "/highlights/" + username, baseHeader);
+  return axios.get(API_URL + "/highlight/" + username, baseHeader);
 }
+
+// // API highlight
+// export function addToHighlight(highlightData) {
+//   return axios.post(API_URL + "/highlights/add-to-highlights", highlightData, {
+//     headers: {
+//       "access-control-allow-origin": "*",
+//       "content-type": "application/json; charset=utf-8 ",
+//       Authorization: sessionStorage.getItem("accessToken"),
+//     },
+//   });
+// }
+
+// export function deleteStoriesFromHighlight(highlightData) {
+//   return axios.post(API_URL + "/highlights/delete", highlightData, {
+//     headers: {
+//       "access-control-allow-origin": "*",
+//       "content-type": "application/json; charset=utf-8 ",
+//       Authorization: sessionStorage.getItem("accessToken"),
+//     },
+//   });
+// }
+
+// export function getHighlightsByUsername(username) {
+//   return axios.get(API_URL + "/highlights/" + username, baseHeader);
+// }
 
 //MUSIC
 export function getMusicFiles() {
