@@ -10,7 +10,8 @@ import {
   unfollowUser,
   checkFollowStatus,
   changePassword,
-  getShortenedProfileDataOfAllUser
+  getShortenedProfileDataOfAllUser,
+  getShortenedProfileDataByUsername
 } from "../controllers/UserController.js";
 import multer from "multer";
 
@@ -23,8 +24,9 @@ router.get("/logout", upload.none(), logout);
 router.get("/password/reset/:email", upload.none(), resetPassword);
 router.get("/password/change/:email", upload.none(), changePassword);
 router.post("/account/edit", upload.fields([{name: 'profilePic', maxCount: 1}]), editProfile);
-router.get("/profile/:username/:isGetShortenedData", upload.none(), getProfileByUsername);
-router.get("/profile/all", upload.none(), getShortenedProfileDataOfAllUser);
+router.get("/profile/:username", upload.none(), getProfileByUsername);
+router.get("/profile/shortened/:username", upload.none(), getShortenedProfileDataByUsername);
+router.get("/profile/all/shortened", upload.none(), getShortenedProfileDataOfAllUser);
 router.post("/follow", upload.none(), followUser);
 router.post("/unfollow", upload.none(), unfollowUser);
 router.post("/check/followStatus", upload.none(), checkFollowStatus);

@@ -306,7 +306,50 @@ export const editProfile = (req, res, next) => {
 export const getProfileByUsername = (req, res, next) => {
   try {
     const username = req.params.username;
-    const isGetShortenedData = req.params.isGetShortenedData;
+    const accessToken = req.headers.authorization;
+    // console.log(username);
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        const docRef = doc(db, "users", username);
+
+        setTimeout(() => {
+          getDoc(docRef)
+            .then((user) => {
+              if (!user.exists()) {
+                return res
+                  .status(400)
+                  .json({ message: "Không tồn tại người dùng " + username });
+              }
+
+              const userData = user.data();
+              return res.status(200).json({
+                biography: userData.biography,
+                followers: userData.followers,
+                followingUsers: userData.followingUsers,
+                fullName: userData.fullName,
+                highlights: userData.highlights,
+                posts: userData.posts,
+                profilePicURL: userData.profilePicURL,
+                stories: userData.stories,
+              });
+            })
+            .catch((err) => next(err));
+        }, 700);
+      })
+      .catch((err) => next(err));
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+};
+
+//GET /profile/shortened/:username
+export const getShortenedProfileDataByUsername = (req, res, next) => {
+  try {
+    const username = req.params.username;
     const accessToken = req.headers.authorization;
 
     admin
@@ -324,48 +367,12 @@ export const getProfileByUsername = (req, res, next) => {
                   .json({ message: "Không tồn tại người dùng " + username });
               }
               const userData = user.data();
-              const postIdList = userData.posts;
 
-              const postsData = postIdList.map((postId) => {
-                const postRef = doc(db, "posts", postId);
-                let postData;
-                getDoc(postRef)
-                  .then((post) => {
-                    const data = post.data();
-                    postData = {
-                      numberOfLikes: data.likes ? data.likes.length : 0,
-                      numberOfComments: data.comments
-                        ? data.comments.length
-                        : 0,
-                      firstPicURL: data.imgURLs[0],
-                    };
-                    // console.log(postsData)
-                  })
-                  .catch((err) => next(err));
-                return postData;
+              return res.status(200).json({
+                username: userData.username,
+                fullName: userData.fullName,
+                profilePicURL: userData.profilePicURL,
               });
-
-              // console.log(postsData);
-              if (isGetShortenedData === "true") {
-                return res.status(200).json({
-                  username: userData.username,
-                  fullName: userData.fullName,
-                  profilePicURL: userData.profilePicURL,
-                });
-              } else {
-                return res.status(200).json({
-                  biography: userData.biography,
-                  followers: userData.followers,
-                  followingUsers: userData.followingUsers,
-                  fullName: userData.fullName,
-                  highlights: userData.highlights,
-                  posts: userData.posts,
-                  profilePicURL: userData.profilePicURL,
-                  stories: userData.stories,
-                  myNewStories: userData.myNewStories,
-                  postsData: postsData,
-                });
-              }
             })
             .catch((err) => next(err));
         }, 700);
@@ -377,7 +384,7 @@ export const getProfileByUsername = (req, res, next) => {
   }
 };
 
-//GET /profile/all
+//GET /profile/all/shortened
 export const getShortenedProfileDataOfAllUser = (req, res, next) => {
   try {
     const accessToken = req.headers.authorization;
@@ -401,7 +408,7 @@ export const getShortenedProfileDataOfAllUser = (req, res, next) => {
             });
           });
 
-          console.log(usersData);
+          // console.log(usersData);
           res.status(200).json({ usersData: usersData });
         }, 700);
       })
@@ -411,6 +418,7 @@ export const getShortenedProfileDataOfAllUser = (req, res, next) => {
     res.status(400).json({ message: err.message });
   }
 };
+
 //POST /follow
 export const followUser = (req, res, next) => {
   try {
