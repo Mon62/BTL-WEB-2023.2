@@ -79,7 +79,7 @@ const SignUp = () => {
             style={{ height: "50px" }}
           />
         </FormGroup>
-        <Form.Label className="mt-2" htmlFor="fullname">Tên đầy đủ</Form.Label>
+        <Form.Label className="mt-2" htmlFor="fullname">Tên hiển thị</Form.Label>
         <FormGroup className="mb-1">
           <Input
             id="fullname"

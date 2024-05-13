@@ -9,6 +9,7 @@ import {
   useToast,
   Input,
   InputLeftAddon,
+  InputRightAddon,
   InputGroup,
   Container,
   Flex,
@@ -31,6 +32,7 @@ import {
 } from "../../api/Api";
 import { Error, Success } from "../../models/Toast";
 import { FaSearch } from "react-icons/fa";
+import { CloseIcon } from "@chakra-ui/icons";
 
 export const SearchUserModal = ({
   isOpenModal,
@@ -58,8 +60,8 @@ export const SearchUserModal = ({
         .then((res) => {
           const data = res.data;
           checkFollowStatus(currentUser, username)
-            .then((ans) => {
-              data.followStatus = ans.data.followStatus;
+            .then((RES) => {
+              data.followStatus = RES.data.followStatus;
               usersData.push(data);
             })
             .catch((err) => {
@@ -131,15 +133,25 @@ export const SearchUserModal = ({
           <hr className="solid" />
           <ModalBody paddingRight={0}>
             <InputGroup className=" d-flex mb-3 pe-4" dir="row">
-              <InputLeftAddon>
-                <FaSearch id="search-icon" />
-              </InputLeftAddon>
+              {input === "" && (
+                <InputLeftAddon>
+                  <FaSearch id="search-icon" />
+                </InputLeftAddon>
+              )}
               <Input
                 variant={"filled"}
                 placeholder="Type to search user"
                 value={input}
                 onChange={(e) => handleChangeInput(e.target.value)}
               />
+              <InputRightAddon>
+                {" "}
+                <CloseIcon
+                  boxSize={2}
+                  cursor={"pointer"}
+                  onClick={() => handleChangeInput("")}
+                />
+              </InputRightAddon>
             </InputGroup>
             <Container className="p-0" gap={10} h={"300px"} overflow={"auto"}>
               {isLoading &&

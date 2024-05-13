@@ -76,9 +76,22 @@ export function editProfile(username, profilePic, fullName, biography) {
   );
 }
 
-export function getProfileByUsername(username, isGetShortListData) {
+export function getProfileByUsername(username, isGetShortenedData) {
   return axios.get(
-    API_URL + "/profile/" + username + "/" + isGetShortListData,
+    API_URL + "/profile/" + username + "/" + isGetShortenedData,
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
+export function getShortenedProfileDataOfAllUser() {
+  return axios.get(
+    API_URL + "/profile/all",
     {
       headers: {
         "access-control-allow-origin": "*",
