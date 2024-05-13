@@ -76,17 +76,34 @@ export function editProfile(username, profilePic, fullName, biography) {
   );
 }
 
-export function getProfileByUsername(username, isGetShortListData) {
-  return axios.get(
-    API_URL + "/profile/" + username + "/" + isGetShortListData,
-    {
-      headers: {
-        "access-control-allow-origin": "*",
-        "content-type": "application/json; charset=utf-8 ",
-        Authorization: sessionStorage.getItem("accessToken"),
-      },
-    }
-  );
+export function getProfileByUsername(username) {
+  return axios.get(API_URL + "/profile/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
+export function getShortenedProfileDataByUsername(username) {
+  return axios.get(API_URL + "/profile/shortened/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
+export function getShortenedProfileDataOfAllUser() {
+  return axios.get(API_URL + "/profile/all/shortened", {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
 }
 
 export function checkFollowStatus(currentUser, targetUser) {
@@ -195,11 +212,18 @@ export function deletePost(postData) {
 
 // API get posts and stories
 
-// export function getPostsByUsername(username) {
-//   return axios.get(API_URL + "/posts/" + username, baseHeader);
-// }
+export function getPostsByUsername(username) {
+  return axios.get(API_URL + "/posts/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
 export function getPostById(pid) {
-  return axios.get(API_URL + "/posts/" + pid, baseHeader);
+  return axios.get(API_URL + "/post/" + pid, baseHeader);
 }
 
 export function getNewPostsByUsername(username) {

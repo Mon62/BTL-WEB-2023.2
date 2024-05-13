@@ -47,7 +47,10 @@ export const createPost = async (req, res, next) => {
         // upload image to storage
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
-          const imgRef = ref(storage, `post/${pid}/${file.originalname + uuid()}`);
+          const imgRef = ref(
+            storage,
+            `post/${pid}/${file.originalname + uuid()}`
+          );
           const metaData = {
             contentType: file.mimetype,
           };
@@ -113,14 +116,11 @@ export const createPost = async (req, res, next) => {
         console.error(error);
         next(error);
       });
-      
   } catch (error) {
     console.error(error);
     return next(error);
   }
-
 };
-
 
 export const updatePost = async (req, res, next) => {
   try {
@@ -197,48 +197,74 @@ export const deletePost = async (req, res, next) => {
   }
 };
 
-// export const getPostByUsername = async (req, res, next) => {
-//   try {
-//     const username = req.params.username;
-//     const userSnapshot = await getDoc(doc(db, "users", username));
-//     if (!userSnapshot.exists()) {
-//       return res
-//         .status(400)
-//         .json({ message: "Không tồn tại người dùng " + username });
-//     }
-//     const q = query(
-//       collection(db, "posts"),
-//       where("createdBy", "==", username)
-//     );
-//     const querySnapshot = await getDocs(q).catch((err) => next(err));
-//     if (querySnapshot.empty) {
-//       return res
-//         .status(400)
-//         .json({ message: "Người dùng " + username + " không có bài viết nào" });
-//     }
-//     const posts = [];
-//     querySnapshot.forEach((doc) => {
-//       posts.push(doc.data());
-//     });
-//     return res.status(200).json({ message: "success", data: posts });
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
+//GET /posts/:username
+export const getPostsByUsername = (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const accessToken = req.headers.authorization;
+    console.log(username);
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        const docRef = doc(db, "users", username);
+
+        setTimeout(() => {
+          getDoc(docRef)
+            .then((user) => {
+              if (!user.exists()) {
+                return res
+                  .status(400)
+                  .json({ message: "Không tồn tại người dùng " + username });
+              }
+              const userData = user.data();
+              const postIdList = userData.posts;
+              if (postIdList.length === 0) {
+                return res.status(200).json({ postsData: [] });
+              }
+
+              let postsData = [];
+              const postPromises = postIdList.map(async (postId) => {
+                const postRef = doc(db, "posts", postId);
+                const post = await getDoc(postRef).catch((err) => next(err));
+                const data = post.data();
+                return {
+                  numberOfLikes: data.likes ? data.likes.length : 0,
+                  numberOfComments: data.comments ? data.comments.length : 0,
+                  firstPicURL: data.imgURLs[0],
+                };
+              });
+
+              Promise.all(postPromises)
+                .then((_postsData) => {
+                  postsData.push(..._postsData);
+                  return res.status(200).json({
+                    postsData: postsData,
+                  });
+                })
+                .catch((err) => next(err));
+            })
+            .catch((err) => next(err));
+        }, 700);
+      })
+      .catch((err) => next(err));
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+};
 
 export const getPostById = async (req, res, next) => {
   try {
     const pid = req.params.pid;
     const postSnapshot = await getDoc(doc(db, "posts", pid));
     if (!postSnapshot.exists()) {
-      return res
-        .status(400)
-        .json({ message: "Không tồn tại bài viết " + pid });
+      return res.status(400).json({ message: "Không tồn tại bài viết " + pid });
     }
     const post = postSnapshot.data();
     return res.status(200).json({ message: "success", data: post });
-  }
-  catch (error) {
+  } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
@@ -295,18 +321,18 @@ export const getNewPostsByUsername = async (req, res, next) => {
           }
         });
         await Promise.all(postPromises);
-    
+
         // Clear newPosts
         await updateDoc(doc(db, "users", username), {
           newPosts: [],
         });
         console.log(newPosts);
         return res.status(200).json({ message: "success", data: validPosts });
-      }
-    ).catch((error) => {
-      console.error(error);
-      next(error);
-    });
+      })
+      .catch((error) => {
+        console.error(error);
+        next(error);
+      });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

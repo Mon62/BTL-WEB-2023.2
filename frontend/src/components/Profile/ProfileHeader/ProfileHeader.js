@@ -15,6 +15,11 @@ import {
   Box,
   SkeletonCircle,
   SkeletonText,
+  AlertDialog,
+  AlertDialogOverlay,
+  AlertDialogHeader,
+  AlertDialogCloseButton,
+  AlertDialogContent,
 } from "@chakra-ui/react";
 import { useDisclosure } from "@chakra-ui/react";
 import { EditProfileModal } from "./EditProfileModal.js";
@@ -24,17 +29,22 @@ import { useEffect, useState } from "react";
 import { useToast } from "@chakra-ui/react";
 import { Success, Error } from "../../../models/Toast.js";
 import { checkFollowStatus } from "../../../api/Api.js";
-import { UnFollowDialog } from "./UnFollowDialog.js";
+import { ChangeFollowStatusDialog } from "./ChangeFollowStatusDialog.js";
 import { SearchUserModal } from "../../SearchUser/SearchUserModal.js";
 
 export const ProfileHeader = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
-    isOpen: isOpenSearchModal,
-    onOpen: onOpenSearchModal,
-    onClose: onCloseSearchModal,
+    isOpen: isOpenSearchFollowersModal,
+    onOpen: onOpenSearchFollowersModal,
+    onClose: onCloseSearchFollowersModal,
   } = useDisclosure();
-  const { profileUser } = useParams();
+  const {
+    isOpen: isOpenSearchFollowingModal,
+    onOpen: onOpenSearchFollowingModal,
+    onClose: onCloseSearchFollowingModal,
+  } = useDisclosure();
+  const { profileUser, tabName } = useParams();
   const [fullName, setFullName] = useState("");
   const [biography, setBiography] = useState("");
   const [profilePicURL, setProfilePicURL] = useState("");
@@ -44,14 +54,15 @@ export const ProfileHeader = () => {
   const [followStatus, setFollowStatus] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const currentUser = sessionStorage.getItem("currentUser");
-  const isGetShortListData = "false";
   const toast = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isOpen) setIsLoading(true);
-    getProfileByUsername(profileUser, isGetShortListData)
+    // if (!isOpen && !isOpenSearchFollowersModal && !isOpenSearchFollowingModal)
+    //   setIsLoading(true);
+    getProfileByUsername(profileUser)
       .then((res) => {
+        // console.log(res.data)
         const profileData = res.data;
         setProfilePicURL(profileData.profilePicURL);
         setFullName(profileData.fullName);
@@ -80,7 +91,12 @@ export const ProfileHeader = () => {
     setTimeout(() => {
       setIsLoading(false);
     }, 1000);
-  }, [isOpen, profileUser]);
+  }, [
+    isOpen,
+    profileUser,
+    isOpenSearchFollowersModal,
+    isOpenSearchFollowingModal,
+  ]);
 
   return (
     <>
@@ -149,14 +165,25 @@ export const ProfileHeader = () => {
                     </ModalContent>
                   </Modal>
                 ) : (
-                  <UnFollowDialog
-                    isOpen={isOpen}
-                    onOpen={onOpen}
-                    onClose={onClose}
-                    followStatus={followStatus}
-                    targetUser={profileUser}
-                    currentUser={currentUser}
-                  />
+                  <AlertDialog onClose={onClose} isOpen={isOpen} isCentered>
+                    <AlertDialogOverlay
+                      bg="blackAlpha.300"
+                      backdropFilter="blur(10px) "
+                    />
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        {followStatus === "Follow" ? "Follow" : "Unfollow"}
+                      </AlertDialogHeader>
+                      <AlertDialogCloseButton />
+                      <ChangeFollowStatusDialog
+                        isOpen={isOpen}
+                        onClose={onClose}
+                        followStatus={followStatus}
+                        targetUser={profileUser}
+                        currentUser={currentUser}
+                      />
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </Flex>
 
@@ -168,8 +195,8 @@ export const ProfileHeader = () => {
                   size={{ base: "xs", md: "sm" }}
                   onClick={() =>
                     profileUser === currentUser
-                      ? navigate("archive/stories")
-                      : navigate("message")
+                      ? navigate(`/profile/${profileUser}/archive/stories`)
+                      : navigate(`/profile/${profileUser}/messages`)
                   }
                 >
                   {profileUser === currentUser ? "View archive" : "Message"}
@@ -188,7 +215,7 @@ export const ProfileHeader = () => {
                 className="px-0"
                 bg={"white.alpha"}
                 _hover={{ bg: "blackAlpha.100" }}
-                onClick={onOpenSearchModal}
+                onClick={onOpenSearchFollowersModal}
               >
                 <Text as="span" fontWeight={"500"} mr={1}>
                   {followers.length}
@@ -196,22 +223,29 @@ export const ProfileHeader = () => {
                 followers
               </Button>
               <SearchUserModal
-                isOpen={isOpenSearchModal}
-                onClose={onCloseSearchModal}
+                isOpenModal={isOpenSearchFollowersModal}
+                onCloseModal={onCloseSearchFollowersModal}
                 modalTitle={"Followers"}
-                followers = {followers}
+                users={followers}
               />
               <Button
                 fontSize={{ base: "xs", md: "lg" }}
                 className="px-0"
                 bg={"white.alpha"}
                 _hover={{ bg: "blackAlpha.100" }}
+                onClick={onOpenSearchFollowingModal}
               >
                 <Text as="span" fontWeight={"500"} mr={1}>
                   {following.length}
                 </Text>
                 following
               </Button>
+              <SearchUserModal
+                isOpenModal={isOpenSearchFollowingModal}
+                onCloseModal={onCloseSearchFollowingModal}
+                modalTitle={"Following"}
+                users={following}
+              />
             </Flex>
             <Flex alignItems={"flex-start"} gap={0} direction={"column"}>
               <Text fontSize={"sm"} fontWeight={"500"} mb={0}>

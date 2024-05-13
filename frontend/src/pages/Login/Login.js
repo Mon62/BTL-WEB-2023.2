@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { Container, Form, FormGroup, Button, InputGroup } from "react-bootstrap";
+import { Container, Form, FormGroup, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../api/Api.js";
 import { GoogleButton } from "react-google-button";
 import { auth } from "../../firebase/firebase.js";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { IconButton } from '@chakra-ui/react'
-
-
+import { InputRightElement, Input, InputGroup } from "@chakra-ui/react";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -16,11 +13,7 @@ export const Login = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const googleAuthProvider = new GoogleAuthProvider();
-  const [showPassword, setShowPassword] = useState(false)
-  const VisiblePassword = () => {
-    setShowPassword(!showPassword)
-  }
-
+  const [showPassword, setShowPassword] = useState(false);
 
   const signInWithGoogle = async () => {
     try {
@@ -65,12 +58,13 @@ export const Login = () => {
         <h1 className="align-self-center" style={{ marginTop: "50px" }}>
           Đăng nhập
         </h1>
-        <Form.Label className="mt-3" htmlFor="email">Email</Form.Label>
-        <FormGroup className="mb-2" style={{ border: "1px solid #000", borderRadius: 6 }}>
-          <Form.Control
-            id="email"
+        <Form.Label className="mt-3" htmlFor="email">
+          Email
+        </Form.Label>
+        <FormGroup className="mb-2">
+          <Input
             type="email"
-            placeholder="Địa chỉ email"
+            id="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -78,22 +72,37 @@ export const Login = () => {
           />
         </FormGroup>
 
-        <Form.Label className="mt-2" htmlFor="password">Password</Form.Label>
-
-        <InputGroup className="mb-1" style={{ border: "1px solid #000", borderRadius: 6 }}>
-
-          <Form.Control
+        <Form.Label className="mt-2" htmlFor="password">
+          Password
+        </Form.Label>
+        <InputGroup className="mb-1">
+          <Input
             id="password"
-            type="password"
-            placeholder="Mật khẩu"
+            type={showPassword ? "text" : "password"}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={{ height: "50px" }}
           />
-            <IconButton icon={showPassword ? <ViewOffIcon />: <ViewIcon />} onClick={VisiblePassword}  color="black" colorScheme="gray" height={50}></IconButton>
-
+          <InputRightElement width="4.5rem">
+            <Button
+              className="m-0 mt-2"
+              h="1.75rem"
+              size="sm"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                backgroundColor: "#EFECEC",
+                color: "black",
+                border: "none",
+                borderRadius: "5px",
+                borderColor: "white",
+              }}
+            >
+              {showPassword ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
         </InputGroup>
+
         {errorMessage.length > 0 && (
           <p className="text-danger">{errorMessage}</p>
         )}

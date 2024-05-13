@@ -9,9 +9,20 @@ import {
 } from '@chakra-ui/react'
 
 
-const Notifications = () => {
+const Notifications = (props) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
-
+    const handleClick = () =>{
+        onOpen()
+        if(typeof props.handleBg === 'function'){
+            (props.handleBg)();
+          }
+    }
+    const handleClose = () =>{
+        onClose();
+        if(typeof props.handlePrevBg === 'function'){
+            (props.handlePrevBg)();
+          }
+    }
     return (
         <Tooltip
             hasArrow
@@ -24,17 +35,18 @@ const Notifications = () => {
             <Flex
                 alignItems={"center"}
                 gap={4}
-                _hover={{ bg: "blackAlpha.200" }}
+                _hover={{ bg: "blackAlpha.300" }}
                 borderRadius={6}
                 p={2}
                 w={{ base: 10, md: "full" }}
                 justifyContent={{ base: "center", md: "flex-start" }}
-                onClick={onOpen}
+                onClick={handleClick}
+                bg={props.bg}
             >
              <Drawer
                     isOpen={isOpen}
                     placement='left'
-                    onClose={onClose}
+                    onClose={handleClose}
                 //finalFocusRef={btnRef}
                 >
                     <DrawerContent marginLeft={{ base: 70, md: 60 }} >

@@ -4,6 +4,7 @@ import { ProfileHeader } from "../../components/Profile/ProfileHeader/ProfileHea
 import { ProfileTabs } from "../../components/Profile/ProfileTab/ProfileTabs.js";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { HighlightStory } from "../../components/Profile/ProfileStory/HighLightStory.js";
 
 export const Profile = () => {
   const pathnameParts = window.location.pathname.split("/");
@@ -20,6 +21,9 @@ export const Profile = () => {
         justify={"center"}
       >
         <ProfileHeader />
+      </Flex>
+      <Flex className="w-full mx-auto">
+        <HighlightStory />
       </Flex>
 
       <Flex

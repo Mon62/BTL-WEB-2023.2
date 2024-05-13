@@ -6,7 +6,7 @@ import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
 import { getProfileByUsername } from "../../api/Api.js";
 import CreateStoryModal from "../../components/CreateStory/CreateStoryModal.js";
-
+import { SkeletonCircle } from "@chakra-ui/react";
 
 export const Home = () => {
   const currentUser = sessionStorage.getItem("currentUser");
@@ -16,7 +16,7 @@ export const Home = () => {
   const [show, setShow] = useState(false)
   const handleShow = () => setShow(true)
   const handleClose = () => setShow(false)
-  console.log(1)
+  const[loading, setLoading] = useState(true)
 
   useEffect(() => {
     getProfileByUsername(currentUser)
@@ -32,11 +32,17 @@ export const Home = () => {
       .catch((err) => {
         console.log(err.response.data.message);
         toast(new Error(err));
-      });},[currentUser])
+      });
+      setTimeout(() => {
+        setLoading(false);
+      }, 4500)
+    },[currentUser])
   return (
     <Container maxW={"container.lg"}>
       <Flex gap={20}>
         <Box flex={2} py={10}>
+        {loading && <SkeletonCircle size='20'/>}
+        {!loading && 
         <Avatar src={profilePicURL} size="lg">
         <AvatarBadge
             cursor="pointer"
@@ -48,6 +54,7 @@ export const Home = () => {
             <AddIcon color="black" fontSize="10px" />
           </AvatarBadge>
           </Avatar>
+        }
           {show && (<CreateStoryModal func={handleClose} show={show} />) }
           
         </Box>

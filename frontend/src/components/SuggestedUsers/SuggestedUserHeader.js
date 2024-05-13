@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from "../../api/Api.js";
 import  SwitchAccountForm  from '../Sidebar/SwitchAccountForm.js';
 import { getProfileByUsername } from "../../api/Api.js";
+import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react'
 
 
 const SuggestedUserHeader = () => {
@@ -15,7 +16,7 @@ const SuggestedUserHeader = () => {
     const [fullName, setFullName] = useState("");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
+    const [loading, setLoading] = useState(true)
     //Logout
     const navigate = useNavigate()
 	const toast = useToast()
@@ -33,7 +34,11 @@ const SuggestedUserHeader = () => {
           .catch((err) => {
             console.log(err.response.data.message);
             toast(new Error(err));
-          });},[currentUser])
+          });
+          setTimeout(() =>{
+            setLoading(false)
+          },4500)
+        },[currentUser])
     
 	const handleLogout = (e) => {
 		e.preventDefault();
@@ -60,7 +65,8 @@ const SuggestedUserHeader = () => {
         <VStack py={8} px={6} gap={4}>
             <Flex justifyContent={"space-between"} alignItems={"center"} w={"full"} gap={10}>
                 <Flex alignItems={"center"} gap={2}>
-                    <Avatar name='test name' src={profilePicURL} size={'lg'} />
+                    {loading && <SkeletonCircle size='20'/>}
+                    {!loading && <Avatar  src={profilePicURL} size={'lg'} />}
                     <Text fontSize={14} fontWeight={'bold'} alignItems={"center"} marginBottom={0} >{currentUser}</Text>
 
                 </Flex>
