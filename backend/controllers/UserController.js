@@ -71,6 +71,7 @@ export const registerUser = async (req, res, next) => {
           [],
           [],
           [],
+          [],
           []
         );
         updateProfile(auth.currentUser, {

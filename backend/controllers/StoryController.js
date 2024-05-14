@@ -109,6 +109,22 @@ export const createStory = async (req, res, next) => {
       contentType: media.mimetype,
     };
 
+    // Function to determine the type of media
+    const getTypeOfMedia = (filename) => {
+      const lowerCaseFilename = filename.toLowerCase();
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+      const videoExtensions = ['mp4', 'avi', 'mov'];
+    
+      if (imageExtensions.some(ext => lowerCaseFilename.includes(ext))) {
+        return 'picture';
+      } else if (videoExtensions.some(ext => lowerCaseFilename.includes(ext))) {
+        return 'video';
+      } else {
+        return 'unknown';
+      }
+    }
+    const typeOfMedia = getTypeOfMedia(media.originalname);
+
     admin
       .auth()
       .verifyIdToken(accessToken)
@@ -134,6 +150,7 @@ export const createStory = async (req, res, next) => {
           storyId: storyId,
           caption: caption,
           mediaURL: mediaURL,
+          typeOfMedia: typeOfMedia,
           musicURL: musicURL,
           likes: [],
           createdAt: createdAt,

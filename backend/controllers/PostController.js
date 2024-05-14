@@ -32,6 +32,8 @@ export const createPost = async (req, res, next) => {
     const pid = uuid();
     let imgURLs = [];
 
+
+    
     admin
       .auth()
       .verifyIdToken(accessToken)
@@ -73,7 +75,22 @@ export const createPost = async (req, res, next) => {
               next(error);
             });
         }
+        // Check if the first media is a picture or a video
+        const getTypeOfMedia = (filename) => {
+          const lowerCaseFilename = filename.toLowerCase();
+          const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+          const videoExtensions = ['mp4', 'avi', 'mov'];
+        
+          if (imageExtensions.some(ext => lowerCaseFilename.includes(ext))) {
+            return 'picture';
+          } else if (videoExtensions.some(ext => lowerCaseFilename.includes(ext))) {
+            return 'video';
+          } else {
+            return 'unknown';
+          }
+        };
 
+        const typeOfFirstMedia = getTypeOfMedia(imgURLs[0]);
         //const postData = new postModel(username, caption, imgURL, createdAt);
         const postData = {
           pid: pid,
@@ -83,6 +100,7 @@ export const createPost = async (req, res, next) => {
           comments: [],
           createdAt: createdAt,
           createdBy: username,
+          typeOfFirstMedia: typeOfFirstMedia, //First media is video or picture
         };
 
         await setDoc(doc(db, "posts", pid), postData);
@@ -414,3 +432,4 @@ export const getNewPostsByUsername = async (req, res, next) => {
     res.status(400).json({ message: error.message });
   }
 };
+

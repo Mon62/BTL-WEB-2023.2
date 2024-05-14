@@ -14,7 +14,8 @@ class User {
     stories, // array of storyID
     newStories, // map key (username) - value (array of storyID) xem mẫu newStories trong username nam03nd trên firebase 
     myNewStories, // newStories from me
-    highlights // array of highlightIDs
+    highlights, // array of highlightIDs
+    notifications // array of notificationID
   ) {
     this.uid = uid;
     this.username = username;
@@ -31,6 +32,7 @@ class User {
     this.newStories = newStories;
     this.myNewStories = myNewStories;
     this.highlights = highlights;
+    this.notifications = notifications;
   }
 }
 
