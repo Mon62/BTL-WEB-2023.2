@@ -114,7 +114,7 @@ export const createStory = async (req, res, next) => {
       const lowerCaseFilename = filename.toLowerCase();
       const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
       const videoExtensions = ['mp4', 'avi', 'mov'];
-    
+
       if (imageExtensions.some(ext => lowerCaseFilename.includes(ext))) {
         return 'picture';
       } else if (videoExtensions.some(ext => lowerCaseFilename.includes(ext))) {
@@ -156,6 +156,7 @@ export const createStory = async (req, res, next) => {
           createdAt: createdAt,
           createdBy: username,
           endAt: endAt,
+          inHighlights: [],
         };
         await setDoc(doc(db, "stories", storyId), storyData);
         await updateDoc(doc(db, "users", username), {
@@ -222,12 +223,35 @@ export const deleteStory = async (req, res, next) => {
 
         const storyData = storySnapshot.data();
         const username = storyData.createdBy;
+        const inHighlights = storyData.inHighlights || [];
 
         // Remove storyId from user's stories
         const userRef = doc(db, "users", username);
         await updateDoc(userRef, {
           stories: arrayRemove(storyId),
         });
+
+        // Create an array to hold all the promises
+        let promises = [];
+
+        for (let i = 0; i < inHighlights.length; i++) {
+          const highlightRef = doc(db, "highlights", inHighlights[i]);
+          const highlightSnapshot = await getDoc(highlightRef);
+          if (highlightSnapshot.exists()) {
+            const highlightData = highlightSnapshot.data();
+            const updatedStories = highlightData.stories.filter(id => id !== storyId);
+           // If the highlight doesn't have any stories, delete the highlight
+           if (updatedStories.length === 0) {
+            promises.push(deleteDoc(highlightRef));
+          } else {
+            // Otherwise, update the highlight with the updated stories
+            promises.push(updateDoc(highlightRef, { stories: updatedStories }));
+          }
+          }
+        }
+
+        // Wait for all promises to resolve
+        await Promise.all(promises);
 
         // Remove story from database
         await deleteDoc(storyRef);

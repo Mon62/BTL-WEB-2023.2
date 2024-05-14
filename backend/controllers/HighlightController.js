@@ -59,6 +59,17 @@ export const createHighlight = async (req, res, next) => {
                     highlights: arrayUnion(hlid),
                 });
 
+                // Add hlid to inHighlights of each story
+                for (let i = 0; i < stories.length; i++) {
+                    const storyRef = doc(db, "stories", stories[i]);
+                    const storySnapshot = await getDoc(storyRef);
+                    if (storySnapshot.exists()) {
+                        await updateDoc(storyRef, {
+                            inHighlights: arrayUnion(hlid),
+                        });
+                    }
+                }
+
                 return res.status(200).json({
                     status: "success",
                     message: "Tạo highlight thành công!",
@@ -167,42 +178,42 @@ export const deleteHighlight = async (req, res, next) => {
 
 export const getAllHighlightsByUsername = async (req, res, next) => {
     try {
-      const username = req.params.username;
-      const userRef = doc(db, "users", username);
-      const userSnapshot = await getDoc(userRef);
-      if (!userSnapshot.exists()) {
-        return res
-          .status(400)
-          .json({ message: "Không tồn tại người dùng " + username });
-      }
-      const userData = userSnapshot.data();
-      const highlights = userData.highlights || [];
-      const highlightData = [];
-
-      for (let i = 0; i < highlights.length; i++) {
-        const highlightRef = doc(db, "highlights", highlights[i]);
-        const highlightSnapshot = await getDoc(highlightRef);
-        if (highlightSnapshot.exists()) {
-          const highlight = highlightSnapshot.data();
-          const stories = [];
-          if(highlight.stories){
-            for (let j = 0; j < highlight.stories.length; j++) {
-                const storyRef = doc(db, "stories", highlight.stories[j]);
-                const storySnapshot = await getDoc(storyRef);
-                if (storySnapshot.exists()) {
-                  stories.push(storySnapshot.data());
-                }
-              }
-          }
-          highlight.stories = stories;
-          highlightData.push(highlight);
+        const username = req.params.username;
+        const userRef = doc(db, "users", username);
+        const userSnapshot = await getDoc(userRef);
+        if (!userSnapshot.exists()) {
+            return res
+                .status(400)
+                .json({ message: "Không tồn tại người dùng " + username });
         }
-      }
-      return res.status(200).json({ message: "success", data: highlightData });
+        const userData = userSnapshot.data();
+        const highlights = userData.highlights || [];
+        const highlightData = [];
+
+        for (let i = 0; i < highlights.length; i++) {
+            const highlightRef = doc(db, "highlights", highlights[i]);
+            const highlightSnapshot = await getDoc(highlightRef);
+            if (highlightSnapshot.exists()) {
+                const highlight = highlightSnapshot.data();
+                const stories = [];
+                if (highlight.stories) {
+                    for (let j = 0; j < highlight.stories.length; j++) {
+                        const storyRef = doc(db, "stories", highlight.stories[j]);
+                        const storySnapshot = await getDoc(storyRef);
+                        if (storySnapshot.exists()) {
+                            stories.push(storySnapshot.data());
+                        }
+                    }
+                }
+                highlight.stories = stories;
+                highlightData.push(highlight);
+            }
+        }
+        return res.status(200).json({ message: "success", data: highlightData });
     } catch (error) {
-      console.error(error);
-      return next(error);
+        console.error(error);
+        return next(error);
     }
-  };
+};
 
 

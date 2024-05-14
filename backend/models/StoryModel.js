@@ -1,5 +1,5 @@
 class Story {
-    constructor(storyId, caption, mediaURL, typeOfMedia, musicURL, likes, createdAt, createdBy, endAt) {
+    constructor(storyId, caption, mediaURL, typeOfMedia, musicURL, likes, createdAt, createdBy, endAt, inHighlights) {
         this.storyId = storyId;
         this.caption = caption;
         this.mediaURL = mediaURL; // media can be a image or video
@@ -9,6 +9,7 @@ class Story {
         this.createdBy = createdBy;
         this.endAt = endAt;
         this.musicURL = musicURL;
+        this.inHighlights = inHighlights;
     }
 }
 
