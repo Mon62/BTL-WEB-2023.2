@@ -14,6 +14,7 @@ import {
   Timestamp,
   arrayUnion,
 } from "firebase/firestore";
+ import ffmpeg from 'fluent-ffmpeg';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import multer from "multer";
 
@@ -198,6 +199,82 @@ export const deletePost = async (req, res, next) => {
 };
 
 //GET /posts/:username
+
+//namvq recommend 
+// export const getPostsByUsername = (req, res, next) => {
+//   try {
+//     const username = req.params.username;
+//     const accessToken = req.headers.authorization;
+//     console.log(username);
+
+//     // const ffmpeg = require('ffmpeg');
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then((decodedToken) => {
+//         const docRef = doc(db, "users", username);
+
+//         setTimeout(() => {
+//           getDoc(docRef)
+//             .then((user) => {
+//               if (!user.exists()) {
+//                 return res
+//                   .status(400)
+//                   .json({ message: "Không tồn tại người dùng " + username });
+//               }
+//               const userData = user.data();
+//               const postIdList = userData.posts;
+//               if (postIdList.length === 0) {
+//                 return res.status(200).json({ postsData: [] });
+//               }
+
+//               const postPromises = postIdList.map(async (postId) => {
+//                 const postRef = doc(db, "posts", postId);
+//                 const post = await getDoc(postRef).catch((err) => next(err));
+//                 const data = post.data();
+
+//                 if (data.imgURLs[0].includes('.mp4')) {
+//                   const thumbnailPath = `D:/DESKTOP/tetsstts/web/BTL-WEB-2023.2/backend/data/thumbnails/${postId}.jpg`;
+//                   await new Promise((resolve, reject) => {
+//                     ffmpeg(data.imgURLs[0])
+//                       .on('end', resolve)
+//                       .on('error', reject)
+//                       .screenshots({
+//                         timestamps: ['00:00:02'],
+//                         filename: thumbnailPath,
+//                         folder: 'D:/DESKTOP/tetsstts/web/BTL-WEB-2023.2/backend/data/thumbnails/',
+//                       });
+//                   });
+//                   data.imgURLs[0] = thumbnailPath;
+//                 }
+
+//                 return {
+//                   numberOfLikes: data.likes ? data.likes.length : 0,
+//                   numberOfComments: data.comments ? data.comments.length : 0,
+//                   firstPicURL: data.imgURLs[0],
+//                 };
+//               });
+
+//               let postsData = [];
+//               Promise.all(postPromises)
+//                 .then((_postsData) => {
+//                   postsData.push(..._postsData);
+//                   return res.status(200).json({
+//                     postsData: postsData,
+//                   });
+//                 })
+//                 .catch((err) => next(err));
+//             })
+//             .catch((err) => next(err));
+//         }, 700);
+//       })
+//       .catch((err) => next(err));
+//   } catch (err) {
+//     console.log(err);
+//     res.status(400).json({ message: err.message });
+//   }
+// };
+
 export const getPostsByUsername = (req, res, next) => {
   try {
     const username = req.params.username;
