@@ -363,3 +363,99 @@ export function getHighlightsByUsername(username) {
 export function getMusicFiles() {
   return axios.get(API_URL + "/music", baseHeader);
 }
+
+
+// API NOTIFICATION
+
+export function likePost(postId, username) {
+  return axios.post(
+    API_URL + "/like-post",
+    { postId: postId, username: username },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
+export function unlikePost(postId, username) {
+  return axios.post(
+    API_URL + "/unlike-post",
+    { postId: postId, username: username },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
+export function likeStory(storyId, username) {
+  return axios.post(
+    API_URL + "/like-story",
+    { storyId: storyId, username: username },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
+export function unlikeStory(storyId, username) {
+  return axios.post(
+    API_URL + "/unlike-story",
+    { storyId: storyId, username: username },
+    {
+      headers: {
+        "access-control-allow-origin": "*",
+        "content-type": "application/json; charset=utf-8 ",
+        Authorization: sessionStorage.getItem("accessToken"),
+      },
+    }
+  );
+}
+
+//truyen vao postId, username nguoi comment, textComment
+export function commentOnPost(commentData) {
+  return axios.post(API_URL + "/comment-on-post", commentData, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
+//truyen vao  commentId, username nguoi delete
+export function deleteComment(commentData) {
+  return axios.delete(API_URL + "/delete-comment", {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+    data: commentData,
+  });
+}
+
+export function getNotificationsByUsername(username) {
+  return axios.get(API_URL + "/get-notifications/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
+export function getCommentsByPostId(postId) {
+  return axios.get(API_URL + "/get-comments/" + postId, baseHeader);
+}

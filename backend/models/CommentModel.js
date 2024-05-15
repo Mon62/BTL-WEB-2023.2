@@ -1,7 +1,8 @@
 class Comment {
-  constructor(postId, comment, createdBy, createdAt) {
+  constructor(commentId, postId, textComment, createdBy, createdAt) {
+    this.commentId = commentId;
     this.postId = postId;
-    this.comment = comment;
+    this.textComment = textComment;
     this.createdAt = createdAt;
     this.createdBy = createdBy;
   }
