@@ -148,7 +148,7 @@ export const createStory = async (req, res, next) => {
           });
         const storyData = {
           storyId: storyId,
-          caption: caption,
+          caption: JSON.stringify(caption),
           mediaURL: mediaURL,
           typeOfMedia: typeOfMedia,
           musicURL: musicURL,
@@ -310,6 +310,7 @@ export const getStoryByStoryId = async (req, res, next) => {
         .json({ message: "Không tồn tại story " + storyId });
     }
     const story = storySnapshot.data();
+  
     return res.status(200).json({ message: "success", data: story });
   } catch (error) {
     res.status(400).json({ message: error.message });

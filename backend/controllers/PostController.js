@@ -94,7 +94,7 @@ export const createPost = async (req, res, next) => {
         //const postData = new postModel(username, caption, imgURL, createdAt);
         const postData = {
           pid: pid,
-          caption: req.body.caption, // change this line
+          caption: JSON.stringify(caption), // change this line
           imgURLs: imgURLs,
           likes: [],
           comments: [],
@@ -162,7 +162,7 @@ export const updatePost = async (req, res, next) => {
 
         // update the post document
         await updateDoc(postRef, {
-          caption: caption,
+          caption: JSON.stringify(caption),
         });
 
         res.status(200).json({
