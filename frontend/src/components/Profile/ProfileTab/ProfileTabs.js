@@ -6,7 +6,7 @@ import {
   TabList,
   TabPanel,
   TabPanels,
-  TabIndicator,
+  Text,
 } from "@chakra-ui/react";
 import { BsGrid3X3, BsBookmark, BsPersonSquare } from "react-icons/bs";
 import { ProfilePostList } from "./ProfilePostList";
@@ -51,7 +51,7 @@ export const ProfileTabs = () => {
           </TabPanel>
           <TabPanel>
             <Flex justifyContent={"center"}>
-              {currentUser === profileUser ? <p>SAVED</p> : <p>Only {profileUser} can view this section</p>}
+              {currentUser === profileUser ? <p>SAVED</p> : <Text textTransform={"none"}>Only {profileUser} can view this section</Text>}
             </Flex>
           </TabPanel>
         </TabPanels>

@@ -13,7 +13,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { editProfile } from "../../../api/Api";
+import { editProfile } from "../../../api/Api.js";
 import { Success, Error } from "../../../models/Toast.js";
 
 export const EditProfileModal = ({

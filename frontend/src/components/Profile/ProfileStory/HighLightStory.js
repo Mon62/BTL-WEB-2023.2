@@ -18,14 +18,20 @@ import {
   Container,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { CloseIcon } from "@chakra-ui/icons";
+import { CloseIcon, ChevronLeftIcon } from "@chakra-ui/icons";
 import { useParams } from "react-router-dom";
+import { SelectStoryModal } from "./SelectStoryModal";
 
 export const HighlightStory = () => {
   const {
     isOpen: isOpenCreateHighlightStories,
     onOpen: onOpenCreateHighlightStories,
     onClose: onCloseCreateHighlightStories,
+  } = useDisclosure();
+  const {
+    isOpen: isOpenSelectStoryModal,
+    onOpen: onOpenSelectStoryModal,
+    onClose: onCloseSelectStoryModal,
   } = useDisclosure();
   const [highlightName, setHighlightName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -35,15 +41,17 @@ export const HighlightStory = () => {
   useEffect(() => {
     setHighlightName("");
     setErrorMessage("");
+  
   }, []);
 
-  const handleSubmit = () => {
-    console.log("first");
+  const handleOpenSelectStoryModal = () => {
     if (highlightName === "") {
       setErrorMessage("Please fill in the highlight name");
       return;
     }
+    onOpenSelectStoryModal();
   };
+
   return (
     <Container className="m-0 p-0">
       <Flex>
@@ -64,16 +72,17 @@ export const HighlightStory = () => {
           onClose={onCloseCreateHighlightStories}
           isOpen={isOpenCreateHighlightStories}
           isCentered
+          id="create-highlight-stories"
         >
-          <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px) " />
+          <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
           <ModalContent>
             <ModalHeader className="d-flex align-self-center">
               New Highlight
             </ModalHeader>
             <ModalCloseButton mt={2} />
             <hr className="solid mt-0" />
-            <ModalBody>
-              <InputGroup>
+            <ModalBody className="ps-0 pe-0">
+              <InputGroup className="pe-4 ps-4">
                 <Input
                   value={highlightName}
                   type="text"
@@ -94,14 +103,51 @@ export const HighlightStory = () => {
                 </InputRightAddon>
               </InputGroup>
               {errorMessage.length > 0 && (
-                <p className="text-danger">{errorMessage}</p>
+                <p className="text-danger pe-4 ps-4">{errorMessage}</p>
               )}
               <hr className="solid mb-0" />
               <Flex justifyContent={"center"}>
                 <Button
                   bgColor={"#FFFFFF"}
                   _hover={{ bgColor: "rgb(250, 250, 250)" }}
-                  onClick={handleSubmit}
+                  onClick={handleOpenSelectStoryModal}
+                >
+                  Next
+                </Button>
+              </Flex>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        <Modal
+          onClose={onCloseSelectStoryModal}
+          isOpen={isOpenSelectStoryModal}
+          isCentered
+          id="select-story-modal"
+        >
+          <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
+          <ModalContent>
+            <ModalHeader className="d-flex">
+              <ChevronLeftIcon
+                alignSelf={"center"}
+                justifySelf={"flex-start"}
+                onClick={onCloseSelectStoryModal}
+                cursor={"pointer"}
+              />
+              <Text className="mb-0" ms={"160px"}>
+                Story
+              </Text>
+            </ModalHeader>
+            <ModalCloseButton mt={2} />
+            <hr className="solid mt-0" />
+            <ModalBody className="p-0">
+              <SelectStoryModal/>
+              <hr className="solid mb-0" />
+              <Flex justifyContent={"center"}>
+                <Button
+                  bgColor={"#FFFFFF"}
+                  _hover={{ bgColor: "rgb(250, 250, 250)" }}
+                  onClick={handleOpenSelectStoryModal}
                 >
                   Next
                 </Button>

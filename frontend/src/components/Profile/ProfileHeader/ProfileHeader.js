@@ -203,7 +203,7 @@ export const ProfileHeader = () => {
                 </Button>
               </Flex>
             </Flex>
-            <Flex alignItems={"center"} gap={{ base: 4, sm: 10 }} mt={0}>
+            <Flex alignItems={"center"} gap={{ base: 4, sm: 8 }} mt={0}>
               <Text fontSize={{ base: "xs", md: "lg" }} className="mb-0">
                 <Text as="span" fontWeight={"500"} mr={1}>
                   {posts.length}

@@ -9,13 +9,16 @@ import {
   VStack,
   Box,
   Skeleton,
+  Text,
 } from "@chakra-ui/react";
 import { getStoriesByUsername } from "../../api/Api";
 import { ArchiveStory } from "../../components/Story/ArchiveStory";
 import { Error, Success } from "../../models/Toast";
+import { useParams } from "react-router-dom";
 
 export const Archive = () => {
   const currentUser = sessionStorage.getItem("currentUser");
+  const { profileUser } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [storiesData, setStoriesData] = useState([]);
   const toast = useToast();
@@ -37,7 +40,7 @@ export const Archive = () => {
     }, 3000);
   }, []);
 
-  return (
+  return currentUser === profileUser ? (
     <Container className="m-0 mw-100" px={10} h={"800px"} overflow={"auto"}>
       <Container className="mw-100">
         <Flex>
@@ -63,23 +66,36 @@ export const Archive = () => {
       <Grid
         className="mt-5 mb-5"
         mx={15}
-        templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }}
+        templateColumns={{base: "repeat(1, 1fr)", sm: "repeat(2, 1fr)", md: "repeat(3, 1fr)", lg: "repeat(4, 1fr)"}}
         gap={5}
         columnGap={5}
       >
         {isLoading &&
-          [0, 1, 2].map((_, idx) => (
+          [0, 1, 2, 3].map((_, idx) => (
             <VStack key={idx} alignItems={"flex-start"} gap={4}>
               <Skeleton w={"full"}>
-                <Box h="480px"></Box>
+                <Box h="360px"></Box>
               </Skeleton>
             </VStack>
           ))}
         {!isLoading &&
-          storiesData.map((story, index) => (
-            <ArchiveStory key={index} img={story.mediaURL} h={"480px"}/>
+          (storiesData.length > 0 ? (
+            storiesData.map((story, index) => (
+              <ArchiveStory
+                key={index}
+                img={story.mediaURL}
+                typeOfMedia={story.typeOfMedia}
+                isInHighlight={story.isInHighlight}
+              />
+            ))
+          ) : (
+            <Text>You don't have any stories</Text>
           ))}
       </Grid>
+    </Container>
+  ) : (
+    <Container className="d-flex mw-100 me-0 ms-0" mt={20} justifyContent={"center"}>
+    <Text alignSelf={"center"} fontWeight={"bolder"} fontSize={"20px"}>Only {profileUser} can view this section</Text>
     </Container>
   );
 };

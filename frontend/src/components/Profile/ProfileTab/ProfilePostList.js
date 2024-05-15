@@ -16,7 +16,9 @@ export const ProfilePostList = ({}) => {
     setIsLoading(true);
     getPostsByUsername(profileUser)
       .then((res) => {
+        // console.log(res);
         setPostsData(res.data.postsData.reverse());
+        // console.log(res.data.postsData.reverse());
       })
       .catch((err) => {
         console.log(err.response.data.message);
@@ -24,6 +26,7 @@ export const ProfilePostList = ({}) => {
       });
 
     setTimeout(() => {
+      // console.log(postsData);
       setIsLoading(false);
     }, 2000);
   }, [profileUser]);
@@ -49,6 +52,8 @@ export const ProfilePostList = ({}) => {
             img={post.firstPicURL}
             likes={post.numberOfLikes}
             comments={post.numberOfComments}
+            typeOfFirstMedia={post.typeOfFirstMedia}
+            numberOfMediaFile = {post.numberOfMediaFile}
           />
         ))}
     </Grid>

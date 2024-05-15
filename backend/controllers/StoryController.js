@@ -112,17 +112,19 @@ export const createStory = async (req, res, next) => {
     // Function to determine the type of media
     const getTypeOfMedia = (filename) => {
       const lowerCaseFilename = filename.toLowerCase();
-      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
-      const videoExtensions = ['mp4', 'avi', 'mov'];
+      const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+      const videoExtensions = ["mp4", "avi", "mov"];
 
-      if (imageExtensions.some(ext => lowerCaseFilename.includes(ext))) {
-        return 'picture';
-      } else if (videoExtensions.some(ext => lowerCaseFilename.includes(ext))) {
-        return 'video';
+      if (imageExtensions.some((ext) => lowerCaseFilename.includes(ext))) {
+        return "picture";
+      } else if (
+        videoExtensions.some((ext) => lowerCaseFilename.includes(ext))
+      ) {
+        return "video";
       } else {
-        return 'unknown';
+        return "unknown";
       }
-    }
+    };
     const typeOfMedia = getTypeOfMedia(media.originalname);
 
     admin
@@ -198,9 +200,7 @@ export const createStory = async (req, res, next) => {
     console.error(error);
     return next(error);
   }
-
 };
-
 
 //delete story
 export const deleteStory = async (req, res, next) => {
@@ -216,9 +216,7 @@ export const deleteStory = async (req, res, next) => {
         const storySnapshot = await getDoc(storyRef);
 
         if (!storySnapshot.exists()) {
-          return res
-            .status(400)
-            .json({ message: "Story does not exist" });
+          return res.status(400).json({ message: "Story does not exist" });
         }
 
         const storyData = storySnapshot.data();
@@ -239,14 +237,18 @@ export const deleteStory = async (req, res, next) => {
           const highlightSnapshot = await getDoc(highlightRef);
           if (highlightSnapshot.exists()) {
             const highlightData = highlightSnapshot.data();
-            const updatedStories = highlightData.stories.filter(id => id !== storyId);
-           // If the highlight doesn't have any stories, delete the highlight
-           if (updatedStories.length === 0) {
-            promises.push(deleteDoc(highlightRef));
-          } else {
-            // Otherwise, update the highlight with the updated stories
-            promises.push(updateDoc(highlightRef, { stories: updatedStories }));
-          }
+            const updatedStories = highlightData.stories.filter(
+              (id) => id !== storyId
+            );
+            // If the highlight doesn't have any stories, delete the highlight
+            if (updatedStories.length === 0) {
+              promises.push(deleteDoc(highlightRef));
+            } else {
+              // Otherwise, update the highlight with the updated stories
+              promises.push(
+                updateDoc(highlightRef, { stories: updatedStories })
+              );
+            }
           }
         }
 
@@ -310,7 +312,7 @@ export const getStoryById = async (req, res, next) => {
         .json({ message: "Không tồn tại story " + storyId });
     }
     const story = storySnapshot.data();
-  
+
     return res.status(200).json({ message: "success", data: story });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -350,6 +352,8 @@ export const getStoriesByUsername = (req, res, next) => {
                 const data = story.data();
                 return {
                   mediaURL: data.mediaURL,
+                  typeOfMedia: data.typeOfMedia,
+                  isInHighlight: data.inHighlights.length > 0,
                 };
               });
 
@@ -436,8 +440,7 @@ export const getNewStoriesByUsername = async (req, res, next) => {
       .catch((error) => {
         console.error(error);
         return next(error);
-      }
-      );
+      });
   } catch (error) {
     console.error(error);
     throw error;
@@ -493,8 +496,7 @@ export const getMyNewStories = async (req, res, next) => {
           message: "Lấy myNewStories thành công!",
           data: myNewStories,
         });
-      }
-      )
+      })
       .catch((error) => {
         console.error(error);
         return next(error);
@@ -600,8 +602,6 @@ export const getMyNewStories = async (req, res, next) => {
 //   }
 // };
 
-
-
 // MUSIC IN STORY
 // export const getMusicFiles = async (req, res, next) => {
 //   try {
@@ -622,17 +622,18 @@ export const getMyNewStories = async (req, res, next) => {
 
 export const getMusicFiles = async (req, res, next) => {
   try {
-    const musicFolder = ref(storage, '/music');
+    const musicFolder = ref(storage, "/music");
     const result = await listAll(musicFolder);
-    const fileData = await Promise.all(result.items.map(async (item) => {
-      const url = await getDownloadURL(item);
-      const name = item.name;
-      return { name, url };
-    }));
+    const fileData = await Promise.all(
+      result.items.map(async (item) => {
+        const url = await getDownloadURL(item);
+        const name = item.name;
+        return { name, url };
+      })
+    );
     res.status(200).json({ message: "success", data: fileData });
-  }
-  catch (error) {
+  } catch (error) {
     console.error(error);
     return next(error);
   }
-}
+};

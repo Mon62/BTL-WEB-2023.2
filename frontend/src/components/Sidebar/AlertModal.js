@@ -6,7 +6,7 @@ import { Box } from '@chakra-ui/react';
 
 const AlertModal = (props) => {
   return (
-    <Modal show={props.showAtt} onHide={props.handleCloseAtt} centered style={{backdropFilter: "blur(10px)"}} animation={false} >
+    <Modal show={props.showAtt} onHide={props.handleCloseAtt} centered style={{backdropFilter: "blur(5px)"}} animation={false} >
       <Modal.Header closeButton>
         <Modal.Title style={{ textAlign: "center", width: "100%" }}>
           {props.title}

@@ -2,27 +2,22 @@ import {
   Flex,
   GridItem,
   Image,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
   Text,
   useDisclosure,
-  Box,
-  Avatar,
-  Divider,
-  VStack,
+  AspectRatio,
 } from "@chakra-ui/react";
 import { AiFillHeart } from "react-icons/ai";
-import { SlHeart } from "react-icons/sl";
-
 import { FaComment } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { Comment } from "../../Comment/Comment.js";
+import { TbBoxMultiple } from "react-icons/tb";
+import { MdOndemandVideo } from "react-icons/md";
 
-export const ProfilePost = ({ img, likes, comments }) => {
+export const ProfilePost = ({
+  img,
+  likes,
+  comments,
+  typeOfFirstMedia,
+  numberOfMediaFile,
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -46,7 +41,7 @@ export const ProfilePost = ({ img, likes, comments }) => {
           bottom={0}
           bg={"blackAlpha.400"}
           transition={"all 0.3s ease"}
-          zIndex={1}
+          zIndex={2}
           justifyContent={"center"}
         >
           <Flex alignItems={"center"} gap={50}>
@@ -72,75 +67,36 @@ export const ProfilePost = ({ img, likes, comments }) => {
             </Flex>
           </Flex>
         </Flex>
+        <Flex
+          position={"absolute"}
+          top={1}
+          right={1}
+          zIndex={1}
+          className="shadow"
+        >
+          {numberOfMediaFile === 1 ? (
+            typeOfFirstMedia === "picture" ? (
+              <></>
+            ) : (
+              <MdOndemandVideo color="white" size={25} />
+            )
+          ) : (
+            <TbBoxMultiple color="white" size={25} />
+          )}
+        </Flex>
 
-        <Image src={img} w={"100%"} h={"100%"} objectFit={"cover"}></Image>
+        {typeOfFirstMedia === "video" ? (
+          <AspectRatio ratio={3 / 4} objectFit={"cover"}>
+            <iframe
+              title="post"
+              src={img}
+              // allowFullScreen
+            />
+          </AspectRatio>
+        ) : (
+          <Image src={img} w={"100%"} h={"100%"} objectFit={"cover"}></Image>
+        )}
       </GridItem>
-
-      {/* <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        isCentered={true}
-        size={{ base: "3xl", md: "5xl" }}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton />
-          <ModalBody bg={"black"} pb={5}>
-            <Flex
-              gap={4}
-              w={{ base: "90%", sm: "70%", md: "full" }}
-              mx={"auto"}
-            >
-              <Box
-                borderRadius={4}
-                overflow={"hidden"}
-                border={"1px solid"}
-                borderColor={"whiteAlpha.300"}
-                flex={1.5}
-              >
-                <Image src={img} alt="profile post"></Image>
-              </Box>
-              <Flex
-                flex={1}
-                flexDir={"column"}
-                px={10}
-                display={{ base: "none", md: "flex" }}
-              >
-                <Flex alignItems={"center"} justifyContent={"space-between"}>
-                  <Flex alignItems={"center"} gap={4}>
-                    <Avatar src="" size={"sm"} name="Nguyen Van Nam" />
-                    <Text fontWeight={"bold"} fontSize={12}>
-                      mon62
-                    </Text>
-                  </Flex>
-
-                  <Box
-                    _hover={{ bg: "whiteAlpha.300", color: "red.600" }}
-                    borderRadius={4}
-                    p={1}
-                  >
-                    <MdDelete size={20} cursor="pointer"></MdDelete>
-                  </Box>
-                </Flex>
-                <Divider my={4} bg={"gray.500"} />
-                <VStack
-                  w="full"
-                  alignItems={"start"}
-                  maxH={"350px"}
-                  overflowY={"auto"}
-                >
-                  <Comment
-                    createdAt="1d ago"
-                    username="monn"
-                    profilePic=""
-                    text={""}
-                  ></Comment>
-                </VStack>
-              </Flex>
-            </Flex>
-          </ModalBody>
-        </ModalContent>
-      </Modal> */}
     </>
   );
 };

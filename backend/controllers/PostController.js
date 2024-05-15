@@ -323,10 +323,13 @@ export const getPostsByUsername = (req, res, next) => {
                 const postRef = doc(db, "posts", postId);
                 const post = await getDoc(postRef).catch((err) => next(err));
                 const data = post.data();
+                // console.log(data);
                 return {
                   numberOfLikes: data.likes ? data.likes.length : 0,
                   numberOfComments: data.comments ? data.comments.length : 0,
                   firstPicURL: data.imgURLs[0],
+                  typeOfFirstMedia: data.typeOfFirstMedia,
+                  numberOfMediaFile: data.imgURLs.length
                 };
               });
 
