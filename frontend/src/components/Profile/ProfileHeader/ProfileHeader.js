@@ -62,7 +62,7 @@ export const ProfileHeader = () => {
     //   setIsLoading(true);
     getProfileByUsername(profileUser)
       .then((res) => {
-        // console.log(res.data)
+        // console.log(res.data);
         const profileData = res.data;
         setProfilePicURL(profileData.profilePicURL);
         setFullName(profileData.fullName);
@@ -153,7 +153,7 @@ export const ProfileHeader = () => {
                     />
                     <ModalContent>
                       <ModalHeader>Edit Your Profile</ModalHeader>
-                      <ModalCloseButton />
+                      <ModalCloseButton className="mt-2" />
                       <ModalBody>
                         <EditProfileModal
                           username={profileUser}
@@ -251,7 +251,12 @@ export const ProfileHeader = () => {
               <Text fontSize={"sm"} fontWeight={"500"} mb={0}>
                 {fullName}
               </Text>
-              <Text fontSize={"sm"} mb={0}>
+              <Text
+                style={{ whiteSpace: "pre" }}
+                fontWeight={"450"}
+                fontSize={"sm"}
+                mb={0}
+              >
                 {biography}
               </Text>
             </Flex>

@@ -5,7 +5,7 @@ import SuggestedUserHeader from "../../components/SuggestedUsers/SuggestedUserHe
 import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
 import { getProfileByUsername } from "../../api/Api.js";
-import CreateStoryModal from "../../components/CreateStory/CreateStoryModal.js";
+import CreateStoryModal from "../../components/Story/CreateStoryModal.js";
 import { SkeletonCircle } from "@chakra-ui/react";
 
 export const Home = () => {

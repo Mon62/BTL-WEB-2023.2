@@ -300,7 +300,7 @@ export const deleteStory = async (req, res, next) => {
 //   }
 // };
 
-export const getStoryByStoryId = async (req, res, next) => {
+export const getStoryById = async (req, res, next) => {
   try {
     const storyId = req.params.storyId;
     const storySnapshot = await getDoc(doc(db, "stories", storyId));
@@ -317,6 +317,60 @@ export const getStoryByStoryId = async (req, res, next) => {
   }
 };
 
+//GET /stories/:username
+export const getStoriesByUsername = (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then((decodedToken) => {
+        const docRef = doc(db, "users", username);
+
+        setTimeout(() => {
+          getDoc(docRef)
+            .then((user) => {
+              if (!user.exists()) {
+                return res
+                  .status(400)
+                  .json({ message: "Không tồn tại người dùng " + username });
+              }
+              const userData = user.data();
+              const storyIdList = userData.stories;
+              if (storyIdList.length === 0) {
+                return res.status(200).json({ storiesData: [] });
+              }
+
+              let storiesData = [];
+              const storyPromises = storyIdList.map(async (storyId) => {
+                const storyRef = doc(db, "stories", storyId);
+                const story = await getDoc(storyRef).catch((err) => next(err));
+                const data = story.data();
+                return {
+                  mediaURL: data.mediaURL,
+                };
+              });
+
+              Promise.all(storyPromises)
+                .then((_storiesData) => {
+                  storiesData.push(..._storiesData);
+                  return res.status(200).json({
+                    storiesData: storiesData,
+                  });
+                })
+                .catch((err) => next(err));
+            })
+            .catch((err) => next(err));
+        }, 700);
+      })
+      .catch((err) => next(err));
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+};
 
 export const getNewStoriesByUsername = async (req, res, next) => {
   try {

@@ -261,8 +261,18 @@ export function deleteStory(storyData) {
 // export function getStoriesByUsername(username) {
 //   return axios.get(API_URL + "/stories/" + username, baseHeader);
 // }
-export function getStoryByStoryId(storyId) {
-  return axios.get(API_URL + "/stories/" + storyId, baseHeader);
+export function getStoryById(storyId) {
+  return axios.get(API_URL + "/story/" + storyId, baseHeader);
+}
+
+export function getStoriesByUsername(username) {
+  return axios.get(API_URL + "/stories/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
 }
 
 export function getNewStoriesByUsername(username) {
@@ -284,7 +294,6 @@ export function getMyNewStories(username) {
     },
   });
 }
-
 
 //API for highlights
 //highlightData cần có các trường sau:hlname, hlimgURL, stories (array), username (createdBy)

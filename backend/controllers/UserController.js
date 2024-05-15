@@ -51,10 +51,10 @@ export const registerUser = async (req, res, next) => {
       return;
     }
 
-    createUserWithEmailAndPassword(auth, email, password).then(
-      async (userCredential) => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(async (userCredential) => {
         const user = userCredential.user;
-
+        const biographyJSON = JSON.stringify("");
         // set data for new user
         const userData = new userModel(
           user.uid,
@@ -62,7 +62,7 @@ export const registerUser = async (req, res, next) => {
           fullName,
           email,
           "https://firebasestorage.googleapis.com/v0/b/btl-web-20232.appspot.com/o/defaultAvatar%2FLovepik_com-450088035-Default%20Avatar%20Profile%20Photo%20Icon%20Vector.png?alt=media&token=90ffbe3d-4e7e-4c45-aa5b-67d6e716a0b8",
-          "",
+          biographyJSON,
           Date.now(),
           [],
           [],
@@ -74,6 +74,7 @@ export const registerUser = async (req, res, next) => {
           [],
           []
         );
+
         updateProfile(auth.currentUser, {
           displayName: username,
         }).catch((err) => next(err));
@@ -87,27 +88,9 @@ export const registerUser = async (req, res, next) => {
           message:
             "Bạn đã đăng ký tài khoản thành công. Thư xác nhận đã được gửi đến email của bạn, vui lòng xác nhận tiếp tục. Trân trọng!",
         });
-      }
-    );
+      })
+      .catch((err) => next(err));
   } catch (error) {
-    const errorCode = error.code;
-    if (errorCode === "auth/email-already-in-use")
-      return res.status(409).json({
-        status: "error",
-        message: "Email đã được sử dụng",
-      });
-    if (errorCode === "auth/weak-password") {
-      return res.status(403).json({
-        status: "failed",
-        message: "Mật khẩu cần có ít nhất 6 ký tự",
-      });
-    }
-    if (errorCode === "auth/invalid-email")
-      return res.status(403).json({
-        status: "failed",
-        message: "Email Không hợp lệ",
-      });
-
     res.status(400).json({ message: error.message });
   }
 };
@@ -118,39 +101,26 @@ export const login = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
-    signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-      const user = userCredential.user;
-      // console.log(user);
-      // if (!user.emailVerified) {
-      //   throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
-      //   next();
-      // }
-      //
-      res.status(200).json({
-        username: user.displayName,
-        accessToken: user.accessToken,
-        message: "Bạn đã đăng nhập thành công",
-      });
-      console.log(user.username);
-    });
-    // .catch((err) => next(err));
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        const user = userCredential.user;
+        // console.log(user);
+        // if (!user.emailVerified) {
+        //   throw new Error("Vui lòng xác thực email trước khi đăng nhập!");
+        //   next();
+        // }
+        //
+        res.status(200).json({
+          username: user.displayName,
+          accessToken: user.accessToken,
+          message: "Bạn đã đăng nhập thành công",
+        });
+        console.log(user.username);
+      })
+      .catch((err) => next(err));
   } catch (error) {
-    const errorCode = error.code;
-    console.log(error.code);
-    if (errorCode === "auth/invalid-credential") {
-      return res.status(403).json({
-        status: "failed",
-        message: "Email hoặc mật khẩu không chính xác!",
-      });
-    }
-    if (errorCode === "auth/invalid-email") {
-      return res.status(403).json({
-        status: "failed",
-        message: "Email không hợp lệ!",
-      });
-    }
+    console.log(error);
     res.status(400).json({
-      status: "error",
       message: error.message,
     });
   }
@@ -181,24 +151,17 @@ export const logout = (req, res) => {
 export const resetPassword = async (req, res, next) => {
   try {
     const email = req.params.email;
-    await sendPasswordResetEmail(auth, email).then(() => {
-      res.status(200).json({
-        status: "success",
-        message:
-          "Thư hướng dẫn cách reset lại mật khẩu đã được gửi đến email của bạn!",
-      });
-    });
-    // .catch((err) => next(err));
+    await sendPasswordResetEmail(auth, email)
+      .then(() => {
+        res.status(200).json({
+          status: "success",
+          message:
+            "Thư hướng dẫn cách reset lại mật khẩu đã được gửi đến email của bạn!",
+        });
+      })
+      .catch((err) => next(err));
   } catch (error) {
-    const errorCode = error.code;
-    if (errorCode === "auth/invalid-email") {
-      return res.status(400).json({
-        status: "error",
-        message: "Email không hợp lệ.",
-      });
-    }
     res.status(400).json({
-      status: "error",
       message: error.message,
     });
   }
@@ -208,24 +171,17 @@ export const resetPassword = async (req, res, next) => {
 export const changePassword = async (req, res, next) => {
   try {
     const email = req.params.email;
-    await sendPasswordResetEmail(auth, email).then(() => {
-      res.status(200).json({
-        status: "success",
-        message:
-          "Thư chứa liên kết thay đổi mật khẩu đã được gửi đến email của bạn!",
-      });
-    });
-    // .catch((err) => next(err));
+    await sendPasswordResetEmail(auth, email)
+      .then(() => {
+        res.status(200).json({
+          status: "success",
+          message:
+            "Thư chứa liên kết thay đổi mật khẩu đã được gửi đến email của bạn!",
+        });
+      })
+      .catch((err) => next(err));
   } catch (error) {
-    const errorCode = error.code;
-    if (errorCode === "auth/invalid-email") {
-      return res.status(400).json({
-        status: "error",
-        message: "Email không hợp lệ.",
-      });
-    }
     res.status(400).json({
-      status: "error",
       message: error.message,
     });
   }
@@ -250,10 +206,10 @@ export const editProfile = (req, res, next) => {
         //update fullName and biography in firestore
         updateDoc(doc(db, "users", username), {
           fullName: fullName,
-          biography: biography,
+          biography: JSON.stringify(biography),
         }).catch((err) => next(err));
-        //update profilePic in storage
 
+        //update profilePic in storage
         if (profilePic != null) {
           // Update new profilePic
           const newProfilePicPath = `profilePic/${username}/${
@@ -326,8 +282,9 @@ export const getProfileByUsername = (req, res, next) => {
               }
 
               const userData = user.data();
+              const biography = JSON.parse(userData.biography);
               return res.status(200).json({
-                biography: userData.biography,
+                biography: biography,
                 followers: userData.followers,
                 followingUsers: userData.followingUsers,
                 fullName: userData.fullName,

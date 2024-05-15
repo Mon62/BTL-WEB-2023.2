@@ -15,9 +15,11 @@ import {
   Input,
   InputRightAddon,
   InputGroup,
+  Container,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { CloseIcon } from "@chakra-ui/icons";
+import { useParams } from "react-router-dom";
 
 export const HighlightStory = () => {
   const {
@@ -27,6 +29,8 @@ export const HighlightStory = () => {
   } = useDisclosure();
   const [highlightName, setHighlightName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const currentUser = sessionStorage.getItem("currentUser");
+  const { profileUser } = useParams();
 
   useEffect(() => {
     setHighlightName("");
@@ -41,17 +45,21 @@ export const HighlightStory = () => {
     }
   };
   return (
-    <Flex>
-      <Box padding={"0px 80px 0px 80px"} dir="column" gap={2}>
-        <IoIosAddCircleOutline
-          size={"120"}
-          color="rgb(199, 199, 199)"
-          cursor={"pointer"}
-          onClick={onOpenCreateHighlightStories}
-        />
-        <Box className="d-flex justify-content-center">
-          <Text className="m-0">New</Text>
-        </Box>
+    <Container className="m-0 p-0">
+      <Flex>
+        {currentUser === profileUser && (
+          <Box dir="column" gap={2}>
+            <IoIosAddCircleOutline
+              size="7em"
+              color="rgb(199, 199, 199)"
+              cursor={"pointer"}
+              onClick={onOpenCreateHighlightStories}
+            />
+            <Box className="d-flex justify-content-center">
+              <Text className="m-0">New</Text>
+            </Box>
+          </Box>
+        )}
         <Modal
           onClose={onCloseCreateHighlightStories}
           isOpen={isOpenCreateHighlightStories}
@@ -101,7 +109,7 @@ export const HighlightStory = () => {
             </ModalBody>
           </ModalContent>
         </Modal>
-      </Box>
-    </Flex>
+      </Flex>
+    </Container>
   );
 };

@@ -9,8 +9,8 @@ export const NotFound = () => {
 
   useEffect(() => {
     toast({
-      title: "Invalid URL",
-      description: "You are accessing an invalid URL",
+      title: "Bạn đang truy cập vào URL không hợp lệ",
+      // description: "You are accessing an invalid URL",
       status: "warning",
       duration: 2500,
       isClosable: true,

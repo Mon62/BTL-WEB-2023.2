@@ -15,14 +15,10 @@ export const Profile = () => {
 
   return (
     <Container className="mw-100" h={"800px"} overflowY={"auto"}>
-      <Flex
-        className="py-10 w-full mx-auto"
-        px={{ base: 4, md: 20 }}
-        justify={"center"}
-      >
+      <Flex className="py-10 w-full mx-auto" justify={"center"}>
         <ProfileHeader />
       </Flex>
-      <Flex className="w-full mx-auto">
+      <Flex className="w-full" px={{ base: 4, md: 20 }}>
         <HighlightStory />
       </Flex>
 

@@ -16,6 +16,7 @@ import { useState } from "react";
 export const ProfileTabs = () => {
   const { profileUser, tabName } = useParams();
   const [tabIndex, setTabIndex] = useState(0);
+  const currentUser = sessionStorage.getItem("currentUser");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +50,9 @@ export const ProfileTabs = () => {
             <ProfilePostList />
           </TabPanel>
           <TabPanel>
-            <p>SAVED</p>
+            <Flex justifyContent={"center"}>
+              {currentUser === profileUser ? <p>SAVED</p> : <p>Only {profileUser} can view this section</p>}
+            </Flex>
           </TabPanel>
         </TabPanels>
       </Tabs>

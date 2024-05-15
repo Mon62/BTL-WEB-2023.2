@@ -10,7 +10,7 @@ import {
   Avatar,
   Center,
   useToast,
-  CircularProgress,
+  Textarea,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { editProfile } from "../../../api/Api";
@@ -62,7 +62,7 @@ export const EditProfileModal = ({
   };
   return (
     <Flex align={"center"} justify={"center"}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => handleSubmit(e)}>
         <Stack spacing={4} w={"full"} maxW={"md"} my={6}>
           <Center>
             <Avatar size="2xl" src={selectedPicURL}></Avatar>
@@ -94,14 +94,14 @@ export const EditProfileModal = ({
           </FormControl>
           <FormControl id="biography">
             <FormLabel>Biography</FormLabel>
-            <Input
+            <Textarea
               placeholder="Your biography"
               _placeholder={{ color: "gray.500" }}
-              type="text"
               maxLength={"150"}
               value={newBiography}
-              onChange={(event) => setNewBiography(event.target.value)}
-            />
+              onChange={(e) => setNewBiography(e.target.value)}
+              resize={"horizontal"}
+            ></Textarea>
           </FormControl>
 
           <Button

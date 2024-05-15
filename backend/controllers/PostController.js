@@ -14,7 +14,6 @@ import {
   Timestamp,
   arrayUnion,
 } from "firebase/firestore";
- import ffmpeg from 'fluent-ffmpeg';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import multer from "multer";
 
@@ -297,7 +296,7 @@ export const getPostsByUsername = (req, res, next) => {
   try {
     const username = req.params.username;
     const accessToken = req.headers.authorization;
-    console.log(username);
+    // console.log(username);
 
     admin
       .auth()

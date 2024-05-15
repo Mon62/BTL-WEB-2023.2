@@ -56,7 +56,7 @@ export const SearchUserModal = ({
     setSearchResults([]);
     setIsDisabled(true);
 
-    console.log(users)
+    // console.log(users)
     let usersData = [];
     const userPromises = users.map(async (username) => {
       let data = {};
