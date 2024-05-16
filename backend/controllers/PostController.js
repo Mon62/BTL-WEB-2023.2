@@ -435,3 +435,125 @@ export const getNewPostsByUsername = async (req, res, next) => {
   }
 };
 
+
+
+
+
+// export const getRecommendPosts = async (req, res, next) => {
+//   try {
+//     const username = req.params.username;
+
+//     // Get user's posts
+//     const userSnapshot = await getDoc(doc(db, 'users', username));
+//     const userData = userSnapshot.data();
+//     const userPosts = userData.posts;
+
+//     // Get all posts
+//     const allPostsSnapshot = await getDocs(collection(db, "posts"));
+//     let allPosts = allPostsSnapshot.docs.map(doc => doc.data());
+
+//     // Filter out posts by the current user
+//     allPosts = allPosts.filter(post => !userPosts.includes(post.id));
+
+//     // Shuffle the array to get random posts
+//     for (let i = allPosts.length - 1; i > 0; i--) {
+//       const j = Math.floor(Math.random() * (i + 1));
+//       [allPosts[i], allPosts[j]] = [allPosts[j], allPosts[i]];
+//     }
+
+//     // Get maximum 30 posts
+//     const recommendPosts = allPosts.slice(0, 30);
+
+//     return res.status(200).json({ posts: recommendPosts });
+//   } catch (error) {
+//     console.error(error);
+//     return next(error);
+//   }
+// };
+
+
+export const getRecommendPosts = async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const allPostsSnapshot = await getDocs(collection(db, "posts"));
+    let allPosts = allPostsSnapshot.docs.map(doc => doc.data());
+
+    // Filter out posts by the current user
+    allPosts = allPosts.filter(post => post.createdBy !== username);
+
+    // Shuffle the array to get random posts
+    for (let i = allPosts.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [allPosts[i], allPosts[j]] = [allPosts[j], allPosts[i]];
+    }
+
+    // Get maximum 20 posts
+    const recommendPosts = allPosts.slice(0, 20);
+
+    return res.status(200).json({ posts: recommendPosts });
+  } catch (error) {
+    console.error(error);
+    return next(error);
+  }
+};
+
+
+// export const getExplorePosts = async (req, res, next) => {
+//   try {
+//     const username = req.params.username;
+//     const postsCollectionRef = collection(db, "posts");
+//     const postsSnapshot = await getDocs(postsCollectionRef);
+//     let postsData = [];
+//     let count = 0;
+//     postsSnapshot.forEach((doc) => {
+//       const data = doc.data();
+//       if (data.createdBy !== username) {
+//         postsData.push({
+//           pid: doc.id,
+//           firstMediaURL: data.imgURLs[0],
+//           typeOfFirstMedia: data.typeOfFirstMedia,
+//           numberOfLikes: data.likes ? data.likes.length : 0,
+//           numberOfComments: data.comments ? data.comments.length : 0,
+//         });
+//         count++;
+//       }
+//       return count  <=  2;
+//     });
+
+//     return res.status(200).json({ postsData: postsData });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(400).json({ message: err.message });
+//   }
+// };
+
+
+export const getExplorePosts = async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const postsCollectionRef = collection(db, "posts");
+    const postsSnapshot = await getDocs(postsCollectionRef);
+    let postsData = [];
+    let count = 0;
+
+    postsSnapshot.docs.some((doc) => {
+      const data = doc.data();
+      if (data.createdBy !== username) {
+        postsData.push({
+          pid: doc.id,
+          firstMediaURL: data.imgURLs[0],
+          typeOfFirstMedia: data.typeOfFirstMedia,
+          numberOfLikes: data.likes ? data.likes.length : 0,
+          numberOfComments: data.comments ? data.comments.length : 0,
+        });
+        count++;
+      }
+      return count >= 30; // This will break the loop when count reaches 30
+    });
+
+    return res.status(200).json({ postsData: postsData });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
+};

@@ -169,6 +169,8 @@ export const createStory = async (req, res, next) => {
         const userSnapshot = await getDoc(doc(db, "users", username));
         const userData = userSnapshot.data();
         const followers = userData.followers;
+        
+       
 
         // Update each follower's stories with the new storyId
         for (const follower of followers) {
@@ -177,6 +179,9 @@ export const createStory = async (req, res, next) => {
           const followerNewStories = followerData.newStories || {};
           followerNewStories[username] = followerNewStories[username] || [];
           followerNewStories[username].push(storyId);
+
+         
+          
           await updateDoc(followerRef, {
             newStories: followerNewStories,
           });

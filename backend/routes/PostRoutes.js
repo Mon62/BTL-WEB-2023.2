@@ -5,7 +5,9 @@ import {
   deletePost,
   getPostById,
   getNewPostsByUsername,
-  getPostsByUsername
+  getPostsByUsername,
+  getRecommendPosts,
+  getExplorePosts
 } from "../controllers/PostController.js";
 import multer from "multer";
 const router = express.Router();
@@ -18,5 +20,7 @@ router.delete("/delete-post", deletePost);
 router.get("/post/:pid", getPostById);
 router.get("/posts/:username", getPostsByUsername);
 router.get("/new-posts/:username", getNewPostsByUsername);
+router.get("/recommend-posts/:username", getRecommendPosts);
+router.get("/explore-posts/:username", getExplorePosts);
 
 export default router;

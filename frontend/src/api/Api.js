@@ -236,6 +236,15 @@ export function getNewPostsByUsername(username) {
   });
 }
 
+export function getRecommendPosts(username) {
+  return axios.get(API_URL + "/recommend-posts/" + username, baseHeader);
+}
+
+export function getExplorePosts(username) {
+  return axios.get(API_URL + "/explore-posts/" + username, baseHeader);
+}
+
+
 // storyData cần có các trường sau:caption, media (ảnh hoặc video tải lên) chỉ 1, username (createdBy)
 export function createStory(storyData) {
   return axios.post(API_URL + "/create-story", storyData, {
