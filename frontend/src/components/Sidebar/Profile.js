@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { Tooltip, Flex, Box, Avatar, Link, useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { getProfileByUsername } from "../../api/Api.js";
+import { getShortenedProfileDataByUsername } from "../../api/Api.js";
 import { SkeletonCircle } from "@chakra-ui/react";
 
 const Profile = (props) => {
@@ -11,7 +11,7 @@ const Profile = (props) => {
   const toast = useToast();
   const navigate = useNavigate();
   useEffect(() => {
-    getProfileByUsername(currentUser)
+    getShortenedProfileDataByUsername(currentUser)
       .then((res) => {
         const profileData = res.data;
         setProfilePicURL(profileData.profilePicURL);
@@ -27,7 +27,7 @@ const Profile = (props) => {
       });
       setTimeout(() => {
         setLoading(false);
-      }, 4500)
+      }, 2000)
     },[currentUser])
   const handleClick = (e) => {
     if(typeof props.handleBg === 'function'){

@@ -5,7 +5,7 @@ import { Avatar, Flex, Link, Text, VStack, useToast } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom';
 import { logout } from "../../api/Api.js";
 import  SwitchAccountForm  from '../Sidebar/SwitchAccountForm.js';
-import { getProfileByUsername } from "../../api/Api.js";
+import { getShortenedProfileDataByUsername } from "../../api/Api.js";
 import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react'
 
 
@@ -21,7 +21,7 @@ const SuggestedUserHeader = () => {
     const navigate = useNavigate()
 	const toast = useToast()
     useEffect(() => {
-        getProfileByUsername(currentUser)
+        getShortenedProfileDataByUsername(currentUser)
           .then((res) => {
             const profileData = res.data;
             setProfilePicURL(profileData.profilePicURL);

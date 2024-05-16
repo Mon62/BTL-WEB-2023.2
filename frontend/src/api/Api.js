@@ -2,7 +2,6 @@ import axios from "axios";
 
 const dev_API_URL = "http://localhost:3000";
 const production_API_URL = "";
-const accessToken = sessionStorage.getItem("accessToken");
 const baseHeader = {
   headers: {
     "access-control-allow-origin": "*",

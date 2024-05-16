@@ -2,7 +2,6 @@ import { Flex, GridItem, Image, Box, AspectRatio } from "@chakra-ui/react";
 import { BiSolidHeartCircle } from "react-icons/bi";
 
 export const ArchiveStory = ({ img, typeOfMedia, isInHighlight }) => {
-  console.log(typeOfMedia);
   return (
     <>
       <GridItem

@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import {
   Flex,
   Container,
-  useToast,
   Grid,
   VStack,
   Skeleton,
@@ -10,21 +9,24 @@ import {
   GridItem,
   Image,
   AspectRatio,
+  AvatarGroup,
+  Avatar,
 } from "@chakra-ui/react";
 import { BiSolidHeartCircle } from "react-icons/bi";
 import { RiCheckboxBlankCircleLine } from "react-icons/ri";
 import { FaCircleCheck } from "react-icons/fa6";
 import { useState } from "react";
 
-export const SelectStoryModal = ({
-  storiesData,
-  isSelectedStories,
-  handleSelectStory,
-
+export const SelectCoverModal = ({
+  selectedStories,
+  selectedCoverIndex,
+  handleSelectCover,
 }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    setIsLoading(true);
+
     setTimeout(() => {
       setIsLoading(false);
     }, 500);
@@ -32,6 +34,16 @@ export const SelectStoryModal = ({
 
   return (
     <Container className="m-0 p-0" h={"540px"} overflow={"auto"}>
+      <AvatarGroup
+        size={{ base: "xl", md: "2xl" }}
+        justifyContent={"center"}
+        mx={"auto"}
+      >
+        <Avatar
+          src={selectedStories[selectedCoverIndex].mediaURL}
+          alt="Highlight cover"
+        ></Avatar>
+      </AvatarGroup>
       <Grid
         className=""
         mx={15}
@@ -42,6 +54,7 @@ export const SelectStoryModal = ({
         }}
         columnGap={1}
         rowGap={1}
+
       >
         {isLoading &&
           [0, 1, 2, 3, 4, 5, 6, 7, 8].map((_, idx) => (
@@ -52,7 +65,7 @@ export const SelectStoryModal = ({
             </VStack>
           ))}
         {!isLoading &&
-          storiesData.map((story, index) => (
+          selectedStories.map((story, index) => (
             <GridItem
               key={index}
               _hover={{ opacity: 0.5 }}
@@ -63,21 +76,8 @@ export const SelectStoryModal = ({
               borderColor={"blackAlpha.300"}
               position={"relative"}
               aspectRatio={3 / 4}
-              onClick={() => handleSelectStory(index)}
+              onClick={() => handleSelectCover(index)}
             >
-              <Flex
-                position={"absolute"}
-                top={1}
-                right={1}
-                zIndex={1}
-                className="shadow"
-              >
-                {story.isInHighlight === true ? (
-                  <BiSolidHeartCircle color="white" size={25} />
-                ) : (
-                  <></>
-                )}
-              </Flex>
               <Flex
                 position={"absolute"}
                 top={1}
@@ -85,7 +85,7 @@ export const SelectStoryModal = ({
                 zIndex={1}
                 className="shadow"
               >
-                {isSelectedStories[index] ? (
+                {selectedCoverIndex === index ? (
                   <FaCircleCheck color="white" size={25} />
                 ) : (
                   <RiCheckboxBlankCircleLine color="white" size={25} />
