@@ -29,7 +29,7 @@ const Explore = (props) => {
             >
                 
                 <IoCompassOutline size={25}/>
-                <Box display={{ base: "none", md:  "block" }}>Explore</Box>
+                <Box display={{ base: "none", md:  "block" }} fontWeight={props.fontWeight}>Explore</Box>
             </Flex>
         </Tooltip>
   )

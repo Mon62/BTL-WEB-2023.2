@@ -57,7 +57,7 @@ const Notifications = (props) => {
                     </DrawerContent>
                 </Drawer>
                 <NotificationsLogo />
-                <Box display={{ base: "none", md: "block" }}>Notifications</Box>
+                <Box display={{ base: "none", md: "block" }} fontWeight={props.fontWeight}>Notifications</Box>
             </Flex>
         </Tooltip>
     )

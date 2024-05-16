@@ -210,7 +210,7 @@ const Search = (props) => {
           </DrawerContent>
         </Drawer>
         <SearchLogo />
-        <Box display={{ base: "none", md: "block" }}>Search</Box>
+        <Box display={{ base: "none", md: "block" }} fontWeight={props.fontWeight}>Search</Box>
       </Flex>
     </Tooltip>
   );

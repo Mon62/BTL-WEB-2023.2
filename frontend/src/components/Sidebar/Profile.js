@@ -57,7 +57,7 @@ const Profile = (props) => {
       >
         {loading && <SkeletonCircle size='6'/>}
         {!loading && <Avatar size={"xs"} src={profilePicURL} />}
-        <Box display={{ base: "none", md: "block" }}>Profile</Box>
+        <Box display={{ base: "none", md: "block" }} fontWeight={props.fontWeight}>Profile</Box>
       </Flex>
     </Tooltip>
   );

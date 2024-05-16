@@ -9,25 +9,30 @@ import Profile from './Profile'
 
 const SidebarItems = () => {
   const [bg, setBg] = useState('Home')
+  const [prevFont, setPrevFont] = useState("")
+  const [fontWeight, setFontWeight] = useState('Home')
   const [prevColor, setPrevColor] = useState("")
   const handleBg = (color) => {
     if((bg === 'Home') || (bg === 'Explore') || (bg === 'Messages') || (bg ==='Profile') ){
       setPrevColor(bg)
+      setPrevFont(fontWeight)
     }
     setBg(color);
+    setFontWeight(color)
   }
   const handlePrevBg = (color) =>{
     setBg(prevColor)
+    setFontWeight(prevFont)
   }
   return (
     <>
-        <Home bg={bg === 'Home' ? 'blackAlpha.200' : ''} handleBg={() => handleBg('Home')} />
-        <Search bg={bg === 'Search' ? 'blackAlpha.200' : ''} handleBg={() => handleBg('Search')} handlePrevBg={handlePrevBg}/>
-        <Explore bg={bg === 'Explore' ? 'blackAlpha.200' : ''} handleBg={() => handleBg('Explore')} />
-        <Messages bg={bg === 'Messages' ? 'blackAlpha.200' : ''} handleBg={() => handleBg('Messages')} />
-        <Notifications bg={bg === 'Notifications' ? 'blackAlpha.200' : ''} handleBg={() => handleBg('Notifications')} handlePrevBg={handlePrevBg}/>
-        <Create bg={bg === 'Create' ? 'blackAlpha.200' : ''} handleBg={() => handleBg('Create')} />
-        <Profile bg={bg === 'Profile' ? 'blackAlpha.200' : ''} handleBg={() => handleBg('Profile')} />
+        <Home bg={bg === 'Home' ? 'blackAlpha.100' : ''} fontWeight={fontWeight === 'Home' ? 'bold' : ''} handleBg={() => handleBg('Home')} />
+        <Search bg={bg === 'Search' ? 'blackAlpha.100' : ''} fontWeight={fontWeight === 'Search' ? 'bold' : ''} handleBg={() => handleBg('Search')} handlePrevBg={handlePrevBg}/>
+        <Explore bg={bg === 'Explore' ? 'blackAlpha.100' : ''} fontWeight={fontWeight === 'Explore' ? 'bold' : ''} handleBg={() => handleBg('Explore')} />
+        <Messages bg={bg === 'Messages' ? 'blackAlpha.100' : ''} fontWeight={fontWeight === 'Messages' ? 'bold' : ''} handleBg={() => handleBg('Messages')} />
+        <Notifications bg={bg === 'Notifications' ? 'blackAlpha.100' : ''} fontWeight={fontWeight === 'Notifications' ? 'bold' : ''} handleBg={() => handleBg('Notifications')} handlePrevBg={handlePrevBg}/>
+        <Create bg={bg === 'Create' ? 'blackAlpha.100' : ''} handleBg={() => handleBg('Create')} />
+        <Profile bg={bg === 'Profile' ? 'blackAlpha.100' : ''} fontWeight={fontWeight === 'Profile' ? 'bold' : ''} handleBg={() => handleBg('Profile')} />
     </>
   )
 }

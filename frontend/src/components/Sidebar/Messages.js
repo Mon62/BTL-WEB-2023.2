@@ -30,7 +30,7 @@ const Messages = (props) => {
             >
                 
                 <MessagesLogo />
-                <Box display={{ base: "none", md:  "block" }}>Messages</Box>
+                <Box display={{ base: "none", md:  "block" }} fontWeight={props.fontWeight}>Messages</Box>
             </Flex>
         </Tooltip>
     )
