@@ -19,13 +19,15 @@ const Create = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [disablePost, setDisablePost] = useState(true);
   const [variant, setVariant] = useState("secondary");
+  const [loading, setLoading] = useState(false)
   //const [selectedFileURL, setSelectedFileURL] = useState([])
   const username = sessionStorage.getItem("currentUser");
   const toast = useToast();
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setDisablePost(true);
+    setDisablePost(true)
+    setLoading(true)
     const files = view.map((file) => {
       return file.originalFile;
     });
@@ -35,6 +37,7 @@ const Create = () => {
     createPost(postData)
       .then((res) => {
         toast(new Success(res));
+        setLoading(false)
         discard();
       })
       .catch((err) => {
@@ -87,7 +90,7 @@ const Create = () => {
   };
 
   useEffect(() => {
-    if (view.length === 0 && caption.length === 0) {
+    if (view.length === 0) {
       setDisablePost(true);
       setVariant("secondary");
     } else {
@@ -214,7 +217,7 @@ const Create = () => {
               disabled={disablePost}
               variant={variant}
             >
-              Post
+              {loading ? 'Creating...' : 'Post'}
             </Button>
           </Modal.Footer>
         </Modal>
