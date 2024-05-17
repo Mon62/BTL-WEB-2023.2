@@ -2,14 +2,14 @@ import React from 'react'
 import PostHeader from './PostHeader'
 import PostFooter from './PostFooter';
 import { Box, Image } from "@chakra-ui/react";
-const FeedPost = () => {
+const FeedPost = ({files, likes, createdBy, caption, numOfComments, avatar}) => {
   return (
     <Box borderTop={"1px solid gray"}>
-			<PostHeader  />
+			<PostHeader avatar={avatar} createdBy={createdBy} />
 			<Box my={2} borderRadius={4} overflow={"hidden"}>
-				<Image src="https://media.vov.vn/sites/default/files/styles/large/public/2021-02/unnamed_12.jpg" alt={"FEED POST IMG"} />
+				<Image src={files} alt={"FEED POST IMG"} />
 			</Box>
-			<PostFooter  />
+			<PostFooter likes={likes} createdBy={createdBy} caption={caption} numOfComments={numOfComments} />
 		</Box>
   )
 }

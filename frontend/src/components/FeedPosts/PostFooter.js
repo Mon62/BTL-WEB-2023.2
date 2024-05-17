@@ -41,7 +41,7 @@ const PostFooter = ({likes, createdBy, caption, numOfComments}) => {
 			</Text>
 
 					<Text fontSize='sm' fontWeight={700}>
-						{createdBy}
+						{createdBy}{"  "}
 						<Text as='span' fontWeight={400}>
 							{caption}
 						</Text>

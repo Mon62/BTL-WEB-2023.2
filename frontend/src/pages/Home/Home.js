@@ -81,7 +81,7 @@ export const Home = () => {
   return (
     <Container maxW={"container.lg"}>
       {showStory && <StoryView isOpen={showStory} onClick={() => setShowStory(false)} handleClose={() => setShowStory(false)} stories={myStory} />}
-      <Flex gap={20} mt={900}>
+      <Flex gap={20} mt={9000}>
         <Box flex={2} py={10}  maxWidth={550}>
 
             {loading && <SkeletonCircle size='20' />}
