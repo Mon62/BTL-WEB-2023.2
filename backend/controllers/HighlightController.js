@@ -13,6 +13,7 @@ import {
   updateDoc,
   Timestamp,
   arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import multer from "multer";
@@ -99,6 +100,27 @@ export const updateHighlight = async (req, res, next) => {
             .status(400)
             .json({ message: "Không tồn tại highlight " + hlid });
         }
+
+
+        const oldHighlightSnapshot = await getDoc(highlightRef);
+        const oldStories = oldHighlightSnapshot.data().stories;
+
+        // Remove hlid from old stories
+        for (let i = 0; i < oldStories.length; i++) {
+          const storyRef = doc(db, "stories", oldStories[i]);
+          await updateDoc(storyRef, {
+            inHighlights: arrayRemove(hlid),
+          });
+        }
+
+        // Add hlid to new stories
+        for (let i = 0; i < stories.length; i++) {
+          const storyRef = doc(db, "stories", stories[i]);
+          await updateDoc(storyRef, {
+            inHighlights: arrayUnion(hlid),
+          });
+        }
+
         const highlightdata = {
           hlid: hlid,
           hlname: hlname,
@@ -106,6 +128,9 @@ export const updateHighlight = async (req, res, next) => {
           stories: stories,
         };
         await updateDoc(highlightRef, highlightdata);
+
+
+
 
         return res.status(200).json({
           status: "success",
@@ -133,6 +158,7 @@ export const deleteHighlight = async (req, res, next) => {
       .then(async () => {
         const highlightRef = doc(db, "highlights", hlid);
         const highlightSnapshot = await getDoc(highlightRef);
+
         if (!highlightSnapshot.exists()) {
           return res
             .status(400)
@@ -141,8 +167,19 @@ export const deleteHighlight = async (req, res, next) => {
 
         const highlightData = highlightSnapshot.data();
         const username = highlightData.username;
+        const stories = highlightSnapshot.data().stories;
 
-        await deleteDoc(highlightRef);
+        // Remove hlid from stories
+        for (let i = 0; i < stories.length; i++) {
+          const storyRef = doc(db, "stories", stories[i]);
+          await updateDoc(storyRef, {
+            inHighlights: arrayRemove(hlid),
+          });
+        }
+
+
+
+
 
         // Get user document
         const userRef = doc(db, "users", username);
@@ -156,6 +193,8 @@ export const deleteHighlight = async (req, res, next) => {
           // Update the user's highlights array in the database
           await updateDoc(userRef, { highlights: updatedHighlights });
         }
+
+        await deleteDoc(highlightRef);
 
         return res.status(200).json({
           status: "success",
