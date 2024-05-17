@@ -3,7 +3,7 @@ import { Grid, Skeleton, VStack, Box, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ProfilePost } from "./ProfilePost.js";
 import { useParams } from "react-router-dom";
-import { getPostsByUsername } from "../../../api/Api.js";
+import { getPostsByUsername, getShortenedProfileDataByUsername } from "../../../api/Api.js";
 import { Error } from "../../../models/Toast.js";
 
 export const ProfilePostList = ({}) => {
@@ -11,12 +11,13 @@ export const ProfilePostList = ({}) => {
   const { profileUser } = useParams();
   const [postsData, setPostsData] = useState([]);
   const toast = useToast();
+  const [profilePicURL, setProfilePicURL] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
     getPostsByUsername(profileUser)
       .then((res) => {
-        // console.log(res);
+         console.log(res);
         setPostsData(res.data.postsData.reverse());
         // console.log(res.data.postsData.reverse());
       })
@@ -31,6 +32,18 @@ export const ProfilePostList = ({}) => {
     }, 2000);
   }, [profileUser]);
 
+  useEffect(() => {
+    getShortenedProfileDataByUsername(profileUser)
+      .then((res) => {
+        // console.log(res.data);
+        const profileData = res.data;
+        setProfilePicURL(profileData.profilePicURL);        
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+        toast(new Error(err));
+      });
+  }, [profileUser]);
   return (
     <Grid
       templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }}
@@ -50,10 +63,12 @@ export const ProfilePostList = ({}) => {
           <ProfilePost
             key={index}
             img={post.firstPicURL}
+            createdBy={profileUser}
             likes={post.numberOfLikes}
             comments={post.numberOfComments}
             typeOfFirstMedia={post.typeOfFirstMedia}
             numberOfMediaFile = {post.numberOfMediaFile}
+            avatar={profilePicURL}
           />
         ))}
     </Grid>

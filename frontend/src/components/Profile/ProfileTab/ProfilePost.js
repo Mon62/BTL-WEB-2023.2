@@ -10,15 +10,26 @@ import { AiFillHeart } from "react-icons/ai";
 import { FaComment } from "react-icons/fa";
 import { TbBoxMultiple } from "react-icons/tb";
 import { MdOndemandVideo } from "react-icons/md";
-
+import { useState } from "react";
+import ViewPost from "../../ViewPost/ViewPost";
 export const ProfilePost = ({
   img,
   likes,
   comments,
   typeOfFirstMedia,
   numberOfMediaFile,
+  createdBy,
+  avatar,
+  caption,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [show, setShow] = useState(false)
+  const handleShow = () => {
+    setShow(true);
+  }
+  const handleClose = () => {
+    setShow(false);
+  }
   return (
     <>
       <GridItem
@@ -29,7 +40,7 @@ export const ProfilePost = ({
         borderColor={"whiteAlpha.300"}
         position={"relative"}
         aspectRatio={1 / 1}
-        onClick={onOpen}
+        onClick={handleShow}
       >
         <Flex
           opacity={0}
@@ -90,13 +101,24 @@ export const ProfilePost = ({
             <iframe
               title="post"
               src={img}
-              // allowFullScreen
+            // allowFullScreen
             />
           </AspectRatio>
         ) : (
           <Image src={img} w={"100%"} h={"100%"} objectFit={"cover"}></Image>
         )}
+
       </GridItem>
+      {show && <ViewPost
+        show={show}
+        onHide={handleClose}
+        imageURL={img}
+        createdBy={createdBy}
+        avatar={avatar}
+        likes={likes}
+        caption={caption}
+        numOfComments={comments}
+      />}
     </>
   );
 };
