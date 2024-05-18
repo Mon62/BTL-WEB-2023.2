@@ -13,7 +13,7 @@ const PageLayout = ({ children }) => {
       pathname !== "/signup/" &&
       pathname !== "/password/reset/" &&
       pathname !== "/" ? (
-        <Box w={{ base: "70px", md: "240px" }} display={"sticky"}>
+        <Box w={{ base: "70px", md: "240px" }}  position={"fixed"} top="0" height={"100vh"} >
           <Sidebar />
         </Box>
       ) : null}
@@ -22,6 +22,8 @@ const PageLayout = ({ children }) => {
         flex={1}
         w={{ base: "calc(100% - 70px)", md: "calc(100% - 240px)" }}
         mx={"auto"}
+        ml={{ base: "70px", md: "240px" }} // Đẩy nội dung sang bên phải để không bị đè lên sidebar
+        p={4} // Khoảng cách padding cho nội dung
       >
         {children}
       </Box>

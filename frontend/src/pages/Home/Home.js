@@ -79,9 +79,9 @@ export const Home = () => {
     }, 4500)
   }, [currentUser])
   return (
-    <Container maxW={"container.lg"}>
+    <Container maxW={"container.lg"} top={0} maxH={"80vh"}>
       {showStory && <StoryView isOpen={showStory} onClick={() => setShowStory(false)} handleClose={() => setShowStory(false)} stories={myStory} />}
-      <Flex gap={20} mt={9000}>
+      <Flex gap={20} alignItems={"start"}>
         <Box flex={2} py={10}  maxWidth={550}>
 
             {loading && <SkeletonCircle size='20' />}
@@ -110,7 +110,7 @@ export const Home = () => {
         <Box
           flex={3}
           mr={20}
-          display={{ base: "none", lg: "block" }}
+          display={{ base: "none", xl: "block" }}
           maxW={"300px"}
           //border={"1px solid red"}
         >
