@@ -292,57 +292,110 @@ export const deletePost = async (req, res, next) => {
 //   }
 // };
 
-export const getPostsByUsername = (req, res, next) => {
+// export const getPostsByUsername = (req, res, next) => {
+//   try {
+//     const username = req.params.username;
+//     const accessToken = req.headers.authorization;
+//     // console.log(username);
+
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then((decodedToken) => {
+//         const docRef = doc(db, "users", username);
+
+//         setTimeout(() => {
+//           getDoc(docRef)
+//             .then((user) => {
+//               if (!user.exists()) {
+//                 return res
+//                   .status(400)
+//                   .json({ message: "Không tồn tại người dùng " + username });
+//               }
+//               const userData = user.data();
+//               const postIdList = userData.posts;
+//               if (postIdList.length === 0) {
+//                 return res.status(200).json({ postsData: [] });
+//               }
+
+//               let postsData = [];
+//               const postPromises = postIdList.map(async (postId) => {
+//                 const postRef = doc(db, "posts", postId);
+//                 const post = await getDoc(postRef).catch((err) => next(err));
+//                 const data = post.data();
+//                 // console.log(data);
+//                 return {
+//                   numberOfLikes: data.likes ? data.likes.length : 0,
+//                   numberOfComments: data.comments ? data.comments.length : 0,
+//                   firstPicURL: data.imgURLs[0],
+//                   typeOfFirstMedia: data.typeOfFirstMedia,
+//                   numberOfMediaFile: data.imgURLs.length
+//                 };
+//               });
+
+//               Promise.all(postPromises)
+//                 .then((_postsData) => {
+//                   postsData.push(..._postsData);
+//                   return res.status(200).json({
+//                     postsData: postsData,
+//                   });
+//                 })
+//                 .catch((err) => next(err));
+//             })
+//             .catch((err) => next(err));
+//         }, 700);
+//       })
+//       .catch((err) => next(err));
+//   } catch (err) {
+//     console.log(err);
+//     res.status(400).json({ message: err.message });
+//   }
+// };
+
+export const getPostsByUsername = async (req, res, next) => {
   try {
     const username = req.params.username;
     const accessToken = req.headers.authorization;
-    // console.log(username);
 
     admin
       .auth()
       .verifyIdToken(accessToken)
-      .then((decodedToken) => {
+      .then(async () => {
         const docRef = doc(db, "users", username);
 
-        setTimeout(() => {
-          getDoc(docRef)
-            .then((user) => {
-              if (!user.exists()) {
-                return res
-                  .status(400)
-                  .json({ message: "Không tồn tại người dùng " + username });
-              }
-              const userData = user.data();
-              const postIdList = userData.posts;
-              if (postIdList.length === 0) {
-                return res.status(200).json({ postsData: [] });
-              }
+        setTimeout(async () => {
+          const user = await getDoc(docRef);
+          if (!user.exists()) {
+            return res
+              .status(400)
+              .json({ message: "Không tồn tại người dùng " + username });
+          }
+          const userData = user.data();
+          const postIdList = userData.posts;
+          if (postIdList.length === 0) {
+            return res.status(200).json({ postsData: [] });
+          }
 
-              let postsData = [];
-              const postPromises = postIdList.map(async (postId) => {
-                const postRef = doc(db, "posts", postId);
-                const post = await getDoc(postRef).catch((err) => next(err));
-                const data = post.data();
-                // console.log(data);
-                return {
-                  numberOfLikes: data.likes ? data.likes.length : 0,
-                  numberOfComments: data.comments ? data.comments.length : 0,
-                  firstPicURL: data.imgURLs[0],
-                  typeOfFirstMedia: data.typeOfFirstMedia,
-                  numberOfMediaFile: data.imgURLs.length
-                };
-              });
+          let postsData = [];
+          const postPromises = postIdList.map(async (postId) => {
+            const postRef = doc(db, "posts", postId);
+            const post = await getDoc(postRef);
+            const data = post.data();
+            return {
+              numberOfLikes: data.likes ? data.likes.length : 0,
+              numberOfComments: data.comments ? data.comments.length : 0,
+              firstPicURL: data.imgURLs[0],
+              typeOfFirstMedia: data.typeOfFirstMedia,
+              numberOfMediaFile: data.imgURLs.length
+            };
+          });
 
-              Promise.all(postPromises)
-                .then((_postsData) => {
-                  postsData.push(..._postsData);
-                  return res.status(200).json({
-                    postsData: postsData,
-                  });
-                })
-                .catch((err) => next(err));
-            })
-            .catch((err) => next(err));
+          const postsDataResult = await Promise.all(postPromises);
+          postsData.push(...postsDataResult);
+          return res.status(200).json({
+            postsData: postsData,
+            profilePicURL: userData.profilePicURL, // Include profilePicURL in the response
+          });
         }, 700);
       })
       .catch((err) => next(err));
@@ -352,19 +405,20 @@ export const getPostsByUsername = (req, res, next) => {
   }
 };
 
-export const getPostById = async (req, res, next) => {
-  try {
-    const pid = req.params.pid;
-    const postSnapshot = await getDoc(doc(db, "posts", pid));
-    if (!postSnapshot.exists()) {
-      return res.status(400).json({ message: "Không tồn tại bài viết " + pid });
-    }
-    const post = postSnapshot.data();
-    return res.status(200).json({ message: "success", data: post });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
+
+// export const getPostById = async (req, res, next) => {
+//   try {
+//     const pid = req.params.pid;
+//     const postSnapshot = await getDoc(doc(db, "posts", pid));
+//     if (!postSnapshot.exists()) {
+//       return res.status(400).json({ message: "Không tồn tại bài viết " + pid });
+//     }
+//     const post = postSnapshot.data();
+//     return res.status(200).json({ message: "success", data: post });
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
 
 // export const getNewPostsByUsername = async (req, res, next) => {
 //     try {
@@ -393,6 +447,71 @@ export const getPostById = async (req, res, next) => {
 //     }
 // }
 
+export const getPostById = async (req, res, next) => {
+  try {
+    const pid = req.params.pid;
+    const postSnapshot = await getDoc(doc(db, "posts", pid));
+    if (!postSnapshot.exists()) {
+      return res.status(400).json({ message: "Không tồn tại bài viết " + pid });
+    }
+    const post = postSnapshot.data();
+
+    // Fetch the user data
+    const userSnapshot = await getDoc(doc(db, "users", post.createdBy));
+    if (!userSnapshot.exists()) {
+      return res.status(400).json({ message: "Không tồn tại người dùng " + post.createdBy });
+    }
+    const user = userSnapshot.data();
+
+    // Include profilePicURL in the response
+    return res.status(200).json({ message: "success", data: post, profilePicURL: user.profilePicURL });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// export const getNewPostsByUsername = async (req, res, next) => {
+//   try {
+//     const username = req.params.username;
+//     const userSnapshot = await getDoc(doc(db, "users", username));
+//     if (!userSnapshot.exists()) {
+//       return res
+//         .status(400)
+//         .json({ message: "Không tồn tại người dùng " + username });
+//     }
+//     const accessToken = req.headers.authorization;
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then(async () => {
+//         const user = userSnapshot.data();
+//         const newPosts = user.newPosts;
+//         const validPosts = [];
+//         const postPromises = newPosts.map(async (postId) => {
+//           const postSnapshot = await getDoc(doc(db, "posts", postId));
+//           if (postSnapshot.exists()) {
+//             const post = postSnapshot.data();
+//             validPosts.push(post); // push the post object instead of postId
+//           }
+//         });
+//         await Promise.all(postPromises);
+
+//         // Clear newPosts
+//         await updateDoc(doc(db, "users", username), {
+//           newPosts: [],
+//         });
+//         console.log(newPosts);
+//         return res.status(200).json({ message: "success", data: validPosts });
+//       })
+//       .catch((error) => {
+//         console.error(error);
+//         next(error);
+//       });
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
 export const getNewPostsByUsername = async (req, res, next) => {
   try {
     const username = req.params.username;
@@ -414,6 +533,11 @@ export const getNewPostsByUsername = async (req, res, next) => {
           const postSnapshot = await getDoc(doc(db, "posts", postId));
           if (postSnapshot.exists()) {
             const post = postSnapshot.data();
+            const createdByUserSnapshot = await getDoc(doc(db, "users", post.createdBy));
+            if (createdByUserSnapshot.exists()) {
+              const createdByUser = createdByUserSnapshot.data();
+              post.profilePicURL = createdByUser.profilePicURL; // Add profilePicURL to the post object
+            }
             validPosts.push(post); // push the post object instead of postId
           }
         });
@@ -472,6 +596,31 @@ export const getNewPostsByUsername = async (req, res, next) => {
 // };
 
 
+// export const getRecommendPosts = async (req, res, next) => {
+//   try {
+//     const username = req.params.username;
+//     const allPostsSnapshot = await getDocs(collection(db, "posts"));
+//     let allPosts = allPostsSnapshot.docs.map(doc => doc.data());
+
+//     // Filter out posts by the current user
+//     allPosts = allPosts.filter(post => post.createdBy !== username);
+
+//     // Shuffle the array to get random posts
+//     for (let i = allPosts.length - 1; i > 0; i--) {
+//       const j = Math.floor(Math.random() * (i + 1));
+//       [allPosts[i], allPosts[j]] = [allPosts[j], allPosts[i]];
+//     }
+
+//     // Get maximum 20 posts
+//     const recommendPosts = allPosts.slice(0, 20);
+
+//     return res.status(200).json({ posts: recommendPosts });
+//   } catch (error) {
+//     console.error(error);
+//     return next(error);
+//   }
+// };
+
 export const getRecommendPosts = async (req, res, next) => {
   try {
     const username = req.params.username;
@@ -489,6 +638,16 @@ export const getRecommendPosts = async (req, res, next) => {
 
     // Get maximum 20 posts
     const recommendPosts = allPosts.slice(0, 20);
+
+    // Add profilePicURL to each post
+    const postPromises = recommendPosts.map(async (post) => {
+      const createdByUserSnapshot = await getDoc(doc(db, "users", post.createdBy));
+      if (createdByUserSnapshot.exists()) {
+        const createdByUser = createdByUserSnapshot.data();
+        post.profilePicURL = createdByUser.profilePicURL; // Add profilePicURL to the post object
+      }
+    });
+    await Promise.all(postPromises);
 
     return res.status(200).json({ posts: recommendPosts });
   } catch (error) {
