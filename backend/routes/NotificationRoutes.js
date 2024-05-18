@@ -3,7 +3,7 @@ import {
     likePost, likeStory,
     unlikePost, unlikeStory,
     commentOnPost, deleteComment,
-    getNotificationsByUsername, getCommentsByPostId
+    getNotificationsByUsername, getCommentsByPostId, getCommentById
 }
 from "../controllers/NotificationController.js";
 const router = express.Router();
@@ -21,5 +21,5 @@ router.delete("/delete-comment", deleteComment);
 
 router.get("/get-notifications/:username", getNotificationsByUsername);
 router.get("/get-comments/:postId", getCommentsByPostId);
-
+router.get("/get-comment/:commentId", getCommentById);
 export default router;

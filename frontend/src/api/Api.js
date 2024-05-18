@@ -502,3 +502,7 @@ export function getNotificationsByUsername(username) {
 export function getCommentsByPostId(postId) {
   return axios.get(API_URL + "/get-comments/" + postId, baseHeader);
 }
+
+export function getCommentById(commentId) {
+  return axios.get(API_URL + "/get-comment/" + commentId, baseHeader);
+}

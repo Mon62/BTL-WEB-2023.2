@@ -559,3 +559,19 @@ export const getCommentsByPostId = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 }
+
+export const getCommentById = async (req, res) => {
+  try {
+    const commentId = req.params.commentId;
+
+    const commentRef = doc(db, 'comments', commentId);
+    const commentSnapshot = await getDoc(commentRef);
+    const commentData = commentSnapshot.data();
+
+    res.status(200).json(commentData);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
