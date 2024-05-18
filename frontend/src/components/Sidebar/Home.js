@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box,  Link, Tooltip } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { AiFillHome } from 'react-icons/ai';
+import { LiaHomeSolid } from "react-icons/lia";
 
 
 const Home = (props) => {
@@ -34,7 +34,7 @@ const Home = (props) => {
                 bg={props.bg}
                 onClick={handleClick}
             >
-                <AiFillHome size={25}/>
+                <LiaHomeSolid size={25}/>
                 <Box display={{ base: "none", md: "block" }} fontWeight={props.fontWeight}>Home</Box>
             </Link>
         </Tooltip>
