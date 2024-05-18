@@ -1,12 +1,29 @@
-import React, { useState } from 'react'
-import { Box, Button, Flex, Input, InputGroup, InputRightElement, Text, useDisclosure } from "@chakra-ui/react";
+import React, { useEffect, useRef, useState } from 'react'
+import { Box, Button, Flex, Input, InputGroup, InputRightElement, Text, useDisclosure, useToast } from "@chakra-ui/react";
 import { CommentLogo, NotificationsLogo, UnlikeLogo } from "../../assets/constants";
 import { FaRegBookmark } from "react-icons/fa"
 import { FaBookmark } from "react-icons/fa";
-const PostFooter = ({likes, createdBy, caption, numOfComments}) => {
+import { commentOnPost } from '../../api/Api';
+import { Success, Error } from "../../models/Toast.js";
+import ViewPost from '../ViewPost/ViewPost';
+
+const PostFooter = ({likes, createdBy, caption, numOfComments, postID, imageURL, avatar, comments, typeFirst}) => {
   const [liked, setLiked] = useState(false)
-  
   const [saved, setSaved] = useState(false)
+  const [disabled, setDisabled] = useState(true)
+  const [comment , setComment] = useState("")
+  const userName = sessionStorage.getItem("currentUser")
+  const commentRef = useRef()
+
+  const [show, setShow] = useState(false)
+  const handleShowPost = () => {
+    setShow(true)
+  }
+  const handleClosePost = () => {
+    setShow(false)
+  }
+
+  const toast = useToast()
   const handleLike = () => {
     if(liked){
       setLiked(false);
@@ -16,7 +33,34 @@ const PostFooter = ({likes, createdBy, caption, numOfComments}) => {
       
     }
   }
+  useEffect(() => {
+	if(comment === "") setDisabled(true)
+	else setDisabled(false)
+  },[comment])
 
+  const handleComment = (event) => {
+	event.preventDefault();
+	setDisabled(true)
+	const commentData = {
+		postId: postID,
+		username: userName,
+		textComment: comment,
+	}
+	console.log(commentData)
+	commentOnPost(commentData)
+	.then((res) => {
+        toast(new Success(res));
+        setDisabled(false)
+		commentRef.current.value = "";
+		setComment("")
+      })
+      .catch((err) => {
+        // console.log(err);
+        console.log(err.response.data.message);
+        toast(new Error(err));
+      });
+    
+  }
   const handleSaved = () => {
     if(saved){
       setSaved(false)
@@ -47,7 +91,7 @@ const PostFooter = ({likes, createdBy, caption, numOfComments}) => {
 						</Text>
 					</Text>
 					
-						{numOfComments !== 0 && <Text fontSize='sm' color={"gray"} cursor={"pointer"} >
+						{numOfComments !== 0 && <Text fontSize='sm' color={"gray"} cursor={"pointer"} onClick={handleShowPost}>
 							View all {numOfComments} comments
 						</Text>}
 					
@@ -62,9 +106,9 @@ const PostFooter = ({likes, createdBy, caption, numOfComments}) => {
 							variant={"flushed"}
 							placeholder={"Add a comment..."}
 							fontSize={14}
-							//onChange={(e) => setComment(e.target.value)}
-							//value={comment}
-							//ref={commentRef}
+							onChange={(e) => setComment(e.target.value)}
+							value={comment}
+							ref={commentRef}
 						/>
 						<InputRightElement>
 							<Button
@@ -74,15 +118,28 @@ const PostFooter = ({likes, createdBy, caption, numOfComments}) => {
 								cursor={"pointer"}
 								_hover={{ color: "white" }}
 								bg={"transparent"}
-								//onClick={handleSubmitComment}
+								onClick={handleComment}
 								//isLoading={isCommenting}
+								isDisabled={disabled}
 							>
 								Post
 							</Button>
 						</InputRightElement>
 					</InputGroup>
 				</Flex>
-		
+				{show && <ViewPost 
+				show={show} 
+				onHide={handleClosePost} 
+				imageURL={imageURL} 
+				createdBy={createdBy}
+				avatar={avatar}
+				likes={likes}
+				caption={caption}
+				numOfComments={numOfComments}
+				postID={postID}	
+				comments={comments}
+				typeFirst={typeFirst}
+				/>}
 		</Box>
   )
 }

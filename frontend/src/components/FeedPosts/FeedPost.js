@@ -2,14 +2,20 @@ import React from 'react'
 import PostHeader from './PostHeader'
 import PostFooter from './PostFooter';
 import { Box, Image } from "@chakra-ui/react";
-const FeedPost = ({files, likes, createdBy, caption, numOfComments, avatar}) => {
+const FeedPost = ({files, likes, createdBy, caption, numOfComments, avatar, postID, comments, typeFirst}) => {
   return (
     <Box borderTop={"1px solid gray"}>
-			<PostHeader avatar={avatar} createdBy={createdBy} />
+			<PostHeader likes={likes} createdBy={createdBy} caption={caption} numOfComments={numOfComments} postID={postID} imageURL={files} avatar={avatar} comments={comments} typeFirst={typeFirst}/>
 			<Box my={2} borderRadius={4} overflow={"hidden"}>
-				<Image src={files} alt={"FEED POST IMG"} />
+				{typeFirst === 'picture' && <Image src={files} alt={"FEED POST IMG"} />} 
+				{typeFirst === 'video' && <video
+                                  src={files}
+                                  controls
+                                  playsinline
+								  autoplay
+                                ></video>}
 			</Box>
-			<PostFooter likes={likes} createdBy={createdBy} caption={caption} numOfComments={numOfComments} />
+			<PostFooter likes={likes} createdBy={createdBy} caption={caption} numOfComments={numOfComments} postID={postID} imageURL={files} avatar={avatar} comments={comments} typeFirst={typeFirst}/>
 		</Box>
   )
 }

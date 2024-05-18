@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Avatar, Box, Button, Flex, Skeleton, SkeletonCircle } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Avatar, Box, Button, Flex, Link, Skeleton, SkeletonCircle } from "@chakra-ui/react";
+import { Link as RouterLink} from "react-router-dom";
 import ViewPost from '../ViewPost/ViewPost';
-const PostHeader = ({avatar, createdBy}) => {
+const PostHeader = ({likes, createdBy, caption, numOfComments, postID, imageURL, avatar, comments, typeFirst}) => {
   const [show, setShow] = useState(false)
   const handleShowPost = () => {
     setShow(true)
@@ -16,13 +16,12 @@ const PostHeader = ({avatar, createdBy}) => {
 				
 						<Avatar src={avatar} alt='user profile pic' size={"sm"} />
 					
-				
 
-				  <Flex fontSize={12} fontWeight={"bold"} gap='2'>
+				  <Link as={RouterLink} to={`/profile/${createdBy}`} fontSize={12} fontWeight={"bold"} gap='2'>
 					{createdBy} 
 
 					<Box color={"gray.500"}></Box>
-				</Flex>
+				</Link>
 			</Flex>
 			<Box cursor={"pointer"}>
 				<Button
@@ -37,10 +36,21 @@ const PostHeader = ({avatar, createdBy}) => {
 					transition={"0.2s ease-in-out"}
 					onClick={handleShowPost}
 				>
-					Unfollow
+					View Post
 				</Button>
 			</Box>
-      {show && <ViewPost show={show} onHide={handleClosePost}/>}
+      {show && <ViewPost show={show} 
+				onHide={handleClosePost} 
+				imageURL={imageURL} 
+				createdBy={createdBy}
+				avatar={avatar}
+				likes={likes}
+				caption={caption}
+				numOfComments={numOfComments}
+				postID={postID}
+				comments={comments}	
+					typeFirst={typeFirst}
+				/>}
 		</Flex>
 	
   )

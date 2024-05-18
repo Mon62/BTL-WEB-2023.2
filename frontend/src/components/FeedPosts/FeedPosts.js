@@ -18,14 +18,17 @@ const FeedPosts = () => {
     try {
       const response = await getRecommendPosts(profileUser, page.current);
       const postData = response.data.posts;
-
+      console.log(postData)
       // Append new posts to the existing posts
       setPosts(prevPosts => [...prevPosts, ...postData.map((file) => ({
         caption: JSON.parse(file.caption),
         comments: file.comments,
         createdBy: file.createdBy,
         imgURL: file.imgURLs[0],
+        type: file.typeOfFirstMedia,
         likes: file.likes,
+        avatar: file.profilePicURL,
+        postID: file.pid,
       }))]);
 
       setLoading(false);
@@ -59,6 +62,7 @@ const FeedPosts = () => {
 
   useEffect(() => {
     fetchData(); // Call the async function within useEffect
+    
   }, [profileUser]);
 
   return (
@@ -68,12 +72,12 @@ const FeedPosts = () => {
             // If this is the last post, attach the ref to this post
             return (
               <div ref={lastPostElementRef}>
-                <FeedPost files={file.imgURL} likes={file.likes.length} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} />
+                <FeedPost files={file.imgURL} likes={file.likes.length} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type}/>
               </div>
             );
           } else {
             return (
-              <FeedPost files={file.imgURL} likes={file.likes.length} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} />
+              <FeedPost files={file.imgURL} likes={file.likes.length} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type}/>
             );
           }
         })}
