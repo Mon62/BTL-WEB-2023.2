@@ -32,7 +32,7 @@ export const createPost = async (req, res, next) => {
     let imgURLs = [];
 
 
-    
+
     admin
       .auth()
       .verifyIdToken(accessToken)
@@ -79,7 +79,7 @@ export const createPost = async (req, res, next) => {
           const lowerCaseFilename = filename.toLowerCase();
           const imageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
           const videoExtensions = ['mp4', 'avi', 'mov'];
-        
+
           if (imageExtensions.some(ext => lowerCaseFilename.includes(ext))) {
             return 'picture';
           } else if (videoExtensions.some(ext => lowerCaseFilename.includes(ext))) {
@@ -555,5 +555,111 @@ export const getExplorePosts = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: err.message });
+  }
+};
+
+
+
+
+//SAVE POST
+export const savePost = async (req, res, next) => {
+  try {
+    const username = req.body.username;
+    const postId = req.body.postId;
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        const userSnapshot = await getDoc(doc(db, "users", username));
+        if (!userSnapshot.exists()) {
+          return res.status(400).json({ message: "User does not exist: " + username });
+        }
+        const user = userSnapshot.data();
+        user.savedPosts.push(postId);
+        await updateDoc(doc(db, "users", username), {
+          savedPosts: user.savedPosts,
+        });
+        return res.status(200).json({ message: "Post saved successfully" });
+      })
+      .catch((error) => {
+        console.error(error);
+        next(error);
+      });
+
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const unSavePost = async (req, res, next) => {
+  try {
+    const username = req.body.username;
+    const postId = req.body.postId;
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        const userSnapshot = await getDoc(doc(db, "users", username));
+        if (!userSnapshot.exists()) {
+          return res.status(400).json({ message: "User does not exist: " + username });
+        }
+        const user = userSnapshot.data();
+        const index = user.savedPosts.indexOf(postId);
+        if (index > -1) {
+          user.savedPosts.splice(index, 1);
+        }
+        await updateDoc(doc(db, "users", username), {
+          savedPosts: user.savedPosts,
+        });
+        return res.status(200).json({ message: "Post unsaved successfully" });
+      })
+      .catch((error) => {
+        console.error(error);
+        next(error);
+      });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const getSavedPosts = async (req, res, next) => {
+  try {
+    const username = req.params.username;
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        const userSnapshot = await getDoc(doc(db, "users", username));
+        if (!userSnapshot.exists()) {
+          return res.status(400).json({ message: "User does not exist: " + username });
+        }
+        const user = userSnapshot.data();
+        const savedPosts = user.savedPosts;
+        const savedPostsData = [];
+        const postPromises = savedPosts.map(async (postId) => {
+          const postSnapshot = await getDoc(doc(db, "posts", postId));
+          if (postSnapshot.exists()) {
+            const post = postSnapshot.data();
+            savedPostsData.push(post);
+          }
+        });
+        await Promise.all(postPromises);
+        return res.status(200).json({ message: "success", data: savedPostsData });
+      })
+      .catch((error) => {
+        console.error(error);
+        next(error);
+      });
+  } catch (error) {
+    console.error(error);
+    next(error);
   }
 };

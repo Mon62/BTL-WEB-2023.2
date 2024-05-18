@@ -11,6 +11,7 @@ class User {
     followingUsers, // username string
     posts, // array of postID
     newPosts, // array of postID
+    savedPosts, // array of postID be saved
     stories, // array of storyID
     newStories, // map key (username) - value (array of storyID) xem mẫu newStories trong username nam03nd trên firebase 
     myNewStories, // newStories from me
@@ -28,6 +29,7 @@ class User {
     this.followingUsers = followingUsers;
     this.posts = posts;
     this.newPosts = newPosts;
+    this.savedPosts = savedPosts;
     this.stories = stories;
     this.newStories = newStories;
     this.myNewStories = myNewStories;

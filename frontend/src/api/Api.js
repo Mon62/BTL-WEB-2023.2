@@ -243,6 +243,41 @@ export function getExplorePosts(username) {
   return axios.get(API_URL + "/explore-posts/" + username, baseHeader);
 }
 
+//save post
+
+//PostData cần có các trường sau:username, postId
+export function savePost(postData) {
+  return axios.post(API_URL + "/save-post", postData, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+  });
+}
+
+//PostData cần có các trường sau:username, postId
+export function unSavePost(postData) {
+  return axios.delete(API_URL + "/unsave-post", {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    },
+    data: postData,
+  });
+}
+
+//truyền vào username
+export function getSavedPosts(username) {
+  return axios.get(API_URL + "/saved-posts/" + username, {
+    headers: {
+      "access-control-allow-origin": "*",
+      "content-type": "application/json; charset=utf-8 ",
+      Authorization: sessionStorage.getItem("accessToken"),
+    }
+  });
+}
 
 // storyData cần có các trường sau:caption, media (ảnh hoặc video tải lên) chỉ 1, username (createdBy)
 export function createStory(storyData) {
