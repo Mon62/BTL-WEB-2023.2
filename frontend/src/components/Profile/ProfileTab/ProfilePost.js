@@ -21,6 +21,7 @@ export const ProfilePost = ({
   createdBy,
   avatar,
   caption,
+  postID,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [show, setShow] = useState(false)
@@ -117,7 +118,9 @@ export const ProfilePost = ({
         avatar={avatar}
         likes={likes}
         caption={caption}
-        numOfComments={comments}
+        comments={comments}
+        postID={postID}
+        typeFirst={typeOfFirstMedia}
       />}
     </>
   );
