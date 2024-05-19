@@ -16,6 +16,8 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
+
+
 import Notification from "../models/NotificationModel.js";
 
 export const likePost = async (req, res) => {
@@ -610,3 +612,38 @@ export const getCommentById = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+
+// //Get the messaging service
+// const messaging = getMessaging();
+
+// // Listen for new notifications
+// onSnapshot(collection(db, "notifications"), (snapshot) => {
+//   snapshot.docChanges().forEach((change) => {
+//     if (change.type === "added") {
+//       const notification = change.doc.data();
+//       // Get the receiver's FCM token
+//       const token = getUserFcmToken(notification.receiver); // You need to implement getUserFcmToken
+//       // Send a message to the receiver
+//     //   send(messaging, {
+//     //     token,
+//     //     notification: {
+//     //       title: "New notification",
+//     //       body: notification.message,
+//     //     },
+//     //   }
+//     // );
+
+//     sendToDevice(token, {
+//         notification: {
+//           title: "New notification",
+//           body: notification.message,
+//         },
+//       }
+//     );
+//     }
+//   });
+// });
+
+
