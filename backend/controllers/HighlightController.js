@@ -16,11 +16,6 @@ import {
   arrayRemove,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import multer from "multer";
-
-import HighlightModel from "../models/HighlightModel.js";
-import StoryModel from "../models/StoryModel.js";
-import UserModel from "../models/UserModel.js";
 
 export const createHighlight = async (req, res, next) => {
   try {
@@ -36,7 +31,7 @@ export const createHighlight = async (req, res, next) => {
       .verifyIdToken(accessToken)
       .then(async () => {
         const userRef = doc(db, "users", username);
-        const userSnapshot = await getDoc(userRef);
+        const userSnapshot = await getDoc(userRef).catch((err) => next(err));
         if (!userSnapshot.exists()) {
           return res
             .status(400)
@@ -51,21 +46,23 @@ export const createHighlight = async (req, res, next) => {
           stories: stories,
         };
         const highlightRef = doc(db, "highlights", hlid);
-        await setDoc(highlightRef, highlightdata);
+        await setDoc(highlightRef, highlightdata).catch((err) => next(err));
 
         // Add hlid to user's highlights
         await updateDoc(userRef, {
           highlights: arrayUnion(hlid),
-        });
+        }).catch((err) => next(err));
 
         // Add hlid to inHighlights of each story
         for (let i = 0; i < stories.length; i++) {
           const storyRef = doc(db, "stories", stories[i]);
-          const storySnapshot = await getDoc(storyRef);
+          const storySnapshot = await getDoc(storyRef).catch((err) =>
+            next(err)
+          );
           if (storySnapshot.exists()) {
             await updateDoc(storyRef, {
               inHighlights: arrayUnion(hlid),
-            });
+            }).catch((err) => next(err));
           }
         }
 
@@ -74,13 +71,10 @@ export const createHighlight = async (req, res, next) => {
           message: "Tạo highlight thành công!",
         });
       })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
+      .catch((err) => next(err));
   } catch (error) {
     console.error(error);
-    return next(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -94,15 +88,18 @@ export const updateHighlight = async (req, res, next) => {
       .verifyIdToken(accessToken)
       .then(async () => {
         const highlightRef = doc(db, "highlights", hlid);
-        const highlightSnapshot = await getDoc(highlightRef);
+        const highlightSnapshot = await getDoc(highlightRef).catch((err) =>
+          next(err)
+        );
         if (!highlightSnapshot.exists()) {
           return res
             .status(400)
             .json({ message: "Không tồn tại highlight " + hlid });
         }
 
-
-        const oldHighlightSnapshot = await getDoc(highlightRef);
+        const oldHighlightSnapshot = await getDoc(highlightRef).catch((err) =>
+          next(err)
+        );
         const oldStories = oldHighlightSnapshot.data().stories;
 
         // Remove hlid from old stories
@@ -110,7 +107,7 @@ export const updateHighlight = async (req, res, next) => {
           const storyRef = doc(db, "stories", oldStories[i]);
           await updateDoc(storyRef, {
             inHighlights: arrayRemove(hlid),
-          });
+          }).catch((err) => next(err));
         }
 
         // Add hlid to new stories
@@ -118,7 +115,7 @@ export const updateHighlight = async (req, res, next) => {
           const storyRef = doc(db, "stories", stories[i]);
           await updateDoc(storyRef, {
             inHighlights: arrayUnion(hlid),
-          });
+          }).catch((err) => next(err));
         }
 
         const highlightdata = {
@@ -127,23 +124,17 @@ export const updateHighlight = async (req, res, next) => {
           hlimgURL: hlimgURL,
           stories: stories,
         };
-        await updateDoc(highlightRef, highlightdata);
-
-
-
+        await updateDoc(highlightRef, highlightdata).catch((err) => next(err));
 
         return res.status(200).json({
           status: "success",
           message: "Cập nhật highlight thành công!",
         });
       })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
+      .catch((err) => next(err));
   } catch (error) {
     console.error(error);
-    return next(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -157,7 +148,9 @@ export const deleteHighlight = async (req, res, next) => {
       .verifyIdToken(accessToken)
       .then(async () => {
         const highlightRef = doc(db, "highlights", hlid);
-        const highlightSnapshot = await getDoc(highlightRef);
+        const highlightSnapshot = await getDoc(highlightRef).catch((err) =>
+          next(err)
+        );
 
         if (!highlightSnapshot.exists()) {
           return res
@@ -174,16 +167,12 @@ export const deleteHighlight = async (req, res, next) => {
           const storyRef = doc(db, "stories", stories[i]);
           await updateDoc(storyRef, {
             inHighlights: arrayRemove(hlid),
-          });
+          }).catch((err) => next(err));
         }
-
-
-
-
 
         // Get user document
         const userRef = doc(db, "users", username);
-        const userSnapshot = await getDoc(userRef);
+        const userSnapshot = await getDoc(userRef).catch((err) => next(err));
         if (userSnapshot.exists()) {
           const userData = userSnapshot.data();
           // Remove the highlight id from the user's highlights array
@@ -191,23 +180,22 @@ export const deleteHighlight = async (req, res, next) => {
             (id) => id !== hlid
           );
           // Update the user's highlights array in the database
-          await updateDoc(userRef, { highlights: updatedHighlights });
+          await updateDoc(userRef, { highlights: updatedHighlights }).catch(
+            (err) => next(err)
+          );
         }
 
-        await deleteDoc(highlightRef);
+        await deleteDoc(highlightRef).catch((err) => next(err));
 
         return res.status(200).json({
           status: "success",
           message: "Xóa highlight thành công!",
         });
       })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
+      .catch((err) => next(err));
   } catch (error) {
     console.error(error);
-    return next(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -215,7 +203,7 @@ export const getAllHighlightsByUsername = async (req, res, next) => {
   try {
     const username = req.params.username;
     const userRef = doc(db, "users", username);
-    const userSnapshot = await getDoc(userRef);
+    const userSnapshot = await getDoc(userRef).catch((err) => next(err));
     if (!userSnapshot.exists()) {
       return res
         .status(400)
@@ -227,14 +215,18 @@ export const getAllHighlightsByUsername = async (req, res, next) => {
 
     for (let i = 0; i < highlights.length; i++) {
       const highlightRef = doc(db, "highlights", highlights[i]);
-      const highlightSnapshot = await getDoc(highlightRef);
+      const highlightSnapshot = await getDoc(highlightRef).catch((err) =>
+        next(err)
+      );
       if (highlightSnapshot.exists()) {
         const highlight = highlightSnapshot.data();
         const stories = [];
         if (highlight.stories) {
           for (let j = 0; j < highlight.stories.length; j++) {
             const storyRef = doc(db, "stories", highlight.stories[j]);
-            const storySnapshot = await getDoc(storyRef);
+            const storySnapshot = await getDoc(storyRef).catch((err) =>
+              next(err)
+            );
             if (storySnapshot.exists()) {
               stories.push(storySnapshot.data());
             }
@@ -247,6 +239,6 @@ export const getAllHighlightsByUsername = async (req, res, next) => {
     return res.status(200).json({ message: "success", data: highlightData });
   } catch (error) {
     console.error(error);
-    return next(error);
+    res.status(400).json({ message: error.message });
   }
 };

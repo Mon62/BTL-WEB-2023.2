@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { Container, Form, FormGroup, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../../api/Api.js";
+import { login, logout } from "../../api/Api.js";
 import { GoogleButton } from "react-google-button";
-import { auth } from "../../firebase/firebase.js";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { InputRightElement, Input, InputGroup } from "@chakra-ui/react";
 
 export const Login = () => {
@@ -12,20 +10,9 @@ export const Login = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const googleAuthProvider = new GoogleAuthProvider();
   const [showPassword, setShowPassword] = useState(false);
 
-  const signInWithGoogle = async () => {
-    try {
-      await signInWithPopup(auth, googleAuthProvider)
-        .then(() => {
-          // navigate("/home");
-        })
-        .catch((err) => console.log(err));
-    } catch (err) {
-      console.log(err);
-    }
-  };
+ 
   const handleSubmit = (e) => {
     e.preventDefault();
     setErrorMessage("");
@@ -121,9 +108,7 @@ export const Login = () => {
           <p style={{ fontSize: "15px" }}>Hoặc</p>
           <hr className="solid" style={{ width: 170 }}></hr>
         </div>
-        <div className="align-self-center mb-3">
-          <GoogleButton onClick={signInWithGoogle}></GoogleButton>
-        </div>
+        
         <Link
           className="align-self-center"
           to="/password/reset"

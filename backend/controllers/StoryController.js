@@ -16,8 +16,6 @@ import {
   arrayRemove,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
-import multer from "multer";
-import storyModel from "../models/StoryModel.js";
 
 export const createStory = async (req, res, next) => {
   try {
@@ -90,17 +88,19 @@ export const createStory = async (req, res, next) => {
           endAt: endAt,
           inHighlights: [],
         };
-        await setDoc(doc(db, "stories", storyId), storyData);
+        await setDoc(doc(db, "stories", storyId), storyData).catch((err) =>
+          next(err)
+        );
         await updateDoc(doc(db, "users", username), {
           stories: arrayUnion(storyId),
-        });
+        }).catch((err) => next(err));
 
         // Fetch followers of the user
-        const userSnapshot = await getDoc(doc(db, "users", username));
+        const userSnapshot = await getDoc(doc(db, "users", username)).catch(
+          (err) => next(err)
+        );
         const userData = userSnapshot.data();
         const followers = userData.followers;
-        
-       
 
         // Update each follower's stories with the new storyId
         for (const follower of followers) {
@@ -110,16 +110,14 @@ export const createStory = async (req, res, next) => {
           followerNewStories[username] = followerNewStories[username] || [];
           followerNewStories[username].push(storyId);
 
-         
-          
           await updateDoc(followerRef, {
             newStories: followerNewStories,
-          });
+          }).catch((err) => next(err));
         }
 
         await updateDoc(doc(db, "users", username), {
           myNewStories: arrayUnion(storyId),
-        });
+        }).catch((err) => next(err));
         res.status(200).json({
           status: "success",
           message: "Đăng Story thành công!",
@@ -127,13 +125,10 @@ export const createStory = async (req, res, next) => {
         });
         console.log(storyData);
       })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
+      .catch((err) => next(err));
   } catch (error) {
     console.error(error);
-    return next(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -148,7 +143,7 @@ export const deleteStory = async (req, res, next) => {
       .verifyIdToken(accessToken)
       .then(async () => {
         const storyRef = doc(db, "stories", storyId);
-        const storySnapshot = await getDoc(storyRef);
+        const storySnapshot = await getDoc(storyRef).catch((err) => next(err));
 
         if (!storySnapshot.exists()) {
           return res.status(400).json({ message: "Story does not exist" });
@@ -162,14 +157,16 @@ export const deleteStory = async (req, res, next) => {
         const userRef = doc(db, "users", username);
         await updateDoc(userRef, {
           stories: arrayRemove(storyId),
-        });
+        }).catch((err) => next(err));
 
         // Create an array to hold all the promises
         let promises = [];
 
         for (let i = 0; i < inHighlights.length; i++) {
           const highlightRef = doc(db, "highlights", inHighlights[i]);
-          const highlightSnapshot = await getDoc(highlightRef);
+          const highlightSnapshot = await getDoc(highlightRef).catch((err) =>
+            next(err)
+          );
           if (highlightSnapshot.exists()) {
             const highlightData = highlightSnapshot.data();
             const updatedStories = highlightData.stories.filter(
@@ -188,30 +185,29 @@ export const deleteStory = async (req, res, next) => {
         }
 
         // Wait for all promises to resolve
-        await Promise.all(promises);
+        await Promise.all(promises).catch((err) => next(err));
 
         // Remove story from database
-        await deleteDoc(storyRef);
+        await deleteDoc(storyRef).catch((err) => next(err));
 
         return res.status(200).json({
           status: "success",
           message: "Story deleted successfully",
         });
       })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
+      .catch((err) => next(err));
   } catch (error) {
     console.error(error);
-    return next(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
 export const getStoryById = async (req, res, next) => {
   try {
     const storyId = req.params.storyId;
-    const storySnapshot = await getDoc(doc(db, "stories", storyId));
+    const storySnapshot = await getDoc(doc(db, "stories", storyId)).catch(
+      (err) => next(err)
+    );
     if (!storySnapshot.exists()) {
       return res
         .status(400)
@@ -294,7 +290,7 @@ export const getNewStoriesByUsername = async (req, res, next) => {
         const username = req.params.username;
         // Fetch the user
         const userRef = doc(db, "users", username);
-        const userSnapshot = await getDoc(userRef);
+        const userSnapshot = await getDoc(userRef).catch((err) => next(err));
         if (!userSnapshot.exists()) {
           throw new Error("User does not exist");
         }
@@ -308,7 +304,9 @@ export const getNewStoriesByUsername = async (req, res, next) => {
         for (const [username, storyIds] of Object.entries(newStoriesIds)) {
           newStories[username] = [];
           for (const storyId of storyIds) {
-            const storySnapshot = await getDoc(doc(db, "stories", storyId));
+            const storySnapshot = await getDoc(
+              doc(db, "stories", storyId)
+            ).catch((err) => next(err));
             if (storySnapshot.exists()) {
               // newStories[username].push(storySnapshot.data());
               const storyData = storySnapshot.data();
@@ -344,13 +342,10 @@ export const getNewStoriesByUsername = async (req, res, next) => {
           data: sortedNewStories,
         });
       })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
+      .catch((err) => next(err));
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.log(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
@@ -364,7 +359,7 @@ export const getMyNewStories = async (req, res, next) => {
         const username = req.params.username;
         // Fetch the user
         const userRef = doc(db, "users", username);
-        const userSnapshot = await getDoc(userRef);
+        const userSnapshot = await getDoc(userRef).catch((err) => next(err));
         if (!userSnapshot.exists()) {
           throw new Error("User does not exist");
         }
@@ -377,7 +372,9 @@ export const getMyNewStories = async (req, res, next) => {
         const myNewStories = [];
         const expiredStories = [];
         for (const storyId of myNewStoriesIds) {
-          const storySnapshot = await getDoc(doc(db, "stories", storyId));
+          const storySnapshot = await getDoc(doc(db, "stories", storyId)).catch(
+            (err) => next(err)
+          );
           if (storySnapshot.exists()) {
             const storyData = storySnapshot.data();
             // Check if the story's endAt is greater than the current time
@@ -395,7 +392,7 @@ export const getMyNewStories = async (req, res, next) => {
         if (expiredStories.length > 0) {
           await updateDoc(userRef, {
             myNewStories: arrayRemove(...expiredStories),
-          });
+          }).catch((err) => next(err));
         }
 
         return res.status(200).json({
@@ -404,30 +401,27 @@ export const getMyNewStories = async (req, res, next) => {
           data: myNewStories,
         });
       })
-      .catch((error) => {
-        console.error(error);
-        return next(error);
-      });
+      .catch((err) => next(err));
   } catch (error) {
-    console.error(error);
-    throw error;
+    console.log(error);
+    res.status(400).json({ message: error.message });
   }
 };
 
 export const getMusicFiles = async (req, res, next) => {
   try {
     const musicFolder = ref(storage, "/music");
-    const result = await listAll(musicFolder);
+    const result = await listAll(musicFolder).catch((err) => next(err));
     const fileData = await Promise.all(
       result.items.map(async (item) => {
-        const url = await getDownloadURL(item);
+        const url = await getDownloadURL(item).catch((err) => next(err));
         const name = item.name;
         return { name, url };
       })
-    );
+    ).catch((err) => next(err));
     res.status(200).json({ message: "success", data: fileData });
   } catch (error) {
     console.error(error);
-    return next(error);
+    res.status(400).json({ message: error.message });
   }
 };

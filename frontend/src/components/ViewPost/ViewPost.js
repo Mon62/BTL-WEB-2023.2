@@ -1,23 +1,40 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	Avatar,
 	Button,
 	Divider,
 	Flex,
-	GridItem,
 	Image,
-
 	Text,
 	VStack,
-	useDisclosure,
+	useToast,
 } from "@chakra-ui/react";
-import { AiFillHeart } from "react-icons/ai";
-import { FaComment } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import PostFooter from '../FeedPosts/PostFooter';
 import Modal from 'react-bootstrap/Modal';
-const ViewPost = ({ show, onHide, imageURL, createdBy, avatar, likes, caption, comments, postID, typeFirst }) => {
+import { getCommentsByPostId } from '../../api/Api';
+import { Error } from "../../models/Toast.js";
+import { Comment } from '../Comment/Comment.js';
 
+const ViewPost = ({ show, onHide, imageURL, createdBy, avatar, likes, caption, comments, postID, typeFirst }) => {
+	const [comment, setComment] = useState([])
+	const toast=useToast()
+	const fetchComments = () => {
+		getCommentsByPostId(postID)
+			.then((res) => {
+				const commentArray = res.data;
+				console.log(commentArray);
+				setComment(commentArray);
+			})
+			.catch((err) => {
+				console.log(err.response.data.message);
+				toast(new Error(err));
+			});
+	};
+
+	useEffect(() => {
+		fetchComments();
+	}, [postID]);
 	return (
 		<Modal show={show} onHide={onHide} centered size='xl'>
 			<Modal.Header closeButton></Modal.Header>
@@ -55,34 +72,22 @@ const ViewPost = ({ show, onHide, imageURL, createdBy, avatar, likes, caption, c
 								</Text>
 							</Flex>
 
-							{true && (
-								<Button
-									size={"sm"}
-									bg={"transparent"}
-									_hover={{ bg: "whiteAlpha.300", color: "red.600" }}
-									borderRadius={4}
-									p={1}
-								//onClick={handleDeletePost}
-								//isLoading={isDeleting}
-								>
-									<MdDelete size={20} cursor='pointer' />
-								</Button>
-							)}
+							
 						</Flex>
 						<Divider my={4} bg={"gray.500"} />
 
 						<VStack w='full' alignItems={"start"} maxH={"350px"} overflowY={"auto"}>
 							{/* CAPTION */}
 							{/*post.caption && <Caption post={post} />*/}
-							{/* COMMENTS */}
-							{/*post.comments.map((comment) => (
-										<Comment key={comment.id} comment={comment} />
-									))*/}
+							
+							{comment.map((each) => (
+										<Comment commentId={each.commentId} userName={each.createdBy}  text={JSON.parse(each.textComment)} postOwner={createdBy} fetch={fetchComments}/>
+									))}
 						</VStack>
 						<Divider my={4} bg={"gray.8000"} />
 
 						<PostFooter likes={likes} createdBy={createdBy} caption={caption} numOfComments={0} postID={postID}
-							imageURL={imageURL} avatar={avatar} />
+							imageURL={imageURL} avatar={avatar} onPostComment={fetchComments} />
 					</Flex>
 				</Flex>
 			</Modal.Body>

@@ -33,6 +33,7 @@ const FeedPosts = () => {
 
       setLoading(false);
       page.current++;
+      
     } catch (err) {
       console.log(err.response.data.message);
       toast(new Error(err));

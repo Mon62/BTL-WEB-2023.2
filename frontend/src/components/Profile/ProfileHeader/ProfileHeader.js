@@ -188,19 +188,19 @@ export const ProfileHeader = () => {
               </Flex>
 
               <Flex gap={4} justifyItems={"center"}>
-                <Button
-                  bg={"rgb(239, 239, 239)"}
-                  _hover={{ bg: "blackAlpha.300" }}
-                  color={"black"}
-                  size={{ base: "xs", md: "sm" }}
-                  onClick={() =>
-                    profileUser === currentUser
-                      ? navigate(`/profile/${profileUser}/archive/stories`)
-                      : navigate(`/profile/${profileUser}/messages`)
-                  }
-                >
-                  {profileUser === currentUser ? "View archive" : "Message"}
-                </Button>
+                {currentUser === profileUser && (
+                  <Button
+                    bg={"rgb(239, 239, 239)"}
+                    _hover={{ bg: "blackAlpha.300" }}
+                    color={"black"}
+                    size={{ base: "xs", md: "sm" }}
+                    onClick={() =>
+                      navigate(`/profile/${profileUser}/archive/stories`)
+                    }
+                  >
+                    View Archive
+                  </Button>
+                )}
               </Flex>
             </Flex>
             <Flex alignItems={"center"} gap={{ base: 4, sm: 8 }} mt={0}>

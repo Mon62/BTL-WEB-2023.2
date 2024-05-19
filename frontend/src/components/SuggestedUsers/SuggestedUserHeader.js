@@ -37,7 +37,7 @@ const SuggestedUserHeader = () => {
           });
           setTimeout(() =>{
             setLoading(false)
-          },4500)
+          },2000)
         },[currentUser])
     
 	const handleLogout = (e) => {

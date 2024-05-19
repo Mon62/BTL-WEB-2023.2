@@ -7,7 +7,7 @@ import { commentOnPost } from '../../api/Api';
 import { Success, Error } from "../../models/Toast.js";
 import ViewPost from '../ViewPost/ViewPost';
 
-const PostFooter = ({likes, createdBy, caption, numOfComments, postID, imageURL, avatar, comments, typeFirst}) => {
+const PostFooter = ({likes, createdBy, caption, numOfComments, postID, imageURL, avatar, comments, typeFirst, onPostComment, commentCount}) => {
   const [liked, setLiked] = useState(false)
   const [saved, setSaved] = useState(false)
   const [disabled, setDisabled] = useState(true)
@@ -38,6 +38,7 @@ const PostFooter = ({likes, createdBy, caption, numOfComments, postID, imageURL,
 	else setDisabled(false)
   },[comment])
 
+  
   const handleComment = (event) => {
 	event.preventDefault();
 	setDisabled(true)
@@ -51,6 +52,7 @@ const PostFooter = ({likes, createdBy, caption, numOfComments, postID, imageURL,
 	.then((res) => {
         toast(new Success(res));
         setDisabled(false)
+		onPostComment();
 		commentRef.current.value = "";
 		setComment("")
       })
@@ -73,7 +75,7 @@ const PostFooter = ({likes, createdBy, caption, numOfComments, postID, imageURL,
 				<Box onClick={handleLike} cursor={"pointer"} fontSize={18}>
 					{!liked ? <NotificationsLogo /> : <UnlikeLogo />}
 				</Box>
-				<Box cursor={"pointer"} fontSize={18} >
+				<Box cursor={"pointer"} fontSize={18} onClick={handleShowPost} >
 					<CommentLogo />
 				</Box>
         <Box cursor={"pointer"} fontSize={18} onClick={handleSaved} >
@@ -92,7 +94,7 @@ const PostFooter = ({likes, createdBy, caption, numOfComments, postID, imageURL,
 					</Text>
 					
 						{numOfComments !== 0 && <Text fontSize='sm' color={"gray"} cursor={"pointer"} onClick={handleShowPost}>
-							View all {numOfComments} comments
+							View all comments
 						</Text>}
 					
 					{/* COMMENTS MODAL ONLY IN THE HOME PAGE */}
