@@ -5,32 +5,72 @@ import {
   Text,
   useDisclosure,
   AspectRatio,
+  useToast,
 } from "@chakra-ui/react";
 import { AiFillHeart } from "react-icons/ai";
 import { FaComment } from "react-icons/fa";
 import { TbBoxMultiple } from "react-icons/tb";
 import { MdOndemandVideo } from "react-icons/md";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ViewPost from "../../ViewPost/ViewPost";
+import { getCommentsByPostId, getPostById } from "../../../api/Api";
+import { Error } from "../../../models/Toast";
+
 export const ProfilePost = ({
   img,
-  likes,
-  comments,
+  numberOfLikes,
+  numberOfComments,
   typeOfFirstMedia,
   numberOfMediaFile,
-  createdBy,
-  avatar,
-  caption,
   postID,
+  savedPost,
+  avatar,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState(false);
+  const [comments, setComments] = useState([]);
+  const [data, setData] = useState({ likes: [], comments: [], createdBy: "", caption: "" });
+  const toast = useToast();
+  const userName = sessionStorage.getItem("currentUser")
   const handleShow = () => {
     setShow(true);
-  }
+  };
+
   const handleClose = () => {
     setShow(false);
-  }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const res = await getCommentsByPostId(postID);
+      setComments(res.data);
+    } catch (err) {
+      console.error(err.response.data.message);
+      toast(new Error(err));
+    }
+  };
+
+  const fetchLikes = async () => {
+    const postData = {
+      pid: postID,
+      username: userName,
+    }
+    console.log(postData)
+    try {
+      
+      const res = await getPostById(postID);
+      setData(res.data.data);
+    } catch (err) {
+      console.error(err);
+      toast(new Error(err));
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+    fetchLikes();
+  }, [postID]);
+
   return (
     <>
       <GridItem
@@ -64,7 +104,7 @@ export const ProfilePost = ({
                 color="white"
               />
               <Text className="fw-bold fs-4 ml-2 mt-3" color={"white"}>
-                {likes}
+                {data.likes.length}
               </Text>
             </Flex>
             <Flex gap={2}>
@@ -74,7 +114,7 @@ export const ProfilePost = ({
                 color="white"
               />
               <Text className="fw-bold fs-4 ml-2 mt-3" color={"white"}>
-                {comments}
+                {comments.length}
               </Text>
             </Flex>
           </Flex>
@@ -102,26 +142,29 @@ export const ProfilePost = ({
             <iframe
               title="post"
               src={img}
-            // allowFullScreen
+              allowFullScreen
             />
           </AspectRatio>
         ) : (
           <Image src={img} w={"100%"} h={"100%"} objectFit={"cover"}></Image>
         )}
-
       </GridItem>
-      {show && <ViewPost
-        show={show}
-        onHide={handleClose}
-        imageURL={img}
-        createdBy={createdBy}
-        avatar={avatar}
-        likes={likes}
-        caption={caption}
-        comments={comments}
-        postID={postID}
-        typeFirst={typeOfFirstMedia}
-      />}
+      {show && (
+        <ViewPost
+          show={show}
+          onHide={handleClose}
+          imageURL={img}
+          createdBy={data.createdBy}
+          avatar={avatar}
+          likes={data.likes}
+          caption={data.caption ? JSON.parse(data.caption) : ""}
+          numOfComments={comments.length}
+          postID={postID}
+          comments={comments}
+          typeFirst={typeOfFirstMedia}
+          savedPost={savedPost}
+        />
+      )}
     </>
   );
 };

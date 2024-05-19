@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Container, useToast, Box, SkeletonText, SkeletonCircle } from '@chakra-ui/react'
 import FeedPost from './FeedPost'
-import { getNewPostsByUsername, getRecommendPosts } from '../../api/Api'
-import { Error } from "../../models/Toast.js";
+import { getNewPostsByUsername, getRecommendPosts, getSavedPosts } from '../../api/Api'
+import { Error, Success } from "../../models/Toast.js";
+
 
 const FeedPosts = () => {
   const profileUser = sessionStorage.getItem("currentUser")
@@ -12,6 +13,8 @@ const FeedPosts = () => {
   const page = useRef(0); // Keep track of the current page
   const observer = useRef(); // Reference to the Intersection Observer
   const lastPostElementRef = useRef(); // Reference to the last post element
+  const [savedPost, setSavedPost] = useState([])
+  const [likes, setLikes] = useState(0)
 
   // Function to fetch data
   const fetchData = async () => {
@@ -66,6 +69,28 @@ const FeedPosts = () => {
     
   }, [profileUser]);
 
+  useEffect(()=>{
+    getSavedPosts(profileUser)
+    .then((res) => {
+          //toast(new Success(res));
+      //console.log(res.data.data)
+      const savedArray = res.data.data.map((file) => {
+        return{pid: file.pid,}
+      })
+      setSavedPost(savedArray)
+      //console.log(savedArray)
+        })
+        .catch((err) => {
+          // console.log(err);
+          console.log(err.response.data.message);
+          toast(new Error(err));
+        });
+      
+  
+    }, [profileUser])
+    
+    
+
   return (
     <Container maxW={"container.sm"} py={10} px={2}>
         {!loading && posts.map((file, index, self) => {
@@ -73,12 +98,12 @@ const FeedPosts = () => {
             // If this is the last post, attach the ref to this post
             return (
               <div ref={lastPostElementRef}>
-                <FeedPost files={file.imgURL} likes={file.likes.length} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type}/>
+                <FeedPost files={file.imgURL} likes={file.likes} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type} savedPost={savedPost}/>
               </div>
             );
           } else {
             return (
-              <FeedPost files={file.imgURL} likes={file.likes.length} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type}/>
+              <FeedPost files={file.imgURL} likes={file.likes} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type} savedPost={savedPost}/>
             );
           }
         })}

@@ -3,7 +3,7 @@ import { Grid, Skeleton, VStack, Box, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ProfilePost } from "./ProfilePost.js";
 import { useParams } from "react-router-dom";
-import { getPostsByUsername, getShortenedProfileDataByUsername } from "../../../api/Api.js";
+import { getPostsByUsername, getShortenedProfileDataByUsername, getSavedPosts } from "../../../api/Api.js";
 import { Error } from "../../../models/Toast.js";
 
 export const ProfilePostList = ({}) => {
@@ -12,14 +12,16 @@ export const ProfilePostList = ({}) => {
   const [postsData, setPostsData] = useState([]);
   const toast = useToast();
   const [profilePicURL, setProfilePicURL] = useState("");
+  const [savedPost, setSavedPost] = useState([])
 
   useEffect(() => {
     setIsLoading(true);
     getPostsByUsername(profileUser)
       .then((res) => {
-         console.log(res);
+         //console.log(res);
         setPostsData(res.data.postsData.reverse());
         // console.log(res.data.postsData.reverse());
+        console.log(postsData)
       })
       .catch((err) => {
         console.log(err.response.data.message);
@@ -44,6 +46,27 @@ export const ProfilePostList = ({}) => {
         toast(new Error(err));
       });
   }, [profileUser]);
+
+  useEffect(()=>{
+    getSavedPosts(profileUser)
+    .then((res) => {
+          //toast(new Success(res));
+      //console.log(res.data.data)
+      const savedArray = res.data.data.map((file) => {
+        return{pid: file.pid,}
+      })
+      setSavedPost(savedArray)
+      //console.log(savedArray)
+        })
+        .catch((err) => {
+          // console.log(err);
+          console.log(err.response.data.message);
+          toast(new Error(err));
+        });
+      
+  
+    }, [profileUser])
+    
   return (
     <Grid
       templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }}
@@ -63,11 +86,12 @@ export const ProfilePostList = ({}) => {
           <ProfilePost
             key={index}
             img={post.firstPicURL}
-            createdBy={profileUser}
-            likes={post.numberOfLikes}
-            comments={post.numberOfComments}
+            numberOfLikes={post.numberOfLikes}
+            numberOfComments={post.numberOfComments}
             typeOfFirstMedia={post.typeOfFirstMedia}
             numberOfMediaFile = {post.numberOfMediaFile}
+            postID={post.postId}
+            savedPost={savedPost}
             avatar={profilePicURL}
           />
         ))}

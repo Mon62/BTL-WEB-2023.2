@@ -65,13 +65,11 @@ export const Comment = ({ userName, profilePic, text, postOwner, commentId, fetc
 
   }
   
-  setTimeout(() => {
-    setLoading(false)
-  }, 1000);
+  
 
-  if (loading) return (<CommentSkeleton/>)
+  //if (loading) return (<CommentSkeleton/>)
 
-  else return (
+  return (
     <Flex gap={4} >
       <Link to={`/profile/${userName}`}>
         <Avatar src={picURL} size={"sm"} />

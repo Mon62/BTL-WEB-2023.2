@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Box, Flex, Tooltip, IconButton, useToast } from "@chakra-ui/react";
+import { Box, Button, Center, IconButton, useToast } from "@chakra-ui/react";
 import { CreatePostLogo } from "../../assets/constants.js";
 import { CloseButton, Modal } from "react-bootstrap";
 import { LuImagePlus } from "react-icons/lu";
-import { Button } from "react-bootstrap";
+//import { Button } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
 import Form from "react-bootstrap/Form";
 import AlertModal from "../Sidebar/AlertModal.js";
@@ -18,7 +18,7 @@ const CreateStoryModal = (props) => {
   const [file, setFile] = useState(null);
   const [view, setView] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
-  const [variant, setVariant] = useState("secondary");
+  const [loading, setLoading] = useState(false);
   const [music, setMusic] = useState([]);
   const [selectedMusic, setSelectedMusic] = useState("");
   const currentUser = sessionStorage.getItem("currentUser");
@@ -46,10 +46,10 @@ const CreateStoryModal = (props) => {
   useEffect(() => {
     if (file === null) {
       setDisabled(true);
-      setVariant("secondary");
+      setLoading(false);
     } else {
       setDisabled(false);
-      setVariant("primary");
+      setLoading(false);
     }
   }, [file]);
   //function to rerender the image whenever the file changes
@@ -68,11 +68,13 @@ const CreateStoryModal = (props) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     setDisabled(true);
+    setLoading(true)
     const storyData = new Story(currentUser, caption, file, selectedMusic);
     console.log(storyData);
 
     createStory(storyData)
       .then((res) => {
+        setLoading(false)
         toast(new Success(res));
         discard();
       })
@@ -193,10 +195,11 @@ const CreateStoryModal = (props) => {
             </audio>
           </Form.Group>
         </Modal.Body>
-        <Modal.Footer>
-          <Button onClick={handleSubmit} disabled={disabled} variant={variant}>
+        <Modal.Footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Button onClick={handleSubmit} isDisabled={disabled} colorScheme="blue" isLoading={loading}>
             Create
           </Button>
+          
         </Modal.Footer>
       </Modal>
       <AlertModal

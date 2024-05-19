@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Avatar, Box, Button, Flex, Link, Skeleton, SkeletonCircle } from "@chakra-ui/react";
 import { Link as RouterLink} from "react-router-dom";
 import ViewPost from '../ViewPost/ViewPost';
-const PostHeader = ({likes, createdBy, caption, numOfComments, postID, imageURL, avatar, comments, typeFirst}) => {
+const PostHeader = ({likes, createdBy, caption, numOfComments, postID, imageURL, avatar, comments, typeFirst, savedPost}) => {
   const [show, setShow] = useState(false)
   const handleShowPost = () => {
     setShow(true)
@@ -50,6 +50,8 @@ const PostHeader = ({likes, createdBy, caption, numOfComments, postID, imageURL,
 				postID={postID}
 				comments={comments}	
 					typeFirst={typeFirst}
+					savedPost={savedPost}
+					
 				/>}
 		</Flex>
 	
