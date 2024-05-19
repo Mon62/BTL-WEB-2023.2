@@ -20,7 +20,7 @@ router.post("/create-post", upload.array("file", 10), createPost);
 router.put("/update-post", updatePost);
 router.delete("/delete-post", deletePost);
 
-router.get("/post/:pid", getPostById);
+router.get("/post", getPostById);
 router.get("/posts/:username", getPostsByUsername);
 router.get("/new-posts/:username", getNewPostsByUsername);
 router.get("/recommend-posts/:username", getRecommendPosts);

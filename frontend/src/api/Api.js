@@ -220,9 +220,9 @@ export function getPostsByUsername(username) {
     },
   });
 }
-
-export function getPostById(pid) {
-  return axios.get(API_URL + "/post/" + pid, baseHeader);
+//postData cần có các trường sau:postId, username (người đang đăng nhập)
+export function getPostById(postData) {
+  return axios.get(API_URL + "/post/", postData, baseHeader);
 }
 
 export function getNewPostsByUsername(username) {

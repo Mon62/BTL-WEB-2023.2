@@ -397,50 +397,14 @@ export const getPostsByUsername = async (req, res, next) => {
   }
 };
 
-// export const getPostById = async (req, res, next) => {
-//   try {
-//     const pid = req.params.pid;
-//     const postSnapshot = await getDoc(doc(db, "posts", pid));
-//     if (!postSnapshot.exists()) {
-//       return res.status(400).json({ message: "Không tồn tại bài viết " + pid });
-//     }
-//     const post = postSnapshot.data();
-//     return res.status(200).json({ message: "success", data: post });
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
 
-// export const getNewPostsByUsername = async (req, res, next) => {
-//     try {
-//         const username = req.params.username;
-//         const userSnapshot = await getDoc(doc(db, "users", username));
-//         if (!userSnapshot.exists()) {
-//             return res.status(400).json({ message: "Không tồn tại người dùng " + username });
-//         }
-//         const user = userSnapshot.data();
-//         const newPosts = user.newPosts;
-//         const validPosts = [];
-//         const currentTime = Date.now();
-//         const postPromises = newPosts.map(async (postId) => {
-//             const postSnapshot = await getDoc(doc(db, "posts", postId));
-//             if (postSnapshot.exists()) {
-//                 const post = postSnapshot.data();
-//                 if (currentTime - post.createdAt.toMillis() <= 3*24 * 60 * 60 * 1000) { // 3 days
-//                     validPosts.push(post); // push the post object instead of postId
-//                 }
-//             }
-//         });
-//         await Promise.all(postPromises);
-//         return res.status(200).json({ message: "success", data: validPosts });
-//     } catch (error) {
-//         res.status(400).json({ message: error.message });
-//     }
-// }
+
+
 
 export const getPostById = async (req, res, next) => {
   try {
-    const pid = req.params.pid;
+    const pid = req.body.pid;
+    const username = req.body.username; 
     const postSnapshot = await getDoc(doc(db, "posts", pid)).catch((err) =>
       next(err)
     );
@@ -448,6 +412,9 @@ export const getPostById = async (req, res, next) => {
       return res.status(400).json({ message: "Không tồn tại bài viết " + pid });
     }
     const post = postSnapshot.data();
+
+    // Check if the post is liked by the user
+    const likedByUser = post.likes.includes(username); // Add this line
 
     // Fetch the user data
     const userSnapshot = await getDoc(doc(db, "users", post.createdBy)).catch(
@@ -460,11 +427,12 @@ export const getPostById = async (req, res, next) => {
     }
     const user = userSnapshot.data();
 
-    // Include profilePicURL in the response
+    // Include profilePicURL and likedByUser in the response
     return res.status(200).json({
       message: "success",
       data: post,
       profilePicURL: user.profilePicURL,
+      likedByUser: likedByUser, // Add this line
     });
   } catch (error) {
     console.log(error);
@@ -472,47 +440,7 @@ export const getPostById = async (req, res, next) => {
   }
 };
 
-// export const getNewPostsByUsername = async (req, res, next) => {
-//   try {
-//     const username = req.params.username;
-//     const userSnapshot = await getDoc(doc(db, "users", username));
-//     if (!userSnapshot.exists()) {
-//       return res
-//         .status(400)
-//         .json({ message: "Không tồn tại người dùng " + username });
-//     }
-//     const accessToken = req.headers.authorization;
-//     admin
-//       .auth()
-//       .verifyIdToken(accessToken)
-//       .then(async () => {
-//         const user = userSnapshot.data();
-//         const newPosts = user.newPosts;
-//         const validPosts = [];
-//         const postPromises = newPosts.map(async (postId) => {
-//           const postSnapshot = await getDoc(doc(db, "posts", postId));
-//           if (postSnapshot.exists()) {
-//             const post = postSnapshot.data();
-//             validPosts.push(post); // push the post object instead of postId
-//           }
-//         });
-//         await Promise.all(postPromises);
 
-//         // Clear newPosts
-//         await updateDoc(doc(db, "users", username), {
-//           newPosts: [],
-//         });
-//         console.log(newPosts);
-//         return res.status(200).json({ message: "success", data: validPosts });
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//         next(error);
-//       });
-//   } catch (error) {
-//     res.status(400).json({ message: error.message });
-//   }
-// };
 
 export const getNewPostsByUsername = async (req, res, next) => {
   try {
@@ -565,46 +493,17 @@ export const getNewPostsByUsername = async (req, res, next) => {
   }
 };
 
-// export const getRecommendPosts = async (req, res, next) => {
-//   try {
-//     const username = req.params.username;
-
-//     // Get user's posts
-//     const userSnapshot = await getDoc(doc(db, 'users', username));
-//     const userData = userSnapshot.data();
-//     const userPosts = userData.posts;
-
-//     // Get all posts
-//     const allPostsSnapshot = await getDocs(collection(db, "posts"));
-//     let allPosts = allPostsSnapshot.docs.map(doc => doc.data());
-
-//     // Filter out posts by the current user
-//     allPosts = allPosts.filter(post => !userPosts.includes(post.id));
-
-//     // Shuffle the array to get random posts
-//     for (let i = allPosts.length - 1; i > 0; i--) {
-//       const j = Math.floor(Math.random() * (i + 1));
-//       [allPosts[i], allPosts[j]] = [allPosts[j], allPosts[i]];
-//     }
-
-//     // Get maximum 30 posts
-//     const recommendPosts = allPosts.slice(0, 30);
-
-//     return res.status(200).json({ posts: recommendPosts });
-//   } catch (error) {
-//     console.error(error);
-//     return next(error);
-//   }
-// };
 
 // export const getRecommendPosts = async (req, res, next) => {
 //   try {
 //     const username = req.params.username;
-//     const allPostsSnapshot = await getDocs(collection(db, "posts"));
-//     let allPosts = allPostsSnapshot.docs.map(doc => doc.data());
+//     const allPostsSnapshot = await getDocs(collection(db, "posts")).catch(
+//       (err) => next(err)
+//     );
+//     let allPosts = allPostsSnapshot.docs.map((doc) => doc.data());
 
 //     // Filter out posts by the current user
-//     allPosts = allPosts.filter(post => post.createdBy !== username);
+//     allPosts = allPosts.filter((post) => post.createdBy !== username);
 
 //     // Shuffle the array to get random posts
 //     for (let i = allPosts.length - 1; i > 0; i--) {
@@ -615,10 +514,22 @@ export const getNewPostsByUsername = async (req, res, next) => {
 //     // Get maximum 20 posts
 //     const recommendPosts = allPosts.slice(0, 20);
 
+//     // Add profilePicURL to each post
+//     const postPromises = recommendPosts.map(async (post) => {
+//       const createdByUserSnapshot = await getDoc(
+//         doc(db, "users", post.createdBy)
+//       ).catch((err) => next(err));
+//       if (createdByUserSnapshot.exists()) {
+//         const createdByUser = createdByUserSnapshot.data();
+//         post.profilePicURL = createdByUser.profilePicURL; // Add profilePicURL to the post object
+//       }
+//     });
+//     await Promise.all(postPromises).catch((err) => next(err));
+
 //     return res.status(200).json({ posts: recommendPosts });
 //   } catch (error) {
 //     console.error(error);
-//     return next(error);
+//     res.status(400).json({ message: error.message });
 //   }
 // };
 
@@ -642,7 +553,7 @@ export const getRecommendPosts = async (req, res, next) => {
     // Get maximum 20 posts
     const recommendPosts = allPosts.slice(0, 20);
 
-    // Add profilePicURL to each post
+    // Add profilePicURL and likedByUser to each post
     const postPromises = recommendPosts.map(async (post) => {
       const createdByUserSnapshot = await getDoc(
         doc(db, "users", post.createdBy)
@@ -650,6 +561,7 @@ export const getRecommendPosts = async (req, res, next) => {
       if (createdByUserSnapshot.exists()) {
         const createdByUser = createdByUserSnapshot.data();
         post.profilePicURL = createdByUser.profilePicURL; // Add profilePicURL to the post object
+        post.likedByUser = post.likes.includes(username); // Add likedByUser to the post object
       }
     });
     await Promise.all(postPromises).catch((err) => next(err));
@@ -661,34 +573,6 @@ export const getRecommendPosts = async (req, res, next) => {
   }
 };
 
-// export const getExplorePosts = async (req, res, next) => {
-//   try {
-//     const username = req.params.username;
-//     const postsCollectionRef = collection(db, "posts");
-//     const postsSnapshot = await getDocs(postsCollectionRef);
-//     let postsData = [];
-//     let count = 0;
-//     postsSnapshot.forEach((doc) => {
-//       const data = doc.data();
-//       if (data.createdBy !== username) {
-//         postsData.push({
-//           pid: doc.id,
-//           firstMediaURL: data.imgURLs[0],
-//           typeOfFirstMedia: data.typeOfFirstMedia,
-//           numberOfLikes: data.likes ? data.likes.length : 0,
-//           numberOfComments: data.comments ? data.comments.length : 0,
-//         });
-//         count++;
-//       }
-//       return count  <=  2;
-//     });
-
-//     return res.status(200).json({ postsData: postsData });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(400).json({ message: err.message });
-//   }
-// };
 
 export const getExplorePosts = async (req, res, next) => {
   try {
