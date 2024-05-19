@@ -545,11 +545,20 @@ export const getCommentsByPostId = async (req, res) => {
     const postSnapshot = await getDoc(postRef);
     const postData = postSnapshot.data();
 
+    
     const comments = [];
     for (const cid of postData.comments) {
       const commentSnapshot = await getDoc(doc(db, 'comments', cid));
       const commentData = commentSnapshot.data();
+      
+
+      const userRef = doc(db, 'users', commentData.createdBy);
+      const userSnapshot = await getDoc(userRef);
+      const userData = userSnapshot.data();
+      commentData.profilePicURL = userData.profilePicURL;
+
       comments.unshift(commentData);
+
     }
 
     res.status(200).json(comments);
@@ -568,6 +577,11 @@ export const getCommentById = async (req, res) => {
     const commentSnapshot = await getDoc(commentRef);
     const commentData = commentSnapshot.data();
 
+    const userRef = doc(db, 'users', commentData.createdBy);
+    const userSnapshot = await getDoc(userRef);
+    const userData = userSnapshot.data();
+    commentData.profilePicURL = userData.profilePicURL;
+    
     res.status(200).json(commentData);
   }
   catch (error) {
