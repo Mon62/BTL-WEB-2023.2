@@ -28,12 +28,12 @@ const CommentSkeleton = () => {
 };
 
 export const Comment = ({ userName, profilePic, text, postOwner, commentId, fetch }) => {
-  const [picURL, setPicURL] = useState("")
+  //const [picURL, setPicURL] = useState("")
   const [disabled, setDisabled] = useState(false)
   const [loading, setLoading] = useState(true)
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure()
-  getShortenedProfileDataByUsername(userName)
+  /*getShortenedProfileDataByUsername(userName)
     .then((res) => {
       const data = res.data;
       setPicURL(data.profilePicURL)
@@ -42,7 +42,7 @@ export const Comment = ({ userName, profilePic, text, postOwner, commentId, fetc
     .catch((err) => {
       console.log(err.response.data.message);
       toast(new Error(err));
-    });
+    });*/
 
   const handleDeleteComment = (event) => {
     event.preventDefault();
@@ -72,13 +72,13 @@ export const Comment = ({ userName, profilePic, text, postOwner, commentId, fetc
   return (
     <Flex gap={4} >
       <Link to={`/profile/${userName}`}>
-        <Avatar src={picURL} size={"sm"} />
+        <Avatar src={profilePic} size={"sm"} />
       </Link>
       <Flex direction={"column"}>
         <Flex gap={2} alignItems={"center"} justifyContent={"center"}>
           <Flex gap={2} width={{ base: 50, md: 100, lg: 200, xl: 320 }}>
             <Link to={`/profile/${userName}`}  >
-              <Text fontWeight={"bold"} fontSize={12}>
+              <Text fontWeight={"bold"} fontSize={14}>
                 {userName}
               </Text>
             </Link>

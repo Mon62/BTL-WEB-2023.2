@@ -11,17 +11,17 @@ export const ProfilePostList = ({}) => {
   const { profileUser } = useParams();
   const [postsData, setPostsData] = useState([]);
   const toast = useToast();
-  const [profilePicURL, setProfilePicURL] = useState("");
+  //const [profilePicURL, setProfilePicURL] = useState("");
   const [savedPost, setSavedPost] = useState([])
 
   useEffect(() => {
     setIsLoading(true);
     getPostsByUsername(profileUser)
       .then((res) => {
-         //console.log(res);
+         console.log(res);
         setPostsData(res.data.postsData.reverse());
         // console.log(res.data.postsData.reverse());
-        console.log(postsData)
+        //console.log(postsData)
       })
       .catch((err) => {
         console.log(err.response.data.message);
@@ -34,7 +34,7 @@ export const ProfilePostList = ({}) => {
     }, 2000);
   }, [profileUser]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     getShortenedProfileDataByUsername(profileUser)
       .then((res) => {
         // console.log(res.data);
@@ -45,7 +45,7 @@ export const ProfilePostList = ({}) => {
         console.log(err.response.data.message);
         toast(new Error(err));
       });
-  }, [profileUser]);
+  }, [profileUser]);*/
 
   useEffect(()=>{
     getSavedPosts(profileUser)
@@ -92,7 +92,7 @@ export const ProfilePostList = ({}) => {
             numberOfMediaFile = {post.numberOfMediaFile}
             postID={post.postId}
             savedPost={savedPost}
-            avatar={profilePicURL}
+            //avatar={profilePicURL}
           />
         ))}
     </Grid>

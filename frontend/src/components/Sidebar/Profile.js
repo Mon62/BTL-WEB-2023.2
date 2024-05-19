@@ -29,6 +29,7 @@ const Profile = (props) => {
         setLoading(false);
       }, 2000)
     },[currentUser])
+    
   const handleClick = (e) => {
     if(typeof props.handleBg === 'function'){
       (props.handleBg)();

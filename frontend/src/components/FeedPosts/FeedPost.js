@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import PostHeader from './PostHeader'
 import PostFooter from './PostFooter';
 import { Box, Image } from "@chakra-ui/react";
@@ -21,7 +21,7 @@ const FeedPost = ({files, likes, createdBy, caption, numOfComments, avatar, post
 								
 					
 			</Box>
-			<PostFooter likes={likes} createdBy={createdBy} caption={caption} numOfComments={numOfComments} postID={postID} imageURL={files} avatar={avatar} comments={comments} typeFirst={typeFirst} savedPost={savedPost}/>
+			<PostFooter likes={likes} createdBy={createdBy} caption={caption} numOfComments={numOfComments} postID={postID} imageURL={files} avatar={avatar} comments={comments} typeFirst={typeFirst} savedPost={savedPost} iconShow={true}/>
 		</Box>
   )
 }

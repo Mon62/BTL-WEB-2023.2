@@ -1,11 +1,15 @@
 import React from 'react'
 import { Tooltip, Flex,Box } from '@chakra-ui/react'
 import { IoCompassOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+
 const Explore = (props) => {
+    const navigate = useNavigate()
     const handleClick = () =>{
         if(typeof props.handleBg === 'function'){
             (props.handleBg)();
           }
+          navigate("/explore")
     }
   return (
     <Tooltip

@@ -9,6 +9,7 @@ import PageLayout from "./layouts/PageLayout/PageLayout.js";
 import { Profile } from "./pages/Profile/Profile.js";
 import { Archive } from "./pages/Archive/Archive.js";
 import { NotFound } from "./pages/NotFound/NotFound.js";
+import Explore from "./pages/Explore/Explore.js";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/password/reset" element={<ResetPassword />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/explore" element={<Explore />} />
           <Route path="/profile/:profileUser" element={<Profile />} />
           <Route path="/profile/:profileUser/:tabName" element={<Profile />} />
           <Route

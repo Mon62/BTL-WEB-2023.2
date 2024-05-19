@@ -49,8 +49,8 @@ const PostHeader = ({likes, createdBy, caption, numOfComments, postID, imageURL,
 				numOfComments={numOfComments}
 				postID={postID}
 				comments={comments}	
-					typeFirst={typeFirst}
-					savedPost={savedPost}
+				typeFirst={typeFirst}
+				savedPost={savedPost}
 					
 				/>}
 		</Flex>

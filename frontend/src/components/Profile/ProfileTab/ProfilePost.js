@@ -3,7 +3,7 @@ import {
   GridItem,
   Image,
   Text,
-  useDisclosure,
+  //useDisclosure,
   AspectRatio,
   useToast,
 } from "@chakra-ui/react";
@@ -18,20 +18,20 @@ import { Error } from "../../../models/Toast";
 
 export const ProfilePost = ({
   img,
-  numberOfLikes,
-  numberOfComments,
+  //numberOfLikes,
+  //numberOfComments,
   typeOfFirstMedia,
   numberOfMediaFile,
   postID,
   savedPost,
-  avatar,
+  //avatar,
 }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  //const { isOpen, onOpen, onClose } = useDisclosure();
   const [show, setShow] = useState(false);
   const [comments, setComments] = useState([]);
   const [data, setData] = useState({ likes: [], comments: [], createdBy: "", caption: "" });
   const toast = useToast();
-  const userName = sessionStorage.getItem("currentUser")
+  //const userName = sessionStorage.getItem("currentUser")
   const handleShow = () => {
     setShow(true);
   };
@@ -50,16 +50,13 @@ export const ProfilePost = ({
     }
   };
 
-  const fetchLikes = async () => {
-    const postData = {
-      pid: postID,
-      username: userName,
-    }
-    console.log(postData)
+  const fetchPosts = async () => {
+    
     try {
       
       const res = await getPostById(postID);
       setData(res.data.data);
+      console.log(data)
     } catch (err) {
       console.error(err);
       toast(new Error(err));
@@ -68,7 +65,7 @@ export const ProfilePost = ({
 
   useEffect(() => {
     fetchComments();
-    fetchLikes();
+    fetchPosts();
   }, [postID]);
 
   return (
@@ -155,7 +152,7 @@ export const ProfilePost = ({
           onHide={handleClose}
           imageURL={img}
           createdBy={data.createdBy}
-          avatar={avatar}
+          //avatar={avatar}
           likes={data.likes}
           caption={data.caption ? JSON.parse(data.caption) : ""}
           numOfComments={comments.length}
@@ -163,6 +160,7 @@ export const ProfilePost = ({
           comments={comments}
           typeFirst={typeOfFirstMedia}
           savedPost={savedPost}
+          iconShow={false}
         />
       )}
     </>
