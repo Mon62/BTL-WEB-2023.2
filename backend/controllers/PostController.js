@@ -42,6 +42,23 @@ export const createPost = async (req, res, next) => {
           });
         }
 
+        // Check if the first media is a picture or a video
+        const getTypeOfMedia = (filename) => {
+          const lowerCaseFilename = filename.toLowerCase();
+          const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+          const videoExtensions = ["mp4", "avi", "mov"];
+
+          if (imageExtensions.some((ext) => lowerCaseFilename.includes(ext))) {
+            return "picture";
+          } else if (
+            videoExtensions.some((ext) => lowerCaseFilename.includes(ext))
+          ) {
+            return "video";
+          } else {
+            return "unknown";
+          }
+        };
+        let typesOfMedia = [];
         // upload image to storage
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
@@ -64,28 +81,14 @@ export const createPost = async (req, res, next) => {
             .then((url) => {
               console.log("File available at", url);
               imgURLs.push(url);
+              typesOfMedia.push(getTypeOfMedia(file.originalname));
             })
             .catch((error) => {
               console.error(error);
               next(error);
             });
         }
-        // Check if the first media is a picture or a video
-        const getTypeOfMedia = (filename) => {
-          const lowerCaseFilename = filename.toLowerCase();
-          const imageExtensions = ["jpg", "jpeg", "png", "gif"];
-          const videoExtensions = ["mp4", "avi", "mov"];
 
-          if (imageExtensions.some((ext) => lowerCaseFilename.includes(ext))) {
-            return "picture";
-          } else if (
-            videoExtensions.some((ext) => lowerCaseFilename.includes(ext))
-          ) {
-            return "video";
-          } else {
-            return "unknown";
-          }
-        };
 
         const typeOfFirstMedia = getTypeOfMedia(imgURLs[0]);
         //const postData = new postModel(username, caption, imgURL, createdAt);
@@ -98,6 +101,7 @@ export const createPost = async (req, res, next) => {
           createdAt: createdAt,
           createdBy: username,
           typeOfFirstMedia: typeOfFirstMedia, //First media is video or picture
+          typesOfMedia: typesOfMedia, //List of media types
         };
 
         await setDoc(doc(db, "posts", pid), postData).catch((err) => next(err));
