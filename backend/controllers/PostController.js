@@ -10,6 +10,7 @@ import {
   updateDoc,
   Timestamp,
   arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -206,6 +207,7 @@ export const createPost = async (req, res, next) => {
           createdBy: username,
           typeOfFirstMedia: typeOfFirstMedia,
           typesOfMedia: typesOfMedia,
+          savedBy: [],
         };
 
         const updatePromises = [
@@ -282,38 +284,38 @@ export const updatePost = async (req, res, next) => {
   }
 };
 
-export const deletePost = async (req, res, next) => {
-  try {
-    const pid = req.body.pid;
-    const accessToken = req.headers.authorization;
+// export const deletePost = async (req, res, next) => {
+//   try {
+//     const pid = req.body.pid;
+//     const accessToken = req.headers.authorization;
 
-    admin
-      .auth()
-      .verifyIdToken(accessToken)
-      .then(async () => {
-        const postRef = doc(db, "posts", pid);
-        const postSnapshot = await getDoc(postRef).catch((err) => next(err));
-        if (!postSnapshot.exists()) {
-          return res.status(404).json({
-            status: "error",
-            message: "Bài viết không tồn tại!",
-          });
-        }
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then(async () => {
+//         const postRef = doc(db, "posts", pid);
+//         const postSnapshot = await getDoc(postRef).catch((err) => next(err));
+//         if (!postSnapshot.exists()) {
+//           return res.status(404).json({
+//             status: "error",
+//             message: "Bài viết không tồn tại!",
+//           });
+//         }
 
-        // delete the post document
-        await deleteDoc(postRef).catch((err) => next(err));
+//         // delete the post document
+//         await deleteDoc(postRef).catch((err) => next(err));
 
-        res.status(200).json({
-          status: "success",
-          message: "Xóa bài viết thành công!",
-        });
-      })
-      .catch((err) => next(err));
-  } catch (error) {
-    console.error(error);
-    res.status(400).json({ message: error.message });
-  }
-};
+//         res.status(200).json({
+//           status: "success",
+//           message: "Xóa bài viết thành công!",
+//         });
+//       })
+//       .catch((err) => next(err));
+//   } catch (error) {
+//     console.error(error);
+//     res.status(400).json({ message: error.message });
+//   }
+// };
 
 //GET /posts/:username
 
@@ -452,6 +454,117 @@ export const deletePost = async (req, res, next) => {
 //   }
 // };
 
+
+// export const deletePost = async (req, res, next) => {
+//   try {
+//     const pid = req.body.pid;
+//     const accessToken = req.headers.authorization;
+
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then(async () => {
+//         const postRef = doc(db, "posts", pid);
+//         const postSnapshot = await getDoc(postRef).catch((err) => next(err));
+//         if (!postSnapshot.exists()) {
+//           return res.status(404).json({
+//             status: "error",
+//             message: "Bài viết không tồn tại!",
+//           });
+//         }
+
+//         const postData = postSnapshot.data();
+
+//         // delete the comments associated with the post
+//         const commentPromises = postData.comments.map((commentId) => {
+//           return deleteDoc(doc(db, "comments", commentId));
+//         });
+//         await Promise.all(commentPromises).catch((err) => next(err));
+
+//         // remove the post from the creator's posts array
+//         const userRef = doc(db, "users", postData.createdBy);
+//         await updateDoc(userRef, { posts: arrayRemove(pid) }).catch((err) => next(err));
+
+//         // remove the post from savedPosts of each user who saved it
+//         const savedByPromises = postData.savedBy.map((userId) => {
+//           const userRef = doc(db, "users", userId);
+//           return updateDoc(userRef, { savedPosts: arrayRemove(pid) });
+//         });
+//         await Promise.all(savedByPromises).catch((err) => next(err));
+
+//         // delete the post document
+//         await deleteDoc(postRef).catch((err) => next(err));
+
+//         res.status(200).json({
+//           status: "success",
+//           message: "Xóa bài viết thành công!",
+//         });
+//       })
+//       .catch((err) => next(err));
+//   } catch (error) {
+//     console.error(error);
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
+export const deletePost = async (req, res, next) => {
+  try {
+    const pid = req.body.pid;
+    const accessToken = req.headers.authorization;
+
+    admin
+      .auth()
+      .verifyIdToken(accessToken)
+      .then(async () => {
+        const postRef = doc(db, "posts", pid);
+        const postSnapshot = await getDoc(postRef).catch((err) => next(err));
+        if (!postSnapshot.exists()) {
+          return res.status(404).json({
+            status: "error",
+            message: "Bài viết không tồn tại!",
+          });
+        }
+
+        const postData = postSnapshot.data();
+
+        // delete the comments associated with the post
+        const commentPromises = postData.comments ? postData.comments.map((commentId) => {
+          return deleteDoc(doc(db, "comments", commentId));
+        }) : [];
+        await Promise.all(commentPromises).catch((err) => next(err));
+
+        // remove the post from the creator's posts array
+        const userRef = doc(db, "users", postData.createdBy);
+        await updateDoc(userRef, { posts: arrayRemove(pid) }).catch((err) => next(err));
+
+        // remove the post from savedPosts of each user who saved it
+        const savedByPromises = postData.savedBy ? postData.savedBy.map((userId) => {
+          const userRef = doc(db, "users", userId);
+          return updateDoc(userRef, { savedPosts: arrayRemove(pid) });
+        }) : [];
+        await Promise.all(savedByPromises).catch((err) => next(err));
+
+        // remove the post from newPosts of each follower
+        const followerPromises = postData.followers ? postData.followers.map((followerId) => {
+          const followerRef = doc(db, "users", followerId);
+          return updateDoc(followerRef, { newPosts: arrayRemove(pid) });
+        }) : [];
+        await Promise.all(followerPromises).catch((err) => next(err));
+
+        // delete the post document
+        await deleteDoc(postRef).catch((err) => next(err));
+
+        res.status(200).json({
+          status: "success",
+          message: "Xóa bài viết thành công!",
+        });
+      })
+      .catch((err) => next(err));
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ message: error.message });
+  }
+};
 export const getPostsByUsername = async (req, res, next) => {
   try {
     const username = req.params.username;
@@ -895,6 +1008,38 @@ export const getExplorePosts = async (req, res, next) => {
 };
 
 //SAVE POST
+// export const savePost = async (req, res, next) => {
+//   try {
+//     const username = req.body.username;
+//     const postId = req.body.postId;
+//     const accessToken = req.headers.authorization;
+
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then(async () => {
+//         const userSnapshot = await getDoc(doc(db, "users", username)).catch(
+//           (err) => next(err)
+//         );
+//         if (!userSnapshot.exists()) {
+//           return res
+//             .status(400)
+//             .json({ message: "User does not exist: " + username });
+//         }
+//         const user = userSnapshot.data();
+//         user.savedPosts.push(postId);
+//         await updateDoc(doc(db, "users", username), {
+//           savedPosts: user.savedPosts,
+//         }).catch((err) => next(err));
+//         return res.status(200).json({ message: "Post saved successfully" });
+//       })
+//       .catch((err) => next(err));
+//   } catch (error) {
+//     console.error(error);
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
 export const savePost = async (req, res, next) => {
   try {
     const username = req.body.username;
@@ -915,9 +1060,31 @@ export const savePost = async (req, res, next) => {
         }
         const user = userSnapshot.data();
         user.savedPosts.push(postId);
+
+        // Get the post document
+        const postSnapshot = await getDoc(doc(db, "posts", postId)).catch(
+          (err) => next(err)
+        );
+        if (!postSnapshot.exists()) {
+          return res
+            .status(400)
+            .json({ message: "Post does not exist: " + postId });
+        }
+        const post = postSnapshot.data();
+        // Update the savedBy field in the post document
+        post.savedBy = post.savedBy || [];
+        post.savedBy.push(username);
+
+        // Update the user document
         await updateDoc(doc(db, "users", username), {
           savedPosts: user.savedPosts,
         }).catch((err) => next(err));
+
+        // Update the post document
+        await updateDoc(doc(db, "posts", postId), {
+          savedBy: post.savedBy,
+        }).catch((err) => next(err));
+
         return res.status(200).json({ message: "Post saved successfully" });
       })
       .catch((err) => next(err));
