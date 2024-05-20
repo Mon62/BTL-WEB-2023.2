@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import SuggestedUserHeader from "../../components/SuggestedUsers/SuggestedUserHeader";
 import { Avatar, AvatarBadge } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
-import { getShortenedProfileDataByUsername, getMyNewStories } from "../../api/Api.js";
+import { getShortenedProfileDataByUsername, getMyNewStories, getNewStoriesByUsername } from "../../api/Api.js";
 import CreateStoryModal from "../../components/Story/CreateStoryModal.js";
 import { SkeletonCircle } from "@chakra-ui/react";
 import StoryView from "../../components/Story/StoryView.js";
@@ -22,9 +22,40 @@ export const Home = () => {
   const [loading, setLoading] = useState(true)
   const [showStory, setShowStory] = useState(false)
   const [myStory, setMyStory] = useState([])
+  const [showOtherStory, setShowOtherStory] = useState(false)
+  const [otherStory, setOtherStory] = useState([])
   //const [savedPost, setSavedPost] = useState([])
-
+  /*getNewStoriesByUsername(currentUser)
+  .then((res)=>{
+    console.log(res.data.data)
+    //console.log(typeof res.data.data)
+    console.log(Object.keys(res.data.data))
+    const usernames = Object.keys(res.data.data)
+    //const 
+    //for (let story of stories){
+      //console
+//}
+    
+  })
   
+  const handleClickOtherAvatar = () => {
+    getNewStoriesByUsername(currentUser)
+    .then((res)=>{
+    console.log(res.data.data)
+    console.log(Object.keys(res.data.data))
+    const temp = res.data.data
+    if (temp.length === 0) {
+      console.log("empty")
+      toast({
+        title: "Không có Story nào khác",
+        variant: "subtle",
+        duration: 2000,
+        isClosable: true,
+        position: 'top-right',
+      })
+    }
+  })
+  }*/
   const handleClickAvatar = () => {
     setMyStory([])
     getMyNewStories(currentUser)
@@ -90,7 +121,7 @@ export const Home = () => {
       });
     setTimeout(() => {
       setLoading(false);
-    }, 2000)
+    }, 3000)
   }, [currentUser])
 
   

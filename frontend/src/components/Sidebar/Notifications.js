@@ -30,7 +30,7 @@ const Notifications = (props) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const userName = sessionStorage.getItem("currentUser")
   const [notiData, setNotiData] = useState([])
-  const [avaArray, setAvaArray] = useState ([])
+  //const [avaArray, setAvaArray] = useState ([])
   const [loading, setLoading] = useState(true)
   const [showPost, setShowPost] = useState(false)
   const [selectedPost, setSelectedPost] = useState("")
@@ -41,6 +41,7 @@ const Notifications = (props) => {
     //setFrom(sender)
     setShowPost(true)
     onClose();
+    //setAvaArray([])
     if (postID === ""){
       navigate(`/profile/${sender}`)
     }
@@ -61,7 +62,7 @@ const Notifications = (props) => {
 
     getNotificationsByUsername(userName)
       .then((res) => {
-        console.log(res.data);
+        //console.log("fetch again");
         const dataArray = res.data;
         setNotiData((prev) => [
           ...prev,
@@ -70,6 +71,7 @@ const Notifications = (props) => {
             sender: file.sender,
             postID: file.postId,
             type: file.type,
+            ava: file.senderProfilePicURL,
           })),
         ]);
         
@@ -82,12 +84,12 @@ const Notifications = (props) => {
       }, 2000);
   };
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (notiData.length > 0) {
       notiData.forEach((file) => {
         getShortenedProfileDataByUsername(file.sender)
           .then((res) => {
-            console.log(res.data);
+            //console.log(res.data);
             setAvaArray((prev) => prev.concat(res.data.profilePicURL))
           })
           .catch((err) => {
@@ -95,11 +97,11 @@ const Notifications = (props) => {
           });
       });
     }
-  }, [notiData]);
+  }, [notiData]);*/
 
   const handleClose = () => {
     setNotiData([])
-    setAvaArray([])
+    //setAvaArray([])
     setSelectedPost("")
     //setFrom("")
     setLoading(true)
@@ -164,7 +166,7 @@ const Notifications = (props) => {
                       <AvatarGroup alignSelf={"center"}>
                         <Avatar
                           //cursor={"pointer"}
-                          src={avaArray[index]}
+                          src={each.ava}
                         //onClick={() =>
                         //navigate(`/profile/${result.username}`)
                         //}

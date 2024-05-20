@@ -21,7 +21,7 @@ const FeedPosts = () => {
     try {
       const response = await getRecommendPosts(profileUser, page.current);
       const postData = response.data.posts;
-      console.log(postData)
+      //console.log(postData)
       // Append new posts to the existing posts
       setPosts(prevPosts => [...prevPosts, ...postData.map((file) => ({
         caption: JSON.parse(file.caption),
@@ -70,7 +70,7 @@ const FeedPosts = () => {
     fetchData(); // Call the async function within useEffect
     
   }, [profileUser]);
-  console.log(posts)
+  //console.log(posts)
 
   useEffect(()=>{
     getSavedPosts(profileUser)
