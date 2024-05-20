@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Avatar, Box, Button, Flex, Link, Skeleton, SkeletonCircle } from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, Link } from "@chakra-ui/react";
 import { Link as RouterLink} from "react-router-dom";
 import ViewPost from '../ViewPost/ViewPost';
 

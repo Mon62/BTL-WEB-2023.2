@@ -1,12 +1,11 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
-import { Modal } from 'react-bootstrap';
 import { Avatar, Flex, Link, Text, VStack, useToast } from '@chakra-ui/react'
-import { useNavigate } from 'react-router-dom';
-import { logout } from "../../api/Api.js";
+//import { useNavigate } from 'react-router-dom';
+//import { logout } from "../../api/Api.js";
 import  SwitchAccountForm  from '../Sidebar/SwitchAccountForm.js';
 import { getShortenedProfileDataByUsername } from "../../api/Api.js";
-import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react'
+import { SkeletonCircle } from '@chakra-ui/react'
 
 
 const SuggestedUserHeader = () => {
@@ -18,7 +17,7 @@ const SuggestedUserHeader = () => {
     const handleShow = () => setShow(true);
     const [loading, setLoading] = useState(true)
     //Logout
-    const navigate = useNavigate()
+    //const navigate = useNavigate()
 	const toast = useToast()
     useEffect(() => {
         getShortenedProfileDataByUsername(currentUser)
@@ -40,7 +39,7 @@ const SuggestedUserHeader = () => {
           },2000)
         },[currentUser])
     
-	const handleLogout = (e) => {
+	/*const handleLogout = (e) => {
 		e.preventDefault();
 		// Call API to logout
 		logout()
@@ -59,7 +58,7 @@ const SuggestedUserHeader = () => {
 				console.log(err.response.data);
 			});
 
-	}
+	}*/
 
     return (
         <VStack py={8} px={6} gap={4}>

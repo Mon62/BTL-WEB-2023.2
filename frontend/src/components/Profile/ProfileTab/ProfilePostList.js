@@ -3,7 +3,7 @@ import { Grid, Skeleton, VStack, Box, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ProfilePost } from "./ProfilePost.js";
 import { useParams } from "react-router-dom";
-import { getPostsByUsername, getShortenedProfileDataByUsername, getSavedPosts } from "../../../api/Api.js";
+import { getPostsByUsername,  getSavedPosts } from "../../../api/Api.js";
 import { Error } from "../../../models/Toast.js";
 
 export const ProfilePostList = ({}) => {

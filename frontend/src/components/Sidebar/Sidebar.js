@@ -71,6 +71,7 @@ const Sidebar = () => {
 
   return (
     <Box
+      zIndex={1500}
       height={"100vh"}
       borderRight={"1px solid"}
       borderColor={"blackAlpha.300"}

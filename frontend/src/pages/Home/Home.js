@@ -1,9 +1,9 @@
-import { Box, Flex, IconButton, useToast, Container } from "@chakra-ui/react";
+import { Box, Flex,  useToast, Container } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import SuggestedUserHeader from "../../components/SuggestedUsers/SuggestedUserHeader";
-import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
+import { Avatar, AvatarBadge } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
-import { getShortenedProfileDataByUsername, getMyNewStories, getSavedPosts } from "../../api/Api.js";
+import { getShortenedProfileDataByUsername, getMyNewStories } from "../../api/Api.js";
 import CreateStoryModal from "../../components/Story/CreateStoryModal.js";
 import { SkeletonCircle } from "@chakra-ui/react";
 import StoryView from "../../components/Story/StoryView.js";
@@ -95,8 +95,10 @@ export const Home = () => {
 
   
   return (
+    <>
+    {showStory && <StoryView isOpen={showStory} onClick={() => setShowStory(false)} handleClose={() => setShowStory(false)} stories={myStory} />}
     <Container maxW={"container.lg"} top={0} maxH={"80vh"}>
-      {showStory && <StoryView isOpen={showStory} onClick={() => setShowStory(false)} handleClose={() => setShowStory(false)} stories={myStory} />}
+      
       <Flex gap={20} alignItems={"start"}>
         <Box flex={2} py={10} maxWidth={550}>
 
@@ -134,6 +136,7 @@ export const Home = () => {
         </Box>
       </Flex>
     </Container>
+    </>
 
     //<Container maxW={"container.lg"}>
     // <Flex gap={40}>

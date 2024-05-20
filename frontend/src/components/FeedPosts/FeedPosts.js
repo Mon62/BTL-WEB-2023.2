@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { Container, useToast, Box, SkeletonText, SkeletonCircle } from '@chakra-ui/react'
 import FeedPost from './FeedPost'
-import { getNewPostsByUsername, getRecommendPosts, getSavedPosts } from '../../api/Api'
-import { Error, Success } from "../../models/Toast.js";
+import {  getRecommendPosts, getSavedPosts } from '../../api/Api'
+import { Error } from "../../models/Toast.js";
 
 
 const FeedPosts = () => {
@@ -14,7 +14,7 @@ const FeedPosts = () => {
   const observer = useRef(); // Reference to the Intersection Observer
   const lastPostElementRef = useRef(); // Reference to the last post element
   const [savedPost, setSavedPost] = useState([])
-  const [likes, setLikes] = useState(0)
+  //const [likes, setLikes] = useState(0)
 
   // Function to fetch data
   const fetchData = async () => {

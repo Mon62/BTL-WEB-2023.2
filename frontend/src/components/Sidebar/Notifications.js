@@ -139,7 +139,7 @@ const Notifications = (props) => {
           onClose={handleClose}
         //finalFocusRef={btnRef}
         >
-          <DrawerContent marginLeft={{ base: 70, md: 60 }} >
+          <DrawerContent marginLeft={{ base: 70, md: 60 }} zIndex={500}>
             <DrawerCloseButton />
             <DrawerHeader>Notifications</DrawerHeader>
             <DrawerBody>

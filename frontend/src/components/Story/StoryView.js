@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Stories from 'react-insta-stories';
-import { Flex, Button, CloseButton } from '@chakra-ui/react';
+import { Flex, CloseButton } from '@chakra-ui/react';
 import Modal from 'react-modal';
 
 const StoryView = (props) => {
@@ -69,6 +69,7 @@ const StoryView = (props) => {
             contentLabel="Story Modal"
             style={{
                 overlay: {
+                    zIndex: 1500,
                     backgroundColor: 'transparent'
                 },
                 content: {
@@ -80,7 +81,9 @@ const StoryView = (props) => {
                     overflow: 'hidden',
                 }
             }}
+            
         >
+        
             <Flex bg={"#2c2c2c"} justifyContent={"center"} alignItems={"center"} position={"relative"} height={"100vh"}>
                 <CloseButton size='lg' color={"white"} position={"absolute"} top={2} right={2} onClick={props.handleClose} />
                 <Flex flex={1} justifyContent={"center"} alignItems={"center"}>
