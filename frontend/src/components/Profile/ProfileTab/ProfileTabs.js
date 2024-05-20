@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { BsGrid3X3, BsBookmark, BsPersonSquare } from "react-icons/bs";
 import { ProfilePostList } from "./ProfilePostList";
+import { ProfileSavedPost } from "./ProfileSavedPost";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
 
@@ -20,7 +21,7 @@ export const ProfileTabs = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setTabIndex(tabName === undefined ? 0 : 1);
+    setTabIndex(tabName === 'posts' ? 0 : 1);
   }, [tabName]);
   return (
     <Flex
@@ -33,7 +34,7 @@ export const ProfileTabs = () => {
     >
       <Tabs position="relative" className="mb-4" isFitted index={tabIndex}>
         <TabList className="mb-4">
-          <Tab gap={2} onClick={() => navigate("/profile/" + profileUser)}>
+          <Tab gap={2} onClick={() => navigate("/profile/" + profileUser + "/posts")}>
             <BsGrid3X3 />
             Posts
           </Tab>
@@ -49,9 +50,15 @@ export const ProfileTabs = () => {
           <TabPanel padding={0}>
             <ProfilePostList />
           </TabPanel>
-          <TabPanel>
+          <TabPanel padding={0}>
             <Flex justifyContent={"center"}>
-              {currentUser === profileUser ? <p>SAVED</p> : <Text textTransform={"none"}>Only {profileUser} can view this section</Text>}
+              {currentUser === profileUser ? (
+                <ProfileSavedPost />
+              ) : (
+                <Text textTransform={"none"}>
+                  Only {profileUser} can view this section
+                </Text>
+              )}
             </Flex>
           </TabPanel>
         </TabPanels>

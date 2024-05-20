@@ -22,7 +22,6 @@ function App() {
           <Route path="/password/reset" element={<ResetPassword />} />
           <Route path="/home" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
-          <Route path="/profile/:profileUser" element={<Profile />} />
           <Route path="/profile/:profileUser/:tabName" element={<Profile />} />
           <Route
             path="/profile/:profileUser/archive/stories"

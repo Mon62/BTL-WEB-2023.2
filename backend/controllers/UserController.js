@@ -190,7 +190,7 @@ export const changePassword = async (req, res, next) => {
 };
 
 //POST /account/edit
-export const editProfile = (req, res, next) => {
+export const editProfile = async (req, res, next) => {
   try {
     const profilePic = req.files["profilePic"]
       ? req.files["profilePic"][0]
@@ -205,17 +205,12 @@ export const editProfile = (req, res, next) => {
       .auth()
       .verifyIdToken(accessToken)
       .then(async () => {
-        //update fullName and biography in firestore
-        updateDoc(doc(db, "users", username), {
-          fullName: fullName,
-          biography: JSON.stringify(biography),
-        }).catch((err) => next(err));
-
         //update profilePic in storage
         if (profilePic != null) {
           // Update new profilePic
-          const newProfilePicPath = `profilePic/${username}/${profilePic.originalname + v4()
-            }`;
+          const newProfilePicPath = `profilePic/${username}/${
+            profilePic.originalname + v4()
+          }`;
           const imageRef = ref(storage, newProfilePicPath);
           const metaData = {
             contentType: profilePic.mimetype,
@@ -249,9 +244,16 @@ export const editProfile = (req, res, next) => {
             .catch((err) => next(err));
         }
 
-        res.status(200).json({
-          message: "Chỉnh sửa trang cá nhân thành công!",
-        });
+        //update fullName and biography in firestore
+        updateDoc(doc(db, "users", username), {
+          fullName: fullName,
+          biography: JSON.stringify(biography),
+        }).catch((err) => next(err));
+        setTimeout(() => {
+          res.status(200).json({
+            message: "Chỉnh sửa trang cá nhân thành công!",
+          });
+        }, 2000);
       })
       .catch((err) => next(err));
   } catch (error) {
@@ -267,38 +269,38 @@ export const getProfileByUsername = (req, res, next) => {
     const accessToken = req.headers.authorization;
     // console.log(username);
 
-    admin
-      .auth()
-      .verifyIdToken(accessToken)
-      .then((decodedToken) => {
-        const docRef = doc(db, "users", username);
+    // admin
+    //   .auth()
+    //   .verifyIdToken(accessToken)
+    //   .then((decodedToken) => {
+    const docRef = doc(db, "users", username);
 
-        setTimeout(() => {
-          getDoc(docRef)
-            .then((user) => {
-              if (!user.exists()) {
-                return res
-                  .status(400)
-                  .json({ message: "Không tồn tại người dùng " + username });
-              }
+    setTimeout(() => {
+      getDoc(docRef)
+        .then((user) => {
+          if (!user.exists()) {
+            return res
+              .status(400)
+              .json({ message: "Không tồn tại người dùng " + username });
+          }
 
-              const userData = user.data();
-              const biography = JSON.parse(userData.biography);
-              return res.status(200).json({
-                biography: biography,
-                followers: userData.followers,
-                followingUsers: userData.followingUsers,
-                fullName: userData.fullName,
-                highlights: userData.highlights,
-                posts: userData.posts,
-                profilePicURL: userData.profilePicURL,
-                stories: userData.stories,
-              });
-            })
-            .catch((err) => next(err));
-        }, 700);
-      })
-      .catch((err) => next(err));
+          const userData = user.data();
+          const biography = JSON.parse(userData.biography);
+          return res.status(200).json({
+            biography: biography,
+            followers: userData.followers,
+            followingUsers: userData.followingUsers,
+            fullName: userData.fullName,
+            // highlights: userData.highlights,
+            numberOfPosts: userData.posts.length,
+            profilePicURL: userData.profilePicURL,
+            // stories: userData.stories,
+          });
+        })
+        .catch((err) => next(err));
+    }, 1500);
+    // })
+    // .catch((err) => next(err));
   } catch (err) {
     console.log(err);
     res.status(400).json({ message: err.message });

@@ -3,25 +3,25 @@ import { Grid, Skeleton, VStack, Box, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ProfilePost } from "./ProfilePost.js";
 import { useParams } from "react-router-dom";
-import { getPostsByUsername,  getSavedPosts } from "../../../api/Api.js";
+import {
+  getShortenedProfileDataByUsername,
+  getSavedPosts,
+} from "../../../api/Api.js";
 import { Error } from "../../../models/Toast.js";
 
-export const ProfilePostList = ({}) => {
+export const ProfileSavedPost = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const { profileUser } = useParams();
+  const { profileUser, tabName } = useParams();
   const [postsData, setPostsData] = useState([]);
   const toast = useToast();
-  //const [profilePicURL, setProfilePicURL] = useState("");
-  const [savedPost, setSavedPost] = useState([])
+  const [profilePicURL, setProfilePicURL] = useState("");
 
   useEffect(() => {
     setIsLoading(true);
-    getPostsByUsername(profileUser)
+    getSavedPosts(profileUser)
       .then((res) => {
-        //  console.log(res);
-        setPostsData(res.data.postsData.reverse());
-        console.log(res.data.postsData.reverse());
-        //console.log(postsData)
+        setPostsData(res.data.data.reverse());
+        console.log(res.data.data.reverse());
       })
       .catch((err) => {
         console.log(err.response.data.message);
@@ -29,43 +29,21 @@ export const ProfilePostList = ({}) => {
       });
 
     setTimeout(() => {
-      // console.log(postsData);
       setIsLoading(false);
     }, 2000);
   }, [profileUser]);
 
-  /*useEffect(() => {
+  useEffect(() => {
     getShortenedProfileDataByUsername(profileUser)
       .then((res) => {
-        // console.log(res.data);
         const profileData = res.data;
-        setProfilePicURL(profileData.profilePicURL);        
+        setProfilePicURL(profileData.profilePicURL);
       })
       .catch((err) => {
         console.log(err.response.data.message);
         toast(new Error(err));
       });
-  }, [profileUser]);*/
-  useEffect(()=>{
-    getSavedPosts(profileUser)
-    .then((res) => {
-          //toast(new Success(res));
-      //console.log(res.data.data)
-      const savedArray = res.data.data.map((file) => {
-        return{pid: file.pid,}
-      })
-      setSavedPost(savedArray)
-      //console.log(savedArray)
-        })
-        .catch((err) => {
-          // console.log(err);
-          console.log(err.response.data.message);
-          toast(new Error(err));
-        });
-      
-  
-    }, [profileUser])
-    
+  }, [profileUser]);
   return (
     <Grid
       templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }}
@@ -84,14 +62,14 @@ export const ProfilePostList = ({}) => {
         postsData.map((post, index) => (
           <ProfilePost
             key={index}
-            img={post.firstPicURL}
-           // numberOfLikes={post.numberOfLikes}
-         //   numberOfComments={post.numberOfComments}
+            img={post.imgURLs[0]}
+           // createdBy={profileUser}
+          //  likes={post.numberOfLikes}
+           // comments={post.numberOfComments}
             typeOfFirstMedia={post.typeOfFirstMedia}
-            numberOfMediaFile = {post.numberOfMediaFile}
-            postID={post.postId}
-            savedPost={savedPost}
-            //avatar={profilePicURL}
+            numberOfMediaFile={post.typesOfMedia.length}
+            postID={post.pid}
+          //  avatar={profilePicURL}
           />
         ))}
     </Grid>

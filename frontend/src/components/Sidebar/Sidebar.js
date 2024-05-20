@@ -82,16 +82,9 @@ const Sidebar = () => {
       px={{ base: 2, md: 4 }}
     >
       <Flex direction={"column"} gap={10} w="full" height={"full"}>
-        <Link
-          to={"/home"}
-          as={RouterLink}
-          pl={2}
-          display={{ base: "none", md: "block" }}
-          cursor="pointer"
-        >
-          <InstagramLogo />
-        </Link>
-        <Link
+        {/* <img src={"../../assets/logo.png"} alt="logo"/> */}
+        {/* <text fontFamily="Billabong">Namsocial</text> */}
+        {/* <Link
           to={"/home"}
           as={RouterLink}
           p={2}
@@ -104,8 +97,8 @@ const Sidebar = () => {
           cursor="pointer"
         >
           <InstagramMobileLogo />
-        </Link>
-        <Flex direction={"column"} gap={5} cursor={"pointer"}>
+        </Link> */}
+        <Flex direction={"column"} gap={5} cursor={"pointer"} mt={10}>
           <SidebarItems />
         </Flex>
         {/*Create menu */}

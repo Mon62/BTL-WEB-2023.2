@@ -23,6 +23,8 @@ import {
   AlertDialogContent,
   AlertDialogBody,
   AlertDialogCloseButton,
+  VStack,
+  SkeletonCircle
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { CloseIcon, ChevronLeftIcon } from "@chakra-ui/icons";
@@ -72,6 +74,7 @@ export const HighlightStory = () => {
   const [selectedHighlightIndex, setSelectedHighlightIndex] = useState(-1);
   const [storiesData, setStoriesData] = useState([]);
   const [highlights, setHighlights] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const currentUser = sessionStorage.getItem("currentUser");
   const { profileUser } = useParams();
   const toast = useToast();
@@ -80,6 +83,8 @@ export const HighlightStory = () => {
     setHighlightName("");
     setCountSelectedStories(0);
     setSelectedCoverIndex(0);
+    if (! isOpenCreateHighlightStories && ! isOpenOptionModal)
+      setIsLoading(true);
 
     getStoriesByUsername(profileUser)
       .then((res) => {
@@ -96,12 +101,15 @@ export const HighlightStory = () => {
       .then((res) => {
         const data = res.data.data;
         setHighlights(data.reverse());
-        // console.log(data);
       })
       .catch((err) => {
         console.log(err.response.data.message);
         toast(new Error(err));
       });
+    
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000)
   }, [isOpenCreateHighlightStories, profileUser, isOpenOptionModal]);
 
   const handleSelectStory = (index) => {
@@ -127,9 +135,6 @@ export const HighlightStory = () => {
   };
 
   const handleDeleteHighlightStories = (index) => {
-    // console.log(highlights[index]);
-    // console.log(highlights);
-    // console.log(index);
     deleteHighlight({ hlid: highlights[index].hlid })
       .then((res) => {
         toast(new Success(res));
@@ -177,7 +182,13 @@ export const HighlightStory = () => {
             </Box>
           </Box>
         )}
-        {highlights.map((highlight, index) => (
+        {isLoading &&
+        [0, 1, 2, 3, 4, 5].map((_, idx) => (
+          <VStack mt={2} key={idx} alignItems={"flex-start"} gap={4}>
+            <SkeletonCircle size={"95"}/>
+          </VStack>
+        ))}
+        {! isLoading && highlights.map((highlight, index) => (
           <Box
             onClick={() => {
               setSelectedHighlightIndex(index);

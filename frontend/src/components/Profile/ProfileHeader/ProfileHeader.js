@@ -48,7 +48,7 @@ export const ProfileHeader = () => {
   const [fullName, setFullName] = useState("");
   const [biography, setBiography] = useState("");
   const [profilePicURL, setProfilePicURL] = useState("");
-  const [posts, setPosts] = useState([]);
+  const [numberOfPosts, setNumberOfPosts] = useState(0);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
   const [followStatus, setFollowStatus] = useState("");
@@ -58,8 +58,6 @@ export const ProfileHeader = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // if (!isOpen && !isOpenSearchFollowersModal && !isOpenSearchFollowingModal)
-    //   setIsLoading(true);
     getProfileByUsername(profileUser)
       .then((res) => {
         // console.log(res.data);
@@ -69,7 +67,7 @@ export const ProfileHeader = () => {
         setBiography(profileData.biography);
         setFollowers(profileData.followers);
         setFollowing(profileData.followingUsers);
-        setPosts(profileData.posts);
+        setNumberOfPosts(profileData.numberOfPosts);
       })
       .catch((err) => {
         console.log(err.response.data.message);
@@ -90,7 +88,7 @@ export const ProfileHeader = () => {
     }
     setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 2000);
   }, [
     isOpen,
     profileUser,
@@ -206,7 +204,7 @@ export const ProfileHeader = () => {
             <Flex alignItems={"center"} gap={{ base: 4, sm: 8 }} mt={0}>
               <Text fontSize={{ base: "xs", md: "lg" }} className="mb-0">
                 <Text as="span" fontWeight={"500"} mr={1}>
-                  {posts.length}
+                  {numberOfPosts}
                 </Text>
                 posts
               </Text>

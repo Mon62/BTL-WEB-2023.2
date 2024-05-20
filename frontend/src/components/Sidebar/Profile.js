@@ -34,7 +34,7 @@ const Profile = (props) => {
     if(typeof props.handleBg === 'function'){
       (props.handleBg)();
     }
-    navigate(`/profile/${sessionStorage.getItem("currentUser")}`);
+    navigate(`/profile/${sessionStorage.getItem("currentUser")}/posts`);
   };
   return (
     <Tooltip

@@ -252,6 +252,10 @@ export const getStoriesByUsername = (req, res, next) => {
                   typeOfMedia: data.typeOfMedia,
                   isInHighlight: data.inHighlights.length > 0,
                   storyId: data.storyId,
+                  caption: JSON.parse(data.caption),
+                  musicURL: data.musicURL,
+                  createdBy: data.createdBy,
+    
                 };
               });
 

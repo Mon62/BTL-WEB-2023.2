@@ -22,10 +22,15 @@ import {
   AlertDialogOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { getStoriesByUsername, deleteStory } from "../../api/Api";
+import {
+  getStoriesByUsername,
+  deleteStory,
+  getShortenedProfileDataByUsername,
+} from "../../api/Api";
 import { ArchiveStory } from "../../components/Story/ArchiveStory";
 import { Error, Success } from "../../models/Toast";
 import { useParams } from "react-router-dom";
+import { StoryView } from "../../components/Story/StoryView.js";
 
 export const Archive = () => {
   const {
@@ -41,8 +46,9 @@ export const Archive = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [storiesData, setStoriesData] = useState([]);
   const [selectedStoryIndex, setSelectedStoryIndex] = useState(-1);
-  const { profileUser } = useParams();
+  const [profilePicURL, setProfilePicURL] = useState("");
   const currentUser = sessionStorage.getItem("currentUser");
+  const { profileUser } = useParams();
   const toast = useToast();
 
   useEffect(() => {
@@ -52,6 +58,15 @@ export const Archive = () => {
       .then((res) => {
         const data = res.data.storiesData;
         setStoriesData(data.reverse());
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+        toast(new Error(err));
+      });
+
+    getShortenedProfileDataByUsername(currentUser)
+      .then((res) => {
+        setProfilePicURL(res.data.profilePicURL);
       })
       .catch((err) => {
         console.log(err.response.data.message);
@@ -123,10 +138,10 @@ export const Archive = () => {
             storiesData.map((story, index) => (
               <>
                 <Box
-                  onClick={() => {
-                    setSelectedStoryIndex(index);
-                    onOpenOptionModal();
-                  }}
+                  // onClick={() => {
+                  //   setSelectedStoryIndex(index);
+                  //   onOpenOptionModal();
+                  // }}
                   key={index}
                 >
                   <ArchiveStory
@@ -134,6 +149,10 @@ export const Archive = () => {
                     img={story.mediaURL}
                     typeOfMedia={story.typeOfMedia}
                     isInHighlight={story.isInHighlight}
+                    profilePicURL={profilePicURL}
+                    caption={story.caption}
+                    musicURL={story.musicURL}
+                    createdBy={story.createdBy}
                   />
                 </Box>
               </>

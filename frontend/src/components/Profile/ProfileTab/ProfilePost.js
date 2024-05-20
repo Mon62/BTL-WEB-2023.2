@@ -26,12 +26,15 @@ export const ProfilePost = ({
   savedPost,
   //avatar,
 }) => {
-  //const { isOpen, onOpen, onClose } = useDisclosure();
   const [show, setShow] = useState(false);
   const [comments, setComments] = useState([]);
-  const [data, setData] = useState({ likes: [], comments: [], createdBy: "", caption: "" });
+  const [data, setData] = useState({
+    likes: [],
+    comments: [],
+    createdBy: "",
+    caption: "",
+  });
   const toast = useToast();
-  //const userName = sessionStorage.getItem("currentUser")
   const handleShow = () => {
     setShow(true);
   };
@@ -43,22 +46,21 @@ export const ProfilePost = ({
   const fetchComments = async () => {
     try {
       const res = await getCommentsByPostId(postID);
+      // console.log(res);
       setComments(res.data);
     } catch (err) {
-      console.error(err.response.data.message);
+      // console.error(err.response.data.message);
       toast(new Error(err));
     }
   };
 
   const fetchPosts = async () => {
-    
     try {
-      
       const res = await getPostById(postID);
       setData(res.data.data);
-      console.log(data)
+      // console.log(data);
     } catch (err) {
-      console.error(err);
+      // console.error(err.response.data.message);
       toast(new Error(err));
     }
   };
@@ -136,11 +138,7 @@ export const ProfilePost = ({
 
         {typeOfFirstMedia === "video" ? (
           <AspectRatio ratio={3 / 4} objectFit={"cover"}>
-            <iframe
-              title="post"
-              src={img}
-              allowFullScreen
-            />
+            <iframe title="post" src={img} allowFullScreen />
           </AspectRatio>
         ) : (
           <Image src={img} w={"100%"} h={"100%"} objectFit={"cover"}></Image>
