@@ -32,9 +32,11 @@ export const Home = () => {
     setOtherStory([])
     getNewStoriesByUsername(currentUser)
       .then((res) => {
-        //console.log(res.data.data)
+        console.log(res.data.data)
         //console.log(typeof res.data.data)
         //console.log(Object.keys(res.data.data))
+        if(JSON.stringify(res.data.data) === '{}') return
+        else {
         const usernames = Object.keys(res.data.data)
 
         for (let username of usernames) {
@@ -59,7 +61,9 @@ export const Home = () => {
           setShowOtherStory(true)
           //console.log()
         }, 500);
+      }
       })
+      
       .catch((err) => {
         console.log(err.response.data.message);
         toast(new Error(err));
