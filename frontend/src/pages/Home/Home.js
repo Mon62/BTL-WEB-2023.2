@@ -1,13 +1,14 @@
-import { Box, Flex,  useToast, Container } from "@chakra-ui/react";
+import { Box, Flex, useToast, Container } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import SuggestedUserHeader from "../../components/SuggestedUsers/SuggestedUserHeader";
-import { Avatar, AvatarBadge } from '@chakra-ui/react'
+import { Avatar, AvatarBadge, Tooltip } from '@chakra-ui/react'
 import { AddIcon } from '@chakra-ui/icons'
 import { getShortenedProfileDataByUsername, getMyNewStories, getNewStoriesByUsername } from "../../api/Api.js";
 import CreateStoryModal from "../../components/Story/CreateStoryModal.js";
 import { SkeletonCircle } from "@chakra-ui/react";
 import StoryView from "../../components/Story/StoryView.js";
 import FeedPosts from "../../components/FeedPosts/FeedPosts.js";
+import { CiPlay1 } from "react-icons/ci";
 
 
 
@@ -25,45 +26,54 @@ export const Home = () => {
   const [showOtherStory, setShowOtherStory] = useState(false)
   const [otherStory, setOtherStory] = useState([])
   //const [savedPost, setSavedPost] = useState([])
-  /*getNewStoriesByUsername(currentUser)
-  .then((res)=>{
-    console.log(res.data.data)
-    //console.log(typeof res.data.data)
-    console.log(Object.keys(res.data.data))
-    const usernames = Object.keys(res.data.data)
-    //const 
-    //for (let story of stories){
-      //console
-//}
-    
-  })
-  
+
+
   const handleClickOtherAvatar = () => {
+    setOtherStory([])
     getNewStoriesByUsername(currentUser)
-    .then((res)=>{
-    console.log(res.data.data)
-    console.log(Object.keys(res.data.data))
-    const temp = res.data.data
-    if (temp.length === 0) {
-      console.log("empty")
-      toast({
-        title: "Không có Story nào khác",
-        variant: "subtle",
-        duration: 2000,
-        isClosable: true,
-        position: 'top-right',
+      .then((res) => {
+        //console.log(res.data.data)
+        //console.log(typeof res.data.data)
+        //console.log(Object.keys(res.data.data))
+        const usernames = Object.keys(res.data.data)
+
+        for (let username of usernames) {
+          const stories = res.data.data[username]
+          //console.log(stories)
+          const storyArray = stories.map((file) => {
+            return {
+              type: file.typeOfMedia === "picture" ? "image" : "video",
+              url: file.mediaURL,
+              music: file.musicURL,
+              duration: 4000,
+              header: {
+                heading: username,
+                subheading: JSON.parse(file.caption),
+                //profileImage: profilePicURL,
+              },
+            }
+          })
+          setOtherStory((prev) => prev.concat(storyArray))
+        }
+        setTimeout(() => {
+          setShowOtherStory(true)
+          //console.log()
+        }, 500);
       })
-    }
-  })
-  }*/
+      .catch((err) => {
+        console.log(err.response.data.message);
+        toast(new Error(err));
+      });
+
+  }
   const handleClickAvatar = () => {
     setMyStory([])
     getMyNewStories(currentUser)
       .then((res) => {
         const test = res.data;
-        console.log(test.data)
+        //console.log(test.data)
         if (test.data.length === 0) {
-          console.log("empty")
+          //console.log("empty")
           toast({
             title: "Bạn không có Story nào",
             variant: "subtle",
@@ -78,7 +88,7 @@ export const Home = () => {
               type: file.typeOfMedia === "picture" ? "image" : "video",
               url: file.mediaURL,
               music: file.musicURL,
-              duration: 5000,
+              duration: 4000,
               header: {
                 heading: currentUser,
                 subheading: JSON.parse(file.caption),
@@ -124,49 +134,63 @@ export const Home = () => {
     }, 3000)
   }, [currentUser])
 
-  
+
   return (
     <>
-    {showStory && <StoryView isOpen={showStory} onClick={() => setShowStory(false)} handleClose={() => setShowStory(false)} stories={myStory} />}
-    <Container maxW={"container.lg"} top={0} maxH={"80vh"}>
-      
-      <Flex gap={20} alignItems={"start"}>
-        <Box flex={2} py={10} maxWidth={550}>
+      {showStory && <StoryView isOpen={showStory} onClick={() => setShowStory(false)} handleClose={() => setShowStory(false)} stories={myStory} />}
+      {showOtherStory && <StoryView isOpen={showOtherStory} onClick={() => setShowOtherStory(false)} handleClose={() => setShowOtherStory(false)} stories={otherStory} />}
 
-          {loading && <SkeletonCircle size='20' />}
-          {!loading &&
-            <Avatar src={profilePicURL} size="lg" cursor="pointer" onClick={handleClickAvatar}>
-              <AvatarBadge
-                cursor="pointer"
-                boxSize='1.25em'
-                bg='gray.200'
-                _hover={{ bg: "gray.400" }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleShow();
-                }}
-              >
-                <AddIcon color="black" fontSize="10px" />
-              </AvatarBadge>
-            </Avatar>
-          }
-          {show && (<CreateStoryModal func={handleClose} show={show} />)}
-          <Flex>
-            <FeedPosts />
-          </Flex>
-        </Box>
+      <Container maxW={"container.lg"} top={0} maxH={"80vh"}>
 
-        <Box
-          flex={3}
-          mr={20}
-          display={{ base: "none", xl: "block" }}
-          maxW={"300px"}
-        //border={"1px solid red"}
-        >
-          <SuggestedUserHeader />
-        </Box>
-      </Flex>
-    </Container>
+        <Flex gap={20} alignItems={"start"}>
+          <Box flex={2} py={10} maxWidth={550}>
+
+            {loading &&
+            <Flex gap={8}>
+            <SkeletonCircle size='20' />
+            <SkeletonCircle size='20' />
+            </Flex>
+            }
+            {!loading &&
+            <Flex gap={8}>
+              <Avatar src={profilePicURL} size="lg" cursor="pointer" onClick={handleClickAvatar}>
+                <AvatarBadge
+                  cursor="pointer"
+                  boxSize='1.25em'
+                  bg='gray.200'
+                  _hover={{ bg: "gray.400" }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleShow();
+                  }}
+                >
+                  <AddIcon color="black" fontSize="10px" />
+                </AvatarBadge>
+              </Avatar>
+              <Tooltip label="Xem story của người mà bạn follow" bg="blue.400">
+              <Avatar bg='red.400' icon={<CiPlay1 fontSize='1.5rem' />}
+              size="lg" cursor="pointer" onClick={handleClickOtherAvatar}>
+              </Avatar>
+              </Tooltip>
+              </Flex>
+            }
+            {show && (<CreateStoryModal func={handleClose} show={show} />)}
+            <Flex>
+              <FeedPosts />
+            </Flex>
+          </Box>
+
+          <Box
+            flex={3}
+            mr={20}
+            display={{ base: "none", xl: "block" }}
+            maxW={"300px"}
+          //border={"1px solid red"}
+          >
+            <SuggestedUserHeader />
+          </Box>
+        </Flex>
+      </Container>
     </>
 
     //<Container maxW={"container.lg"}>

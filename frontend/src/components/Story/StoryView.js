@@ -97,7 +97,7 @@ const StoryView = (props) => {
                         onAllStoriesEnd={props.handleClose}
                         onStoryEnd={(index) => handleStoryEnd(index)}
                         onStoryStart={(index) => handleStoryStart(index)}
-                        preventDefault
+                        //preventDefault
                     />
                     {props.stories.map((story, index) => (
                         <audio
