@@ -702,7 +702,7 @@ export const getRecommendPosts = async (req, res, next) => {
     }
 
     // Get maximum 20 posts
-    const recommendPosts = allPosts.slice(0, 20);
+    const recommendPosts = allPosts.slice(0, 50);
 
     // Add profilePicURL to each post
     const postPromises = recommendPosts.map(async (post) => {
@@ -774,7 +774,7 @@ export const getExplorePosts = async (req, res, next) => {
         });
         count++;
       }
-      return count >= 30; // This will break the loop when count reaches 30
+      return count >= 50; // This will break the loop when count reaches 30
     });
 
     return res.status(200).json({ postsData: postsData });
