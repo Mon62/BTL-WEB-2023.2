@@ -1,21 +1,14 @@
 import { v4 as uuid } from "uuid";
-import { auth, db, storage, admin } from "../firebase.js";
+import { db, admin } from "../firebase.js";
 import {
   doc,
   setDoc,
   getDoc,
-  query,
-  getDocs,
   deleteDoc,
-  where,
-  onSnapshot,
-  collection,
   updateDoc,
-  Timestamp,
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export const createHighlight = async (req, res, next) => {
   try {

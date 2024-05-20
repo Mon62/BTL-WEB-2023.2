@@ -1,18 +1,12 @@
 import { v4 as uuid } from "uuid";
-import { auth, db, storage, admin } from "../firebase.js";
+import { db, admin } from "../firebase.js";
 import {
   doc,
   setDoc,
   getDoc,
-  query,
-  getDocs,
   deleteDoc,
-  where,
-  onSnapshot,
-  collection,
   updateDoc,
   Timestamp,
-  serverTimestamp,
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
@@ -549,6 +543,13 @@ export const getNotificationsByUsername = async (req, res) => {
             doc(db, "notifications", nid)
           ).catch((err) => next(err));
           const notificationData = notificationSnapshot.data();
+
+          const senderRef = doc(db, "users", notificationData.sender);
+          const senderSnapshot = await getDoc(senderRef).catch((err) => next(err));
+          const senderData = senderSnapshot.data();
+          notificationData.senderProfilePicURL = senderData.profilePicURL;
+
+
           notifications.unshift(notificationData);
         }
         res.status(200).json(notifications);

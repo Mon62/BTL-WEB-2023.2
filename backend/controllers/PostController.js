@@ -1,14 +1,11 @@
 import { v4 as uuid } from "uuid";
-import { auth, db, storage, admin } from "../firebase.js";
+import {  db, storage, admin } from "../firebase.js";
 import {
   doc,
   setDoc,
   getDoc,
-  query,
   getDocs,
   deleteDoc,
-  where,
-  onSnapshot,
   collection,
   updateDoc,
   Timestamp,
