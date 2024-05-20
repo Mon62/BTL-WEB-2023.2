@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   Avatar,
-  Button,
   Divider,
   Flex,
   Image,
@@ -15,11 +14,11 @@ import {
   getCommentsByPostId,
   getPostById,
   getSavedPosts,
-  
+
 } from '../../api/Api';
 import { Error } from '../../models/Toast.js';
 import { Comment } from '../Comment/Comment.js';
-import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react';
+import { Skeleton, SkeletonCircle } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import Carousel from "react-bootstrap/Carousel";
 
@@ -40,7 +39,7 @@ const ViewPost = ({
   const [likedBy, setLikedBy] = useState([]);
   const [loading, setLoading] = useState(true);
   const [savedPost1, setSavedPost1] = useState([]);
-  const [owner, setOwner] = useState('');
+  const [caption1, setCaption1] = useState('');
   const [profilePic, setProfilePic] = useState('');
   const [files, setFiles] = useState([])
   const [type, setType] = useState([])
@@ -70,15 +69,16 @@ const ViewPost = ({
     getPostById(postID)
       .then((res) => {
         const dataArray = res.data.data.likes;
-        const own = res.data.data.createdBy;
-		//console.log(res)
+        const temp = res.data.data.caption;
+        //console.log(res)
         setLikedBy(dataArray);
-        setOwner(own);
-		setProfilePic(res.data.profilePicURL)
-		setFiles(res.data.data.imgURLs)
-		//console.log(res.data.data.imgURLs)
-		setType(res.data.data.typesOfMedia)
-		//console.log(res.data.data.typesOfMedia)
+        setCaption1(JSON.parse(temp))
+        //setOwner(own);
+        setProfilePic(res.data.profilePicURL)
+        setFiles(res.data.data.imgURLs)
+        //console.log(res.data.data.imgURLs)
+        setType(res.data.data.typesOfMedia)
+        //console.log(res.data.data.typesOfMedia)
 
       })
       .catch((err) => {
@@ -122,7 +122,7 @@ const ViewPost = ({
   }, [owner, toast]);*/
 
   return (
-    <Modal show={show} onHide={onHide} centered size='xl'>
+    <Modal show={show} onHide={onHide} centered size='xl' backdrop="static">
       <Modal.Header closeButton></Modal.Header>
       <Modal.Body bg={"black"} pb={5}>
         {loading ? (
@@ -144,34 +144,49 @@ const ViewPost = ({
               justifyContent={'center'}
               alignItems={'center'}
             >
-					<Carousel
-                      data-bs-theme="light"
-                      interval={null}
-                      indicators={false}
-					  slide={false}
-                    >
-                      {files.map((file, index) => {
-                        return (
-                          <Carousel.Item>
-                            <Flex
-                              key={index}
-                              style={{ maxWidth: "700px", maxHeight: "500px" }}
-                            >
-                              {type[index] === "video" ? (
-                                <video
-                                  src={file}
-                                  controls
-                                  playsinline
-                                ></video>
-                              ) : (
-                                <Image src={file} rounded fluid />
-                              )}
-                            </Flex>
-                          </Carousel.Item>
-                        );
-                      })}
-                    </Carousel>
-              
+              {files.length === 1 &&
+                <Flex
+                  style={{ maxWidth: "700px", maxHeight: "500px" }}
+                >
+                  {type[0] === "video" ? (
+                    <video
+                      src={files[0]}
+                      controls
+                      playsinline
+                    ></video>
+                  ) : (
+                    <Image src={files[0]} rounded fluid />
+                  )}
+                </Flex>}
+              {files.length !== 1 && <Carousel
+                data-bs-theme="light"
+                interval={null}
+                indicators={false}
+                slide={false}
+              >
+
+                {files.map((file, index) => {
+                  return (
+                    <Carousel.Item>
+                      <Flex
+                        key={index}
+                        style={{ maxWidth: "700px", maxHeight: "500px" }}
+                      >
+                        {type[index] === "video" ? (
+                          <video
+                            src={file}
+                            controls
+                            playsinline
+                          ></video>
+                        ) : (
+                          <Image src={file} rounded fluid />
+                        )}
+                      </Flex>
+                    </Carousel.Item>
+                  );
+                })}
+              </Carousel>}
+
             </Flex>
             <Flex
               flex={1}
@@ -209,7 +224,7 @@ const ViewPost = ({
               <PostFooter
                 likes={likedBy}
                 createdBy={createdBy}
-                caption={caption}
+                caption={caption1}
                 numOfComments={0}
                 postID={postID}
                 imageURL={imageURL}

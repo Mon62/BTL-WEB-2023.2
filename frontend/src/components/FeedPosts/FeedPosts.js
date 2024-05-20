@@ -27,11 +27,13 @@ const FeedPosts = () => {
         caption: JSON.parse(file.caption),
         comments: file.comments,
         createdBy: file.createdBy,
-        imgURL: file.imgURLs[0],
+        imgURL: file.imgURLs,
         type: file.typeOfFirstMedia,
         likes: file.likes,
         avatar: file.profilePicURL,
         postID: file.pid,
+        typesOfMedia: file.typesOfMedia,
+
       }))]);
 
       setLoading(false);
@@ -68,6 +70,7 @@ const FeedPosts = () => {
     fetchData(); // Call the async function within useEffect
     
   }, [profileUser]);
+  console.log(posts)
 
   useEffect(()=>{
     getSavedPosts(profileUser)
@@ -98,12 +101,12 @@ const FeedPosts = () => {
             // If this is the last post, attach the ref to this post
             return (
               <div ref={lastPostElementRef}>
-                <FeedPost files={file.imgURL} likes={file.likes} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type} savedPost={savedPost}/>
+                <FeedPost files={file.imgURL} likes={file.likes} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type} savedPost={savedPost} typesOfMedia={file.typesOfMedia}/>
               </div>
             );
           } else {
             return (
-              <FeedPost files={file.imgURL} likes={file.likes} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type} savedPost={savedPost}/>
+              <FeedPost files={file.imgURL} likes={file.likes} createdBy={file.createdBy} caption={file.caption} numOfComments={file.comments.length} avatar={file.avatar} postID={file.postID} comments={file.comments} typeFirst={file.type} savedPost={savedPost} typesOfMedia={file.typesOfMedia}/>
             );
           }
         })}

@@ -22,7 +22,7 @@ export const Home = () => {
   const [loading, setLoading] = useState(true)
   const [showStory, setShowStory] = useState(false)
   const [myStory, setMyStory] = useState([])
-  const [savedPost, setSavedPost] = useState([])
+  //const [savedPost, setSavedPost] = useState([])
 
   
   const handleClickAvatar = () => {
@@ -31,7 +31,16 @@ export const Home = () => {
       .then((res) => {
         const test = res.data;
         console.log(test.data)
-        if (test.data.length === 0) {console.log("empty")}
+        if (test.data.length === 0) {
+          console.log("empty")
+          toast({
+            title: "Bạn không có Story nào",
+            variant: "subtle",
+            duration: 2000,
+            isClosable: true,
+            position: 'top-right',
+          })
+        }
         else {
           const storyArray = test.data.map((file) => {
             return {
@@ -51,7 +60,7 @@ export const Home = () => {
           setTimeout(() => {
             setShowStory(true)
             console.log(myStory)
-          }, 100);
+          }, 800);
           //setFollowers(profileData.followers);
           //setFollowing(profileData.followingUsers);
           //setPosts(profileData.posts);
