@@ -13,6 +13,130 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
+// export const createPost = async (req, res, next) => {
+//   try {
+//     const username = req.body.username; //createdBy
+//     const caption = req.body.caption;
+//     const files = req.files;
+//     const accessToken = req.headers.authorization;
+
+//     const createdAt = Timestamp.now();
+//     const pid = uuid();
+//     let imgURLs = [];
+
+//     admin
+//       .auth()
+//       .verifyIdToken(accessToken)
+//       .then(async () => {
+//         // Kiểm tra sự tồn tại của người dùng
+//         const userSnapshot = await getDoc(doc(db, "users", username)).catch(
+//           (err) => next(err)
+//         );
+//         if (!userSnapshot.exists()) {
+//           return res.status(404).json({
+//             status: "error",
+//             message: "Người dùng không tồn tại!",
+//           });
+//         }
+
+//         // Check if the first media is a picture or a video
+//         const getTypeOfMedia = (filename) => {
+//           const lowerCaseFilename = filename.toLowerCase();
+//           const imageExtensions = ["jpg", "jpeg", "png", "gif"];
+//           const videoExtensions = ["mp4", "avi", "mov"];
+
+//           if (imageExtensions.some((ext) => lowerCaseFilename.includes(ext))) {
+//             return "picture";
+//           } else if (
+//             videoExtensions.some((ext) => lowerCaseFilename.includes(ext))
+//           ) {
+//             return "video";
+//           } else {
+//             return "unknown";
+//           }
+//         };
+//         let typesOfMedia = [];
+//         // upload image to storage
+//         for (let i = 0; i < files.length; i++) {
+//           const file = files[i];
+//           const imgRef = ref(
+//             storage,
+//             `post/${pid}/${file.originalname + uuid()}`
+//           );
+//           const metaData = {
+//             contentType: file.mimetype,
+//           };
+//           await uploadBytes(imgRef, file.buffer, metaData)
+//             .then((snapshot) => {
+//               console.log("Uploaded a blob or file!");
+//             })
+//             .catch((error) => {
+//               console.error(error);
+//               next(error);
+//             });
+//           await getDownloadURL(imgRef)
+//             .then((url) => {
+//               console.log("File available at", url);
+//               imgURLs.push(url);
+//               typesOfMedia.push(getTypeOfMedia(file.originalname));
+//             })
+//             .catch((error) => {
+//               console.error(error);
+//               next(error);
+//             });
+//         }
+
+
+//         const typeOfFirstMedia = getTypeOfMedia(imgURLs[0]);
+//         //const postData = new postModel(username, caption, imgURL, createdAt);
+//         const postData = {
+//           pid: pid,
+//           caption: JSON.stringify(caption), // change this line
+//           imgURLs: imgURLs,
+//           likes: [],
+//           comments: [],
+//           createdAt: createdAt,
+//           createdBy: username,
+//           typeOfFirstMedia: typeOfFirstMedia, //First media is video or picture
+//           typesOfMedia: typesOfMedia, //List of media types
+//         };
+
+//         await setDoc(doc(db, "posts", pid), postData).catch((err) => next(err));
+//         await updateDoc(doc(db, "users", username), {
+//           posts: arrayUnion(pid),
+//         }).catch((err) => next(err));
+
+//         //Update Post to newPosts of followers
+//         //Update Post to newPosts of followers
+//         const userRef = doc(db, "users", username);
+//         const userSnap = await getDoc(userRef).catch((err) => next(err));
+//         if (userSnap.exists()) {
+//           const user = userSnap.data();
+//           const followers = user.followers;
+//           const updatePromises = followers.map((follower) => {
+//             const followerRef = doc(db, "users", follower);
+//             return updateDoc(followerRef, {
+//               newPosts: arrayUnion(pid),
+//             });
+//           });
+//           await Promise.all(updatePromises);
+//         }
+
+//         res.status(200).json({
+//           status: "success",
+//           message: "Đăng bài viết thành công!",
+//           data: postData,
+//         });
+//         console.log(postData);
+//       })
+//       .catch((err) => next(err));
+//   } catch (error) {
+//     console.error(error);
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
+
 export const createPost = async (req, res, next) => {
   try {
     const username = req.body.username; //createdBy
@@ -23,12 +147,12 @@ export const createPost = async (req, res, next) => {
     const createdAt = Timestamp.now();
     const pid = uuid();
     let imgURLs = [];
+    let typesOfMedia = [];
 
     admin
       .auth()
       .verifyIdToken(accessToken)
       .then(async () => {
-        // Kiểm tra sự tồn tại của người dùng
         const userSnapshot = await getDoc(doc(db, "users", username)).catch(
           (err) => next(err)
         );
@@ -39,7 +163,6 @@ export const createPost = async (req, res, next) => {
           });
         }
 
-        // Check if the first media is a picture or a video
         const getTypeOfMedia = (filename) => {
           const lowerCaseFilename = filename.toLowerCase();
           const imageExtensions = ["jpg", "jpeg", "png", "gif"];
@@ -55,10 +178,8 @@ export const createPost = async (req, res, next) => {
             return "unknown";
           }
         };
-        let typesOfMedia = [];
-        // upload image to storage
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
+
+        const uploadPromises = files.map(async (file) => {
           const imgRef = ref(
             storage,
             `post/${pid}/${file.originalname + uuid()}`
@@ -66,61 +187,49 @@ export const createPost = async (req, res, next) => {
           const metaData = {
             contentType: file.mimetype,
           };
-          await uploadBytes(imgRef, file.buffer, metaData)
-            .then((snapshot) => {
-              console.log("Uploaded a blob or file!");
-            })
-            .catch((error) => {
-              console.error(error);
-              next(error);
-            });
-          await getDownloadURL(imgRef)
-            .then((url) => {
-              console.log("File available at", url);
-              imgURLs.push(url);
-              typesOfMedia.push(getTypeOfMedia(file.originalname));
-            })
-            .catch((error) => {
-              console.error(error);
-              next(error);
-            });
-        }
+          await uploadBytes(imgRef, file.buffer, metaData);
+          const url = await getDownloadURL(imgRef);
+          imgURLs.push(url);
+          typesOfMedia.push(getTypeOfMedia(file.originalname));
+        });
 
+        await Promise.all(uploadPromises);
 
         const typeOfFirstMedia = getTypeOfMedia(imgURLs[0]);
-        //const postData = new postModel(username, caption, imgURL, createdAt);
         const postData = {
           pid: pid,
-          caption: JSON.stringify(caption), // change this line
+          caption: JSON.stringify(caption),
           imgURLs: imgURLs,
           likes: [],
           comments: [],
           createdAt: createdAt,
           createdBy: username,
-          typeOfFirstMedia: typeOfFirstMedia, //First media is video or picture
-          typesOfMedia: typesOfMedia, //List of media types
+          typeOfFirstMedia: typeOfFirstMedia,
+          typesOfMedia: typesOfMedia,
         };
 
-        await setDoc(doc(db, "posts", pid), postData).catch((err) => next(err));
-        await updateDoc(doc(db, "users", username), {
-          posts: arrayUnion(pid),
-        }).catch((err) => next(err));
+        const updatePromises = [
+          setDoc(doc(db, "posts", pid), postData),
+          updateDoc(doc(db, "users", username), {
+            posts: arrayUnion(pid),
+          }),
+        ];
 
-        //Update Post to newPosts of followers
-        //Update Post to newPosts of followers
         const userRef = doc(db, "users", username);
         const userSnap = await getDoc(userRef).catch((err) => next(err));
         if (userSnap.exists()) {
           const user = userSnap.data();
           const followers = user.followers;
-          const updatePromises = followers.map((follower) => {
+          const followerPromises = followers.map((follower) => {
             const followerRef = doc(db, "users", follower);
             return updateDoc(followerRef, {
               newPosts: arrayUnion(pid),
             });
           });
-          await Promise.all(updatePromises);
+          updatePromises.push(...followerPromises);
         }
+
+        await Promise.all(updatePromises);
 
         res.status(200).json({
           status: "success",
@@ -135,6 +244,7 @@ export const createPost = async (req, res, next) => {
     res.status(400).json({ message: error.message });
   }
 };
+
 
 export const updatePost = async (req, res, next) => {
   try {
