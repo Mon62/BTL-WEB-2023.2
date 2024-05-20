@@ -77,6 +77,8 @@ const SignUp = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
         </FormGroup>
         <Form.Label className="mt-2" htmlFor="fullname">Tên đầy đủ</Form.Label>
@@ -88,6 +90,8 @@ const SignUp = () => {
             value={fullName}
             onChange={(e) => setFullname(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
         </FormGroup>
 
@@ -100,6 +104,8 @@ const SignUp = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
         </FormGroup>
         <Form.Label className="mt-2" htmlFor="password">Mật khẩu</Form.Label>
@@ -112,6 +118,8 @@ const SignUp = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
           <InputRightElement width="4.5rem">
             <Button
@@ -141,6 +149,8 @@ const SignUp = () => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
           <InputRightElement width="4.5rem">
             <Button

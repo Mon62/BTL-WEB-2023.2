@@ -52,8 +52,8 @@ const Sidebar = () => {
     logout()
       .then((res) => {
         toast({
-          title: "Logging Out",
-          description: "You need to log back in",
+          title: "Đăng xuất",
+          description: "Bạn cần đăng nhập lại",
           status: "loading",
           duration: 2000,
           isClosable: true,

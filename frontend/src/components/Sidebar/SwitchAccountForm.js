@@ -90,6 +90,8 @@ const SwitchAccountForm = (props) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
         </FormGroup>
 
@@ -104,6 +106,8 @@ const SwitchAccountForm = (props) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
           <InputRightElement width="4.5rem">
             <Button

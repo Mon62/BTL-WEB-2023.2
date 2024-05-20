@@ -52,15 +52,18 @@ export const Login = () => {
           <Input
             type="email"
             id="email"
+            //placeholder="abcd@example.com"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
+
           />
         </FormGroup>
 
         <Form.Label className="mt-2" htmlFor="password">
-          Password
+          Mật khẩu
         </Form.Label>
         <InputGroup className="mb-1">
           <Input
@@ -70,6 +73,7 @@ export const Login = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={{ height: "50px" }}
+            borderColor={"blackAlpha.300"}
           />
           <InputRightElement width="4.5rem">
             <Button

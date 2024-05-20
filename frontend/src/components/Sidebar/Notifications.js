@@ -74,14 +74,14 @@ const Notifications = (props) => {
             ava: file.senderProfilePicURL,
           })),
         ]);
-        
+        setLoading(false)
+
       })
       .catch((err) => {
         console.log(err.response.data.message);
       });
-      setTimeout(() => {
-        setLoading(false)
-      }, 2000);
+      //setTimeout(() => {
+      //}, 3000);
   };
 
   /*useEffect(() => {
