@@ -875,16 +875,20 @@ export const getSavedPosts = async (req, res, next) => {
         const user = userSnapshot.data();
         const savedPosts = user.savedPosts;
         const savedPostsData = [];
-        const postPromises = savedPosts.map(async (postId) => {
-          const postSnapshot = await getDoc(doc(db, "posts", postId)).catch(
-            (err) => next(err)
-          );
-          if (postSnapshot.exists()) {
-            const post = postSnapshot.data();
-            savedPostsData.push(post);
-          }
-        });
-        await Promise.all(postPromises).catch((err) => next(err));
+
+        if (savedPosts) {
+          const postPromises = savedPosts.map(async (postId) => {
+            const postSnapshot = await getDoc(doc(db, "posts", postId)).catch(
+              (err) => next(err)
+            );
+            if (postSnapshot.exists()) {
+              const post = postSnapshot.data();
+              savedPostsData.push(post);
+            }
+          });
+
+          await Promise.all(postPromises).catch((err) => next(err));
+        }
         return res
           .status(200)
           .json({ message: "success", data: savedPostsData });

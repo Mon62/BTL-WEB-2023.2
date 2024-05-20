@@ -17,6 +17,7 @@ import {
   onSnapshot,
   collection,
   updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import {
   ref,
@@ -213,9 +214,8 @@ export const editProfile = (req, res, next) => {
         //update profilePic in storage
         if (profilePic != null) {
           // Update new profilePic
-          const newProfilePicPath = `profilePic/${username}/${
-            profilePic.originalname + v4()
-          }`;
+          const newProfilePicPath = `profilePic/${username}/${profilePic.originalname + v4()
+            }`;
           const imageRef = ref(storage, newProfilePicPath);
           const metaData = {
             contentType: profilePic.mimetype,
@@ -391,6 +391,24 @@ export const followUser = (req, res, next) => {
       .auth()
       .verifyIdToken(accessToken)
       .then(() => {
+        //create a new notification
+        const notificationId = v4();
+        const message = currentUser + " đã theo dõi bạn.";
+        const notificationData = {
+          nid: notificationId,
+          type: "follow",
+          sender: currentUser,
+          receiver: targetUser,
+          postId: "",
+          storyId: "",
+          commentId: "",
+          createdAt: Date.now(),
+          message: message,
+        };
+        setDoc(doc(db, "notifications", notificationId), notificationData).catch(
+          (err) => next(err)
+        );
+
         // update followers of username in firestore
         getDoc(currentUserRef)
           .then((user) => {
@@ -407,11 +425,13 @@ export const followUser = (req, res, next) => {
           .then((user) => {
             let followers = user.data().followers;
             let newFollowers = [...followers, currentUser];
-            updateDoc(targetUserRef, { followers: newFollowers }).catch((err) =>
+            updateDoc(targetUserRef, { followers: newFollowers, notifications: arrayUnion(notificationId) }).catch((err) =>
               next(err)
             );
           })
           .catch((err) => next(err));
+
+
 
         res.status(200).json({
           message: "Theo dõi người dùng " + targetUser + " thành công.",
