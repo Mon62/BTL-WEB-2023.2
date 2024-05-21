@@ -34,6 +34,7 @@ export const ProfilePostList = ({}) => {
   const toast = useToast();
   const [savedPost, setSavedPost] = useState([]);
   const [selectedPostIndex, setSelectedPostIndex] = useState(-1);
+  const currentUser = sessionStorage.getItem("currentUser");
 
   useEffect(() => {
     if (!isOpen) setIsLoading(true);
@@ -102,17 +103,19 @@ export const ProfilePostList = ({}) => {
               postID={post.postId}
               savedPost={savedPost}
             />
-            <Text
-              color={"red"}
-              textTransform={"none"}
-              fontWeight={"normal"}
-              onClick={() => {
-                setSelectedPostIndex(index);
-                onOpen();
-              }}
-            >
-              Delete
-            </Text>
+            {currentUser === profileUser && (
+              <Text
+                color={"red"}
+                textTransform={"none"}
+                fontWeight={"normal"}
+                onClick={() => {
+                  setSelectedPostIndex(index);
+                  onOpen();
+                }}
+              >
+                Delete
+              </Text>
+            )}
           </Flex>
         ))}
 
