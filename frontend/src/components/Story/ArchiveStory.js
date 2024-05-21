@@ -45,10 +45,10 @@ export const ArchiveStory = ({
           right={1}
           zIndex={1}
           className="shadow"
-          onClick={() => alert("mmmm")}
+          
         >
           {isInHighlight === true ? (
-            <BiSolidHeartCircle color="white" size={25} />
+            <BiSolidHeartCircle color="white" size={25} onClick={() => alert("mmmm")}/>
           ) : (
             <></>
           )}

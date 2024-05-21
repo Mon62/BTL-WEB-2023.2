@@ -4,6 +4,8 @@ import { Flex, CloseButton } from '@chakra-ui/react';
 import Modal from 'react-modal';
 
 const StoryView = (props) => {
+    // console.log(props)
+
     const [isPlaying, setIsPlaying] = useState(true);
     const storiesRef = useRef(null);
     const audioRefs = useRef([]);
@@ -99,7 +101,7 @@ const StoryView = (props) => {
                         onStoryStart={(index) => handleStoryStart(index)}
                         //preventDefault
                     />
-                    {props.stories.map((story, index) => (
+                    {props.stories && props.stories.map((story, index) => (
                         <audio
                             key={index}
                             ref={el => audioRefs.current[index] = el}

@@ -52,7 +52,8 @@ export const Archive = () => {
   const toast = useToast();
 
   useEffect(() => {
-    setIsLoading(true);
+    if (! isOpenOptionModal)
+      setIsLoading(true);
 
     getStoriesByUsername(currentUser)
       .then((res) => {
@@ -138,11 +139,8 @@ export const Archive = () => {
             storiesData.map((story, index) => (
               <>
                 <Box
-                  // onClick={() => {
-                  //   setSelectedStoryIndex(index);
-                  //   onOpenOptionModal();
-                  // }}
                   key={index}
+                  // className="d-flex"
                 >
                   <ArchiveStory
                     key={index}
@@ -154,6 +152,16 @@ export const Archive = () => {
                     musicURL={story.musicURL}
                     createdBy={story.createdBy}
                   />
+                  <Text
+                    color={"red"}
+                    cursor={"pointer"}
+                    onClick={() => {
+                      setSelectedStoryIndex(index);
+                      onOpenOptionModal();
+                    }}
+                  >
+                    Delete
+                  </Text>
                 </Box>
               </>
             ))

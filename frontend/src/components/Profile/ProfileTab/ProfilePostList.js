@@ -1,27 +1,45 @@
 import React from "react";
-import { Grid, Skeleton, VStack, Box, useToast } from "@chakra-ui/react";
+import {
+  Grid,
+  Skeleton,
+  VStack,
+  Box,
+  useToast,
+  Flex,
+  Text,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  Button,
+  AlertDialogCloseButton,
+  AlertDialogOverlay,
+  AlertDialogHeader,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { ProfilePost } from "./ProfilePost.js";
 import { useParams } from "react-router-dom";
-import { getPostsByUsername,  getSavedPosts } from "../../../api/Api.js";
-import { Error } from "../../../models/Toast.js";
+import {
+  getPostsByUsername,
+  getSavedPosts,
+  deletePost,
+} from "../../../api/Api.js";
+import { Error, Success } from "../../../models/Toast.js";
 
 export const ProfilePostList = ({}) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [isLoading, setIsLoading] = useState(true);
   const { profileUser } = useParams();
   const [postsData, setPostsData] = useState([]);
   const toast = useToast();
-  //const [profilePicURL, setProfilePicURL] = useState("");
-  const [savedPost, setSavedPost] = useState([])
+  const [savedPost, setSavedPost] = useState([]);
+  const [selectedPostIndex, setSelectedPostIndex] = useState(-1);
 
   useEffect(() => {
-    setIsLoading(true);
+    if (!isOpen) setIsLoading(true);
     getPostsByUsername(profileUser)
       .then((res) => {
-        //  console.log(res);
         setPostsData(res.data.postsData.reverse());
-        console.log(res.data.postsData.reverse());
-        //console.log(postsData)
       })
       .catch((err) => {
         console.log(err.response.data.message);
@@ -29,43 +47,36 @@ export const ProfilePostList = ({}) => {
       });
 
     setTimeout(() => {
-      // console.log(postsData);
       setIsLoading(false);
     }, 2000);
-  }, [profileUser]);
+  }, [profileUser, isOpen]);
 
-  /*useEffect(() => {
-    getShortenedProfileDataByUsername(profileUser)
+  useEffect(() => {
+    getSavedPosts(profileUser)
       .then((res) => {
-        // console.log(res.data);
-        const profileData = res.data;
-        setProfilePicURL(profileData.profilePicURL);        
+        const savedArray = res.data.data.map((file) => {
+          return { pid: file.pid };
+        });
+        setSavedPost(savedArray);
       })
       .catch((err) => {
         console.log(err.response.data.message);
         toast(new Error(err));
       });
-  }, [profileUser]);*/
-  useEffect(()=>{
-    getSavedPosts(profileUser)
-    .then((res) => {
-          //toast(new Success(res));
-      //console.log(res.data.data)
-      const savedArray = res.data.data.map((file) => {
-        return{pid: file.pid,}
+  }, [profileUser, isOpen]);
+
+  const handleDeletePost = (index) => {
+    // console.log(postsData[index])
+    deletePost({ pid: postsData[index].postId })
+      .then((res) => {
+        toast(new Success(res));
       })
-      setSavedPost(savedArray)
-      //console.log(savedArray)
-        })
-        .catch((err) => {
-          // console.log(err);
-          console.log(err.response.data.message);
-          toast(new Error(err));
-        });
-      
-  
-    }, [profileUser])
-    
+      .catch((err) => {
+        console.log(err.response.data.message);
+        toast(new Error(err));
+      });
+  };
+
   return (
     <Grid
       templateColumns={{ sm: "repeat(1, 1fr)", md: "repeat(3, 1fr)" }}
@@ -82,18 +93,53 @@ export const ProfilePostList = ({}) => {
         ))}
       {!isLoading &&
         postsData.map((post, index) => (
-          <ProfilePost
-            key={index}
-            img={post.firstPicURL}
-           // numberOfLikes={post.numberOfLikes}
-         //   numberOfComments={post.numberOfComments}
-            typeOfFirstMedia={post.typeOfFirstMedia}
-            numberOfMediaFile = {post.numberOfMediaFile}
-            postID={post.postId}
-            savedPost={savedPost}
-            //avatar={profilePicURL}
-          />
+          <Flex direction={"column"}>
+            <ProfilePost
+              key={index}
+              img={post.firstPicURL}
+              typeOfFirstMedia={post.typeOfFirstMedia}
+              numberOfMediaFile={post.numberOfMediaFile}
+              postID={post.postId}
+              savedPost={savedPost}
+            />
+            <Text
+              color={"red"}
+              textTransform={"none"}
+              fontWeight={"normal"}
+              onClick={() => {
+                setSelectedPostIndex(index);
+                onOpen();
+              }}
+            >
+              Delete
+            </Text>
+          </Flex>
         ))}
+
+      <AlertDialog onClose={onClose} isOpen={isOpen} isCentered>
+        <AlertDialogOverlay bg="blackAlpha.300" backdropFilter="blur(10px) " />
+        <AlertDialogContent>
+          <AlertDialogHeader>Delete Highlight Story</AlertDialogHeader>
+          <AlertDialogCloseButton />
+          <AlertDialogBody className="fs-5">
+            Are you sure you want to delete this highlight story?
+            <hr className="solid my-2" />
+            <Flex justifyContent={"flex-end"}>
+              <Button className="mt-2 mb-2" onClick={onClose}>
+                No
+              </Button>
+              <Button
+                className="mb-2 mt-2"
+                onClick={() => handleDeletePost(selectedPostIndex)}
+                colorScheme="red"
+                ml={3}
+              >
+                Yes
+              </Button>
+            </Flex>
+          </AlertDialogBody>
+        </AlertDialogContent>
+      </AlertDialog>
     </Grid>
   );
 };

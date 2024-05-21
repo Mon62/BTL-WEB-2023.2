@@ -197,7 +197,7 @@ const ViewPost = ({
               <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex alignItems={'center'} gap={4}>
                   <Avatar src={profilePic} size={'sm'} name='name' />
-                  <Link to={`/profile/${createdBy}`}>
+                  <Link to={`/profile/${createdBy}/posts`}>
                     <Text fontWeight={'bold'} fontSize={14}>
                       {createdBy}
                     </Text>

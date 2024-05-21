@@ -21,7 +21,7 @@ export const ProfileSavedPost = () => {
     getSavedPosts(profileUser)
       .then((res) => {
         setPostsData(res.data.data.reverse());
-        console.log(res.data.data.reverse());
+        // console.log(res.data.data.reverse());
       })
       .catch((err) => {
         console.log(err.response.data.message);

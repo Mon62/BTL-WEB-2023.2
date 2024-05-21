@@ -24,7 +24,7 @@ import {
   AlertDialogBody,
   AlertDialogCloseButton,
   VStack,
-  SkeletonCircle
+  SkeletonCircle,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { CloseIcon, ChevronLeftIcon } from "@chakra-ui/icons";
@@ -37,8 +37,10 @@ import {
   createHighlight,
   getHighlightsByUsername,
   deleteHighlight,
+  getShortenedProfileDataByUsername,
 } from "../../../api/Api";
 import { Success, Error } from "../../../models/Toast.js";
+import StoryView from "../../Story/StoryView.js";
 
 export const HighlightStory = () => {
   const {
@@ -74,7 +76,10 @@ export const HighlightStory = () => {
   const [selectedHighlightIndex, setSelectedHighlightIndex] = useState(-1);
   const [storiesData, setStoriesData] = useState([]);
   const [highlights, setHighlights] = useState([]);
+  const [highlightsData, setHighlightsData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [profilePicURL, setProfilePicURL] = useState("");
+  const [showStory, setShowStory] = useState(false);
   const currentUser = sessionStorage.getItem("currentUser");
   const { profileUser } = useParams();
   const toast = useToast();
@@ -83,8 +88,18 @@ export const HighlightStory = () => {
     setHighlightName("");
     setCountSelectedStories(0);
     setSelectedCoverIndex(0);
-    if (! isOpenCreateHighlightStories && ! isOpenOptionModal)
-      setIsLoading(true);
+    setHighlightsData([]);
+    if (!isOpenCreateHighlightStories && !isOpenOptionModal) setIsLoading(true);
+
+    getShortenedProfileDataByUsername(profileUser)
+      .then((res) => {
+        // console.log(res);
+        setProfilePicURL(res.data.profilePicURL);
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+        toast(new Error(err));
+      });
 
     getStoriesByUsername(profileUser)
       .then((res) => {
@@ -101,15 +116,33 @@ export const HighlightStory = () => {
       .then((res) => {
         const data = res.data.data;
         setHighlights(data.reverse());
+        // console.log(data);
+        const tempHighlightsData = data.map((highlight) => {
+          const storyData = highlight.stories.map((story) => ({
+            duration: 5000,
+            music: story.musicURL,
+            url: story.mediaURL,
+            type: story.typeOfMedia === "picture" ? "image" : "video",
+            header: {
+              heading: profileUser,
+              profileImage: profilePicURL,
+              subheading: JSON.parse(story.caption),
+            },
+          }));
+          return storyData;
+        });
+        // console.log(tempHighlightsData);
+        setHighlightsData(tempHighlightsData);
       })
       .catch((err) => {
         console.log(err.response.data.message);
         toast(new Error(err));
       });
-    
+
+    // console.log(highlightsData);
     setTimeout(() => {
       setIsLoading(false);
-    }, 2000)
+    }, 2000);
   }, [isOpenCreateHighlightStories, profileUser, isOpenOptionModal]);
 
   const handleSelectStory = (index) => {
@@ -170,7 +203,7 @@ export const HighlightStory = () => {
     <Container className="m-0 p-0">
       <Flex gap={10} w={"1100px"} overflowX={"auto"}>
         {currentUser === profileUser && (
-          <Box dir="column" gap={2}>
+          <Box dir="column" gap={2} mt={4}>
             <IoIosAddCircleOutline
               size="7em"
               color="rgb(199, 199, 199)"
@@ -183,25 +216,51 @@ export const HighlightStory = () => {
           </Box>
         )}
         {isLoading &&
-        [0, 1, 2, 3, 4, 5].map((_, idx) => (
-          <VStack mt={2} key={idx} alignItems={"flex-start"} gap={4}>
-            <SkeletonCircle size={"95"}/>
-          </VStack>
-        ))}
-        {! isLoading && highlights.map((highlight, index) => (
-          <Box
-            onClick={() => {
-              setSelectedHighlightIndex(index);
-              onOpenOptionModal();
-            }}
-            key={index}
-          >
-            <StorySnapshot
-              img={highlight.hlimgURL}
-              caption={highlight.hlname}
-            />
-          </Box>
-        ))}
+          [0, 1, 2, 3, 4, 5].map((_, idx) => (
+            <VStack mt={5} key={idx} alignItems={"flex-start"} gap={4}>
+              <SkeletonCircle size={"95"} />
+            </VStack>
+          ))}
+        {!isLoading &&
+          highlights.map((highlight, index) => (
+            <Flex direction={"column"}>
+              <Box
+                key={index}
+                onClick={() => {
+                  setSelectedHighlightIndex(index);
+                  setShowStory(!showStory);
+                }}
+              >
+                <StorySnapshot
+                  img={highlight.hlimgURL}
+                  caption={highlight.hlname}
+                />
+              </Box>
+              {currentUser === profileUser && (
+                <Box
+                  className="d-flex"
+                  justifyContent={"center"}
+                  onClick={() => {
+                    setSelectedHighlightIndex(index);
+                    onOpenOptionModal();
+                  }}
+                >
+                  <Text color={"red"} mt={2}>
+                    Delete
+                  </Text>
+                </Box>
+              )}
+            </Flex>
+          ))}
+
+        {highlightsData && (
+          <StoryView
+            isOpen={showStory}
+            onClick={() => setShowStory(false)}
+            handleClose={() => setShowStory(false)}
+            stories={highlightsData[selectedHighlightIndex]}
+          />
+        )}
         <Modal
           isOpen={isOpenOptionModal}
           onClose={onCloseOptionModal}
@@ -211,12 +270,12 @@ export const HighlightStory = () => {
           <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(10px)" />
           <ModalContent>
             <ModalBody>
-              <Flex flexDirection="column" alignItems={"center"}>
+              {/* <Flex flexDirection="column" alignItems={"center"}>
                 <Text cursor={"pointer"} _hover={{ color: "blue" }}>
                   Edit
                 </Text>
               </Flex>
-              <hr className="solid mt-0" />
+              <hr className="solid mt-0" /> */}
               <Flex flexDirection="column" alignItems={"center"}>
                 <Text
                   cursor={"pointer"}

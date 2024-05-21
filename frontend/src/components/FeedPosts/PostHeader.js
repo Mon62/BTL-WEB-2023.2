@@ -18,7 +18,7 @@ const PostHeader = ({likes, createdBy, caption, numOfComments, postID, imageURL,
 						<Avatar src={avatar} alt='user profile pic' size={"sm"} />
 					
 
-				  <Link as={RouterLink} to={`/profile/${createdBy}`} fontSize={12} fontWeight={"bold"} gap='2'>
+				  <Link as={RouterLink} to={`/profile/${createdBy}/posts`} fontSize={12} fontWeight={"bold"} gap='2'>
 					{createdBy} 
 
 					<Box color={"gray.500"}></Box>

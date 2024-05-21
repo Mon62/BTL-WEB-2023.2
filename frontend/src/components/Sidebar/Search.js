@@ -176,7 +176,7 @@ const Search = (props) => {
                             cursor={"pointer"}
                             src={result.profilePicURL}
                             onClick={() =>
-                              navigate(`/profile/${result.username}`)
+                              navigate(`/profile/${result.username}/posts`)
                             }
                           />
                         </AvatarGroup>
@@ -189,7 +189,7 @@ const Search = (props) => {
                             className="m-0"
                             style={{ fontWeight: "500" }}
                             onClick={() =>
-                              navigate(`/profile/${result.username}`)
+                              navigate(`/profile/${result.username}/posts`)
                             }
                             cursor={"pointer"}
                             alignSelf={"flex-start"}
