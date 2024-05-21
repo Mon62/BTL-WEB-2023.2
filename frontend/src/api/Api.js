@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const dev_API_URL = "http://localhost:3000";
-const production_API_URL = "";
+const dev_API_URL = "http://localhost:5000";
+const production_API_URL = "35.201.141.33:5000";
 const baseHeader = {
   headers: {
     "access-control-allow-origin": "*",
