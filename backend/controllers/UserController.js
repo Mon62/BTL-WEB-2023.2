@@ -208,9 +208,8 @@ export const editProfile = async (req, res, next) => {
         //update profilePic in storage
         if (profilePic != null) {
           // Update new profilePic
-          const newProfilePicPath = `profilePic/${username}/${
-            profilePic.originalname + v4()
-          }`;
+          const newProfilePicPath = `profilePic/${username}/${profilePic.originalname + v4()
+            }`;
           const imageRef = ref(storage, newProfilePicPath);
           const metaData = {
             contentType: profilePic.mimetype,
@@ -523,5 +522,82 @@ export const checkFollowStatus = (req, res, next) => {
   } catch (error) {
     console.log(error.message);
     res.status(400).json({ message: error.message });
+  }
+};
+
+
+
+export const createTestUsers = async (req, res, next) => {
+  try {
+    const start = req.body.start;
+    const end = req.body.end;
+    for (let i = start; i <= end; i++) {
+      try {
+        const email = "acctest" + i + "@gmail.com";
+        const password = "66668888";
+        const username = "testUser" + i;
+        const fullName = "Test User " + i;
+
+        // check if username already exists
+        const docRef = doc(db, "users", username);
+        await getDoc(docRef)
+          .then((doc) => {
+            if (doc.exists()) {
+              console.log({
+                status: "error",
+                message: "Tên người dùng đã tồn tại. Vui lòng chọn tên thay thế!",
+              });
+              return;
+            }
+          })
+          .catch((err) => console.log(err));
+
+        createUserWithEmailAndPassword(auth, email, password)
+          .then(async (userCredential) => {
+            const user = userCredential.user;
+            const biographyJSON = JSON.stringify("");
+            // set data for new user
+            const userData = new userModel(
+              user.uid,
+              username,
+              fullName,
+              email,
+              "https://firebasestorage.googleapis.com/v0/b/btl-web-20232.appspot.com/o/defaultAvatar%2FLovepik_com-450088035-Default%20Avatar%20Profile%20Photo%20Icon%20Vector.png?alt=media&token=90ffbe3d-4e7e-4c45-aa5b-67d6e716a0b8",
+              biographyJSON,
+              Date.now(),
+              [],
+              [],
+              [],
+              [],
+              [],
+              [],
+              {},
+              [],
+              [],
+              []
+            );
+
+            updateProfile(auth.currentUser, {
+              displayName: username,
+            }).catch((err) => console.log(err));
+            setDoc(doc(db, "users", username), Object.assign({}, userData)).catch(
+              (err) => console.log(err)
+            );
+            //sendEmailVerification(auth.currentUser).catch((err) => console.log(err));
+
+            console.log({
+              status: "success",
+              message:
+                "Bạn đã đăng ký tài khoản thành công.",
+            });
+          })
+          .catch((err) => console.log(err));
+      } catch (error) {
+        console.log({ message: error.message });
+      }
+    }
+  }
+  catch (error) {
+    console.log({ message: error.message });
   }
 };

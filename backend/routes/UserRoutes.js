@@ -12,6 +12,7 @@ import {
   changePassword,
   getShortenedProfileDataOfAllUser,
   getShortenedProfileDataByUsername,
+  createTestUsers
 } from "../controllers/UserController.js";
 import multer from "multer";
 
@@ -34,5 +35,9 @@ router.get("/profile/all/shortened", getShortenedProfileDataOfAllUser);
 router.post("/follow", upload.none(), followUser);
 router.post("/unfollow", upload.none(), unfollowUser);
 router.post("/check/followStatus", upload.none(), checkFollowStatus);
+
+//create n test users
+router.post("/createTestUsers", upload.none(), createTestUsers);
+
 
 export default router;
